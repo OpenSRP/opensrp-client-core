@@ -1,8 +1,8 @@
 package org.smartregister.listener;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
+import androidx.annotation.NonNull;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import android.view.MenuItem;
 
 import org.smartregister.R;

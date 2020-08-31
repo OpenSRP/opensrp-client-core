@@ -84,6 +84,7 @@ public class SecuredFragmentTest extends BaseUnitTest {
         Assert.assertNotNull(securedFragment);
     }
 
+    /*
     @Test
     public void testOnCreateInitializesFragmentFields() {
 
@@ -100,6 +101,8 @@ public class SecuredFragmentTest extends BaseUnitTest {
         Assert.assertNotNull(navigationController);
 
     }
+
+     */
 
     @Test
     public void assertOnResumeLogsOutCurrentUserIfContextIsUserLoggedOutIsTrue() {

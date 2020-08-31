@@ -1,7 +1,8 @@
 package org.smartregister.login.interactor;
 
 import android.content.DialogInterface;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;

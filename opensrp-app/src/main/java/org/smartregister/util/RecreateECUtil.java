@@ -1,7 +1,7 @@
 package org.smartregister.util;
 
 import android.database.Cursor;
-import android.support.v4.util.Pair;
+import androidx.core.util.Pair;
 
 import net.sqlcipher.database.SQLiteDatabase;
 

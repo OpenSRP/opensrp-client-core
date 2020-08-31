@@ -1,7 +1,7 @@
 package org.smartregister.view.activity.mock;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import org.smartregister.R;
 import org.smartregister.view.activity.BarcodeScanActivity;

@@ -113,6 +113,5 @@ public class SettingsActivityTest extends BaseUnitTest {
         Toast toast = ShadowToast.getLatestToast();
         assertEquals(Toast.LENGTH_SHORT, toast.getDuration());
         assertEquals(RuntimeEnvironment.application.getString(R.string.invalid_url_massage), ShadowToast.getTextOfLatestToast());
-
     }
 }

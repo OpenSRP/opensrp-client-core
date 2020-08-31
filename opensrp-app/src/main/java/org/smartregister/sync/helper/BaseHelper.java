@@ -2,7 +2,8 @@ package org.smartregister.sync.helper;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.smartregister.AllConstants;
 import org.smartregister.domain.SyncProgress;

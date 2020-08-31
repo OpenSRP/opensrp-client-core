@@ -1,8 +1,8 @@
 package org.smartregister.client;
 
-import junit.framework.Assert;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.junit.Assert;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -33,7 +33,7 @@ public class GZipEncodingHttpClientTest extends BaseUnitTest {
     @Test
     public void assertFetchContentNotNull() throws Exception {
         HttpGet httpGet = Mockito.mock(HttpGet.class);
-        HttpResponse httpResponse = new MockHttpResponse();
+        CloseableHttpResponse httpResponse = new MockHttpResponse();
 
         Mockito.when(defaultHttpClient.execute(Mockito.any(HttpGet.class))).thenReturn(httpResponse);
         Assert.assertNotNull(gZipEncodingHttpClient.fetchContent(httpGet));

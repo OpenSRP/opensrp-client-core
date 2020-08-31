@@ -7,9 +7,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -204,7 +205,7 @@ public class BaseLoginActivityTest extends BaseRobolectricUnitTest {
 
         @Override
         public void onCreate(@Nullable Bundle savedInstanceState) {
-            setTheme(R.style.AppTheme); //we need this here
+            setTheme(R.style.Theme_AppCompat_Light_DarkActionBar); //we need this here
             super.onCreate(savedInstanceState);
         }
     }

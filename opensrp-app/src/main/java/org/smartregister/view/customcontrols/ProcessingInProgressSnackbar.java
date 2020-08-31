@@ -1,15 +1,17 @@
 package org.smartregister.view.customcontrols;
 
-import android.support.annotation.NonNull;
-import android.support.design.widget.BaseTransientBottomBar;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
+
+import androidx.annotation.NonNull;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
+
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.smartregister.R;
 
@@ -21,7 +23,7 @@ import org.smartregister.R;
 public class ProcessingInProgressSnackbar extends BaseTransientBottomBar<Snackbar> {
 
     protected ProcessingInProgressSnackbar(@NonNull ViewGroup parent, @NonNull View content
-            , @NonNull android.support.design.snackbar.ContentViewCallback contentViewCallback) {
+            , @NonNull com.google.android.material.snackbar.ContentViewCallback contentViewCallback) {
         super(parent, content, contentViewCallback);
 
         getView().setBackgroundColor(ContextCompat.getColor(parent.getContext(), android.R.color.transparent));

@@ -1,9 +1,11 @@
 package org.smartregister.view.fragment;
 
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.GestureDetectorCompat;
+import com.google.android.material.appbar.AppBarLayout;
+import androidx.fragment.app.Fragment;
+import androidx.core.view.GestureDetectorCompat;
+import androidx.fragment.app.FragmentManager;
+
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -15,6 +17,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.powermock.reflect.Whitebox;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.BaseUnitTest;
 import org.smartregister.Context;
@@ -82,6 +85,9 @@ public class BaseProfileFragmentTest extends BaseUnitTest {
         Mockito.when(context.IsUserLoggedOut()).thenReturn(false);
         Mockito.doReturn(context).when(baseProfileFragment).context();
 
+        FragmentManager mChildFragmentManager = Mockito.mock(FragmentManager.class);
+        Whitebox.setInternalState(baseProfileFragment, "mChildFragmentManager", mChildFragmentManager);
+
         baseProfileFragment.onViewCreated(view, bundle);
 
         Mockito.verify(view).setOnTouchListener(baseProfileFragmentArgumentCaptor.capture());
@@ -96,6 +102,9 @@ public class BaseProfileFragmentTest extends BaseUnitTest {
 
         Mockito.when(context.IsUserLoggedOut()).thenReturn(false);
         Mockito.doReturn(context).when(baseProfileFragment).context();
+
+        FragmentManager mChildFragmentManager = Mockito.mock(FragmentManager.class);
+        Whitebox.setInternalState(baseProfileFragment, "mChildFragmentManager", mChildFragmentManager);
 
         GestureDetectorCompat gestureDetector = ReflectionHelpers.getField(baseProfileFragment, "gestureDetector");
         Assert.assertNull(gestureDetector);

@@ -8,8 +8,9 @@ buildscript {
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$androidToolsBuildGradle"
-        classpath 'org.apache.commons:commons-lang3:3.3.2'
-        classpath 'io.fabric.tools:gradle:1.30.0'
+        classpath 'org.apache.commons:commons-lang3:3.9'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.3'
+        classpath 'io.fabric.tools:gradle:1.31.2'
     }
 }
 
@@ -156,21 +157,21 @@ configurations.all {
 
 dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.5'
-    implementation 'net.zetetic:android-database-sqlcipher:4.1.3'
-    implementation 'com.android.support:multidex:1.0.3'
+    implementation 'net.zetetic:android-database-sqlcipher:4.2.0'
+    implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'org.codehaus.jackson:jackson-core-asl:1.9.13'
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support:support-v4:28.0.0'
-    implementation "org.apache.httpcomponents:httpmime:4.2.3"
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation "org.apache.httpcomponents:httpmime:4.5.6"
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.10'
-    implementation group: 'com.google.guava', name: 'guava', version: '20.0'
+    implementation group: 'com.google.guava', name: 'guava', version: '24.1-jre'
     implementation group: 'commons-io', name: 'commons-io', version: '2.4'
-    implementation 'org.apache.commons:commons-lang3:3.2'
+    implementation 'org.apache.commons:commons-lang3:3.9'
     implementation 'org.mozilla:rhino:1.7R4'
     implementation 'com.ocpsoft:ocpsoft-pretty-time:1.0.7'
-    api 'joda-time:joda-time:2.10.3'
+    api 'joda-time:joda-time:2.10.5'
     implementation 'com.github.bmelnychuk:atv:1.2.9'
-    implementation 'com.github.johnkil.print:print:1.2.3'
+    implementation 'com.github.johnkil.print:print:1.3.1'
 
     implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
         transitive = true
@@ -180,22 +181,22 @@ dependencies {
         exclude group: 'org.json', module: 'json'
     }
 
-    implementation 'com.github.ybq:Android-SpinKit:1.2.0'
+    implementation 'com.github.ybq:Android-SpinKit:1.4.0'
     implementation 'com.mcxiaoke.volley:library:1.0.19'
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     annotationProcessor fileTree(include: ['butterknife*.jar'], dir: 'libs')
 
     implementation 'com.cloudant:cloudant-http:2.7.0'
-    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
 
-    implementation('com.android.support:design:28.0.0') {
+    implementation('com.google.android.material:material:1.1.0') {
         exclude group: 'com.android.support', module: 'recyclerview-v7'
     }
 
     implementation 'com.evernote:android-job:1.2.6'
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.6'
-    implementation 'de.hdodenhof:circleimageview:2.2.0'
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
 
     implementation('org.smartregister:android-p2p-sync:0.3.7-SNAPSHOT') {
         exclude group: 'com.android.support', module: 'support-v4'
@@ -203,31 +204,40 @@ dependencies {
         exclude group: 'android.arch.core', module: 'runtime'
     }
 
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+
     implementation 'org.smartregister:opensrp-client-utils:0.0.2-SNAPSHOT'
 
     implementation 'org.smartregister:opensrp-plan-evaluator:0.1.0-SNAPSHOT'
 
     implementation 'xerces:xercesImpl:2.12.0'
+
+    def workVersion = "2.4.0"
+    implementation "androidx.work:work-runtime:$workVersion"
+    implementation "androidx.work:work-rxjava2:$workVersion"
+    implementation "androidx.work:work-gcm:$workVersion"
+    androidTestImplementation "androidx.work:work-testing:$workVersion"
 }
 
 dependencies {
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestImplementation 'junit:junit:4.12'
+    androidTestImplementation 'junit:junit:4.13'
 
     testImplementation group: 'com.google.android', name: 'android-test', version: '4.1.1.4'
     testImplementation 'org.apache.maven:maven-ant-tasks:2.1.3'
-    testImplementation 'org.mockito:mockito-core:1.9.5'
+    testImplementation 'org.mockito:mockito-core:3.1.0'
     testAnnotationProcessor fileTree(include: ['butterknife*.jar'], dir: 'libs')
 
-    testImplementation('org.robolectric:robolectric:4.0') {
+    testImplementation('org.robolectric:robolectric:4.3.1') {
         exclude group: 'com.google.guava', module: 'guava'
         exclude group: 'org.apache.maven', module: 'maven-model'
         exclude group: 'com.android.support'
         exclude group: 'androidx.test'
         exclude group: 'com.thoughtworks.xstream', module: 'xstream'
     }
-    testImplementation('org.robolectric:shadows-multidex:4.0') {
+
+    testImplementation('org.robolectric:shadows-multidex:4.3.1') {
         exclude group: 'com.google.guava', module: 'guava'
     }
 
@@ -240,6 +250,8 @@ dependencies {
     testImplementation "org.powermock:powermock-api-mockito2:$powerMockVersion"
     testImplementation("org.powermock:powermock-classloading-xstream:$powerMockVersion")
 
+    def fragmentVersion = "1.2.5"
+    testImplementation "androidx.fragment:fragment-testing:$fragmentVersion"
 }
 
 task clearJar(type: Delete) {

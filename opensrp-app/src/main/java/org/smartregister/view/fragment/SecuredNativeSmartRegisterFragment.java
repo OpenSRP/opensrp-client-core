@@ -5,7 +5,7 @@ import android.database.DataSetObserver;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.VisibleForTesting;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;

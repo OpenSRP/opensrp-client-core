@@ -1,7 +1,7 @@
 package org.smartregister.repository;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.smartregister.AllConstants;
 import org.smartregister.CoreLibrary;

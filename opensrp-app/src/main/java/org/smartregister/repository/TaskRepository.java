@@ -1,10 +1,11 @@
 package org.smartregister.repository;
 
 import android.content.ContentValues;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
 import com.ibm.fhir.model.resource.QuestionnaireResponse;

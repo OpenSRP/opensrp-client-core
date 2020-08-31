@@ -5,13 +5,10 @@ import android.view.View;
 
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.customshadows.FontTextViewShadow;
-import org.smartregister.shadows.ShadowDrawableResourcesImpl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,7 +18,7 @@ import java.util.Collection;
  */
 
 @RunWith(RobolectricTestRunner.class)
-@Config(application = TestApplication.class, shadows = {FontTextViewShadow.class, ShadowDrawableResourcesImpl.class}, sdk = Build.VERSION_CODES.P)
+@Config(application = TestApplication.class, shadows = {FontTextViewShadow.class}, sdk = Build.VERSION_CODES.P)
 @PowerMockIgnore({"org.mockito.*",
         "org.robolectric.*",
         "android.*",

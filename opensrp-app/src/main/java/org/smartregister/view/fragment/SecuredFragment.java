@@ -2,8 +2,8 @@ package org.smartregister.view.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.VisibleForTesting;
-import android.support.v4.app.Fragment;
+import androidx.annotation.VisibleForTesting;
+import androidx.fragment.app.Fragment;
 import android.view.MenuItem;
 
 import com.google.gson.Gson;

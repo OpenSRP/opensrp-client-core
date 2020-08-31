@@ -1,6 +1,6 @@
 package org.smartregister;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import org.smartregister.p2p.authorizer.P2PAuthorizationService;
 import org.smartregister.p2p.callback.SyncFinishedCallback;

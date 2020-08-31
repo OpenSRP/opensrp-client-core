@@ -1,6 +1,6 @@
 package org.smartregister.multitenant;
 
-import android.arch.persistence.db.SupportSQLiteOpenHelper;
+import androidx.sqlite.db.SupportSQLiteOpenHelper;
 import android.content.SharedPreferences;
 
 import org.junit.Before;
