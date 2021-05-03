@@ -8,8 +8,8 @@ buildscript {
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$androidToolsBuildGradle"
-        classpath 'org.apache.commons:commons-lang3:3.3.2'
-        classpath 'io.fabric.tools:gradle:1.30.0'
+        classpath 'org.apache.commons:commons-lang3:3.10'
+        classpath 'io.fabric.tools:gradle:1.31.2'
     }
 }
 
@@ -116,6 +116,7 @@ android {
         exclude 'LICENSE.txt'
         exclude 'META-INF/*'
     }
+
     testOptions {
         unitTests {
             includeAndroidResources = true
@@ -123,13 +124,20 @@ android {
     }
 }
 
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
 tasks.withType(Test) {
     jacoco.includeNoLocationClasses = true
     testLogging {
-        // to see the exceptions of failed tests in Travis-CI console.
-        exceptionFormat = 'full'
+        // Enables easier debugging of tests in Github Actions CI
+        events TestLogEvent.FAILED
+        exceptionFormat TestExceptionFormat.FULL
+        showExceptions true
+        showCauses true
+        showStackTraces true
     }
-    maxHeapSize = "2g"
+    maxHeapSize = "4g"
 }
 
 def filesToCopy = copySpec {
