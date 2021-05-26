@@ -18,9 +18,9 @@ project.properties
 build/
 .gradle
 *.log
-!opensrp-app/assets/web/build/
-!opensrp-app/assets/web/lib/enketo-core/build/
+!opensrp-core/assets/web/build/
+!opensrp-core/assets/web/lib/enketo-core/build/
 opensrp-path/fabric.properties
 opensrp-path/reports/
-opensrp-app/reports/
-opensrp-app/jacoco.exec
+opensrp-core/reports/
+opensrp-core/jacoco.exec

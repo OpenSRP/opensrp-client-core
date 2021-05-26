@@ -1,4 +1,4 @@
 rootProject.name = 'opensrp-client-core'
-include ':opensrp-app', ':sample'
+include ':opensrp-core', ':sample'
 
-project(':opensrp-app').projectDir = "$rootDir/opensrp-app" as File
+project(':opensrp-core').projectDir = "$rootDir/opensrp-core" as File

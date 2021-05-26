@@ -78,7 +78,7 @@ android {
 
 dependencies {
 
-    implementation (project(':opensrp-app')){
+    implementation (project(':opensrp-core')){
         transitive=true
         exclude group: 'com.ibm.fhir', module: 'fhir-model'
     }
