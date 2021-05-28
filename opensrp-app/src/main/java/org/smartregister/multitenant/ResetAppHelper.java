@@ -1,10 +1,10 @@
 package org.smartregister.multitenant;
 
 import android.content.SharedPreferences;
-import android.support.annotation.AnyThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.AnyThread;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.evernote.android.job.JobManager;
@@ -127,14 +127,11 @@ public class ResetAppHelper {
                         Timber.w("User %s has completely reset the app", application.getUsername());
                         performResetOperations();
                         appExecutors.mainThread()
-                                .execute(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        dismissDialog();
+                                .execute(() -> {
+                                    dismissDialog();
 
-                                        if (onCompleteClearDataCallback != null) {
-                                            onCompleteClearDataCallback.onComplete();
-                                        }
+                                    if (onCompleteClearDataCallback != null) {
+                                        onCompleteClearDataCallback.onComplete();
                                     }
                                 });
 
@@ -154,6 +151,7 @@ public class ResetAppHelper {
     protected void clearP2PDb() {
         P2POptions p2POptions = CoreLibrary.getInstance().getP2POptions();
         if (p2POptions != null && p2POptions.isEnableP2PLibrary()) {
+            p2POptions.setAuthorizationService(null);
             AppDatabase roomP2PDb = P2PLibrary.getInstance().getDb();
             roomP2PDb.clearAllTables();
             Utils.deleteRoomDb(application.getApplicationContext(), roomP2PDb.getOpenHelper().getDatabaseName());
@@ -207,9 +205,9 @@ public class ResetAppHelper {
 
     @Nullable
     public PreResetAppCheck removePreResetAppCheck(@NonNull String checkName) {
-        for (PreResetAppCheck preResetAppCheck: preResetAppChecks) {
+        for (PreResetAppCheck preResetAppCheck : preResetAppChecks) {
             if (checkName.equals(preResetAppCheck.getUniqueName())) {
-                if(removePreResetAppCheck(preResetAppCheck)) {
+                if (removePreResetAppCheck(preResetAppCheck)) {
                     return preResetAppCheck;
                 }
 

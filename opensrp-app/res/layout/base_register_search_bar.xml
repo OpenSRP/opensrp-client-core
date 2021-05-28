@@ -62,6 +62,7 @@
             android:layout_alignParentTop="true"
             android:layout_marginEnd="5dp"
             android:layout_marginRight="5dp"
+            android:foregroundTint="@color/white"
             android:drawableLeft="@drawable/ic_icon_filter"
             android:drawablePadding="@dimen/register_search_bar_min_margin"
             android:drawableStart="@drawable/ic_icon_filter"

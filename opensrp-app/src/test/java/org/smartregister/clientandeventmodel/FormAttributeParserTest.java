@@ -216,8 +216,8 @@ public class FormAttributeParserTest extends BaseUnitTest {
         Mockito.when(context.getAssets()).thenReturn(assetManager);
         FileInputStream formDefinitionIS = (new FileInputStream(getFileFromPath(this, formDefinition)));
         String stringOfFormDefinition = getStringFromStream(formDefinitionIS);
-        JsonParser jsonparser = new JsonParser();
-        Object obj = jsonparser.parse(stringOfFormDefinition);
+
+        Object obj = JsonParser.parseString(stringOfFormDefinition);
         Mockito.doReturn(obj).when(spyparser).getFormDefinitionData(FORMNAME);
         Mockito.when(assetManager.open(model)).thenReturn(new FileInputStream(getFileFromPath(this, model)));
         Mockito.when(assetManager.open(formJSON)).thenReturn(new FileInputStream(getFileFromPath(this, formMultiJSON)));

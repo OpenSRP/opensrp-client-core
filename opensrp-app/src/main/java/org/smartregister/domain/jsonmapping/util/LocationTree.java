@@ -3,6 +3,7 @@ package org.smartregister.domain.jsonmapping.util;
 import org.smartregister.domain.jsonmapping.Location;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -55,5 +56,13 @@ public class LocationTree {
 
     public LinkedHashMap<String, TreeNode<String, Location>> getLocationsHierarchy() {
         return locationsHierarchy.getTree();
+    }
+
+    public LinkedHashMap<String, LinkedHashSet<String>> getChildParent() {
+        return locationsHierarchy.getChildParent();
+    }
+
+    public void deleteLocation(String locationId) {
+        locationsHierarchy.deleteNode(locationId);
     }
 }

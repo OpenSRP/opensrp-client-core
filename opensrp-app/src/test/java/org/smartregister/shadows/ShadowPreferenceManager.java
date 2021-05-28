@@ -3,7 +3,8 @@ package org.smartregister.shadows;
 import android.content.Context;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.support.annotation.XmlRes;
+
+import androidx.annotation.XmlRes;
 
 import org.robolectric.annotation.Implementation;
 import org.robolectric.annotation.Implements;

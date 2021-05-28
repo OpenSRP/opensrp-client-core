@@ -26,12 +26,12 @@ public class LocationTagRepository extends BaseRepository {
     protected static final String NAME = "name";
     protected static final String LOCATION_ID = "location_id";
     protected static final String LOCATION_TAG_TABLE = "location_tag";
-    protected static final String[] COLUMNS = new String[]{NAME,LOCATION_ID};
+    protected static final String[] COLUMNS = new String[]{NAME, LOCATION_ID};
     private static final String CREATE_LOCATION_TAG_TABLE =
             "CREATE TABLE " + LOCATION_TAG_TABLE + " (" +
                     NAME + " VARCHAR NOT NULL, " +
                     LOCATION_ID + " VARCHAR NOT NULL, " +
-                    "PRIMARY KEY ("+NAME+", "+LOCATION_ID+")) ";
+                    "PRIMARY KEY (" + NAME + ", " + LOCATION_ID + ")) ";
 
     protected static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HHmm")
             .registerTypeAdapter(LocationProperty.class, new PropertiesConverter()).create();
@@ -46,6 +46,7 @@ public class LocationTagRepository extends BaseRepository {
 
     /**
      * this method is used to save/update locationTags
+     *
      * @param locationTag to be saved or updated if it already exists.
      */
     public void addOrUpdate(LocationTag locationTag) {
@@ -59,7 +60,8 @@ public class LocationTagRepository extends BaseRepository {
     }
 
     /**
-     *  this method returns a list of all location tags stored
+     * this method returns a list of all location tags stored
+     *
      * @return a list of all location tags stored
      */
     public List<LocationTag> getAllLocationTags() {
@@ -82,6 +84,7 @@ public class LocationTagRepository extends BaseRepository {
 
     /**
      * Get a list of location tags for the passed locationId
+     *
      * @param id of a location to obtain it's tags
      * @return a list of tags for the passed location
      */
@@ -99,11 +102,31 @@ public class LocationTagRepository extends BaseRepository {
 
     }
 
+    /**
+     * Get a list of locations for the passed tagName
+     *
+     * @param tagName Tag Name
+     * @return a list of location tags for the passed tag name
+     */
+    public List<LocationTag> getLocationTagsByTagName(String tagName) {
+        List<LocationTag> locationTags = new ArrayList<>();
+
+        try (Cursor cursor = getReadableDatabase().rawQuery("SELECT * FROM " + getLocationTagTableName() +
+                " WHERE " + NAME + " =?", new String[]{tagName})) {
+            while (cursor.moveToNext()) {
+                locationTags.add(readCursor(cursor));
+            }
+        } catch (Exception e) {
+            Timber.e(e);
+        }
+
+        return locationTags;
+    }
+
     protected LocationTag readCursor(Cursor cursor) {
         LocationTag locationTag = new LocationTag();
         locationTag.setName(cursor.getString(cursor.getColumnIndex(NAME)));
         locationTag.setLocationId(cursor.getString(cursor.getColumnIndex(LOCATION_ID)));
         return locationTag;
     }
-
 }

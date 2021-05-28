@@ -7,33 +7,31 @@
     <string name="login_text">Ingia kwenye mfumo</string>
     <string name="logout_text">Toka kwenye mfumo</string>
     <string name="image_description">Nembo</string>
-    <string name="spacer">spacer</string>
-    <string name="loggin_in_dialog_title">Kuingia kwenye mfumo</string>
+    <string name="spacer">Spacer</string>
+    <string name="loggin_in_dialog_title">Kuingia kwenye mfumo..</string>
     <string name="loggin_in_dialog_message">Tafadhali subiri</string>
-    <string name="login_failed_dialog_title">Log in failed</string>
-    <string name="login_failed_dialog_message">Tafadhali angalia utambulisho</string>
-    <string name="form_back_confirm_dialog_message">Una uhakika unataka kurudi nyuma? Takwimu zote ulizoingiza kwenye 
-         fomu hii zitafutika na kupotea.</string>
-    <string name="form_back_confirm_dialog_title">Thibitisha kufunga fomu</string>
+    <string name="login_failed_dialog_title">Imeshindikana kuingia</string>
+    <string name="login_failed_dialog_message">Tafadhali angalia sifa za mtumiaji</string>
+    <string name="form_back_confirm_dialog_message">Una uhakika unataka kurudi nyuma? Data zote ulizoingiza kwenye fomu hii zitafutika.</string>
+    <string name="form_back_confirm_dialog_title">Hakiki kufunga fomu</string>
     <string name="yes_button_label">Ndiyo</string>
     <string name="no_button_label">Hapana</string>
 
     <string name="home_ec_label">Wanandoa wanaofaa</string>
-    <string name="home_fp_label">UZAZI WA MPANGO</string>
-    <string name="home_anc_label">WAJAWAZITO</string>
-    <string name="home_pnc_label">BAADA YA KUJIFUNGUA</string>
+    <string name="home_fp_label">Uzazi wa Mpango</string>
+    <string name="home_anc_label">Wajawazito</string>
+    <string name="home_pnc_label">Baada ya Kujifungua</string>
     <string name="home_child_label">Mtoto</string>
     <string name="home_report_label">Kutoa taarifa</string>
     <string name="register_label">Rejesta</string>
     <string name="home_videos_label">Video</string>
 
-    <string name="videos_cannot_play_video_dialog_title">Haiwezekani kucheza video</string>
-    <string name="videos_IEC_not_installed_dialog_message">Tafadhali weka programu ya IEC kucheza video.</string>
-    <string name="videos_unknown_error_dialog_message">Haiwezi kucheza video kutokana na hitilafu ya kiufundi</string>
-    <string name="settings_logout_confirm_title">Hakiki kutoka kwenye mfumo</string>
-    <string name="settings_logout_confirm_dialog_message">Je, una uhakika unataka kutoka? Takwimu zote
-zitafutwa</string>
-    <string name="unsynced_forms_count_message">fomu hazijasync</string>
+    <string name="videos_cannot_play_video_dialog_title">Haiwezi kuonesha video</string>
+    <string name="videos_IEC_not_installed_dialog_message">Tafadhali pakua programu ya IEC kuonesha video</string>
+    <string name="videos_unknown_error_dialog_message">Video haiwezi kucheza kwa sababu ya hitilafu ya kiufundi</string>
+    <string name="settings_logout_confirm_title">Hakiki kutoka</string>
+    <string name="settings_logout_confirm_dialog_message">Una uhakika unataka kutoka kwenye mfumo? Data zote ulizoingiza zitafutika.</string>
+    <string name="unsynced_forms_count_message">Fomu haijasync</string>
 
     <string name="str_next">Inayofuata &gt;&gt;</string>
     <string name="str_previous">&lt;&lt; iliyotangulia</string>
@@ -49,10 +47,10 @@ zitafutwa</string>
 
     <string name="couple_selection">Wanandoa wote wanaofaa</string>
     <string name="str_ec_search_hint">Tafuta</string>
-    <string name="str_fp_search_hint">Tafuta Rejesta ya Uzazi wa pango</string>
-    <string name="str_pnc_search_hint">Tafuta Rejesta ya Baada ya kujifungua</string>
-    <string name="str_child_search_hint">Tafuta Rejesta ya Mtoto</string>
-    <string name="label_sorted_by">Imepangwa Kwa:</string>
+    <string name="str_fp_search_hint">Tafuta Rejesta ya Uzazi wa Mpango</string>
+    <string name="str_pnc_search_hint">Tafuta Rejesta ya Baada ya Kujifungua</string>
+    <string name="str_child_search_hint">Tafuta Rejesta ya Watoto</string>
+    <string name="label_sorted_by">Imepangwa kwa:</string>
     <string name="label_village">, Kijiji:</string>
     <string name="ec_register_wife_age">({0})</string>
 
@@ -63,10 +61,10 @@ zitafutwa</string>
     <string name="status_delivery">Kujifungua:</string>
     <string name="str_lmp">HEDHI YA MWISHO:</string>
     <string name="str_edd">TAREHE YA MATARAJIO:</string>
-    <string name="str_anc">WAJAWAZITO</string>
-    <string name="str_pnc">BAADA YA KUJIFUNGUA</string>
-    <string name="str_fp">UZAZI WA MPANGO</string>
-    <string name="str_number_of_strips">No. strips:</string>
+    <string name="str_anc">Wajawazito</string>
+    <string name="str_pnc">Baada ya Kujifungua</string>
+    <string name="str_fp">Uzazi wa Mpango</string>
+    <string name="str_number_of_strips">No. Strips:</string>
     <string name="str_number_given">No. Amepewa:</string>
     <string name="str_gravida">G</string>
     <string name="str_parity">P</string>
@@ -84,7 +82,7 @@ zitafutwa</string>
     <string name="sort_by_st_label">ST</string>
     <string name="sort_by_high_priority_label">Kipaumbele cha Juu (KJ)</string>
     <string name="sort_by_high_risk_pregnancy_label">HRP</string>
-    <string name="sort_by_high_risk_label">Hatari kubwa (HK)</string>
+    <string name="sort_by_high_risk_label">Hatari Kubwa (HK)</string>
     <string name="sort_by_bpl_label">BPL</string>
 
     <string name="filter_by_all_label">Wote</string>
@@ -103,7 +101,7 @@ zitafutwa</string>
     <string name="report_month_sample_text">26/03 - 25/04</string>
     <string name="str_switch_language">Badilisha lugha</string>
 
-    <string name="str_register_anc_visit_form">Hudhurio la mjamzito</string>
+    <string name="str_register_anc_visit_form">Tembeleo la mjamzito</string>
     <string name="str_register_hb_test_form">Kipimo cha Hb</string>
     <string name="str_register_ifa_form">Vidonge vya kuongeza damu</string>
     <string name="str_register_tt_form">Pepopunda</string>
@@ -181,8 +179,8 @@ zitafutwa</string>
     <string name="service_type_dpt_booster_2_short">DPT B2</string>
     <string name="pentavalent_short">Pentav</string>
 
-    <string name="fp_register_title_in_short">FP:</string>
-    <string name="pnc_register_title_in_short">PNC:</string>
+    <string name="fp_register_title_in_short">Uzazi wa Mpango</string>
+    <string name="pnc_register_title_in_short">Baada ya Kujifungua</string>
     <string name="header_method">NJIA</string>
     <string name="header_side_effects">MADHARA</string>
     <string name="header_followup_refill">UFUATILIAJI</string>
@@ -221,34 +219,34 @@ zitafutwa</string>
     <string name="header_child">MTOTO</string>
     <string name="header_days_pp">DAYS PP</string>
     <string name="header_first_seven_days">SIKU 7 ZA KWANZA</string>
-    <string name="header_pnc_visits">MAHUDHURIO BAADA YA KUJIFUNGUA</string>
+    <string name="header_pnc_visits">MATEMBELEO BAADA YA KUJIFUNGUA</string>
 
     <string name="pnc_register_service_mode_overview">Muhtasari</string>
-    <string name="pnc_register_service_mode_pnc_visits">Mahudhurio baada ya kujifungua</string>
+    <string name="pnc_register_service_mode_pnc_visits">Matembeleo baada ya kujifungua</string>
 
-    <string name="str_pnc_visit_form">Hudhurio baada ya kujifungua</string>
+    <string name="str_pnc_visit_form">Tembeleo baada ya kujifungua</string>
     <string name="str_pnc_postpartum_family_planning_form">Uzazi wa mpango ndani ya masaa 48 baada ya kujifungua</string>
     <string name="str_pnc_close_form">PNC Close</string>
 
     <string name="str_referred">Amepewa rufaa</string>
-    <string name="str_referral">rufaa</string>
-    <string name="str_follow_up">ufuatiliaji</string>
-    <string name="str_refill">jaza tena</string>
+    <string name="str_referral">Rufaa</string>
+    <string name="str_follow_up">Ufuatiliaji</string>
+    <string name="str_refill">Jaza tena</string>
     <string name="str_update">Update</string>
     <string name="str_side_effects">Madhara</string>
 
     <string name="anc_label">Wajawazito:</string>
     <string name="hb_test_label">Kipimo cha kiwango cha damu</string>
-    <string name="edd_label">TAREHE YA MATARAJIO:</string>
+    <string name="edd_label">Tarehe ya matarajio: </string>
     <string name="str_days_past_due">Siku zinazostahili zimepita</string>
     <string name="lmp_label">HEDHI YA MWISHO:</string>
-    <string name="str_weeks">wiki</string>
+    <string name="str_weeks">Wiki</string>
     <string name="anc_register_title_in_short">Wajawazito:</string>
     <string name="str_bp">Shinikizo la damu</string>
     <string name="str_weight">Uzito</string>
     <string name="str_anc_search_hint">Tafuta rejesta ya wajawazito</string>
     <string name="anc_service_mode_overview">Muhtasari</string>
-    <string name="anc_service_mode_anc_visits">Mahudhurio wakati wa ujauzito</string>
+    <string name="anc_service_mode_anc_visits">Matembeleo wakati wa ujauzito</string>
     <string name="anc_service_mode_tt">Pepopunda</string>
     <string name="anc_service_mode_hb_ifa">Kiwango cha damu / Vidonge vya kuongeza damu</string>
     <string name="anc_service_mode_delivery_plan">Taarifa za kujifungua</string>
@@ -262,7 +260,7 @@ zitafutwa</string>
     <string name="header_anc_3">WAJAWAZITO 3</string>
     <string name="header_anc_4">WAJAWAZITO 4</string>
     <string name="header_other">Nyingine</string>
-    <string name="header_visits">MAHUDHURIO</string>
+    <string name="header_visits">Matembeleo</string>
     <string name="header_tt">Pepopunda</string>
     <string name="header_tt_1">Pepopunda 1</string>
     <string name="header_tt_2">Pepopunda 2</string>
@@ -272,7 +270,7 @@ zitafutwa</string>
     <string name="header_delivery_plan">TAARIFA ZA KUJIFUNGUA</string>
     <string name="str_delivery_at">Sehemu ya kujifungulia</string>
     <string name="str_transport">Usafiri:</string>
-    <string name="str_has_companion">Ana mwenzi:</string>
+    <string name="str_has_companion">Ana mwenza</string>
     <string name="str_asha">Asha:</string>
     <string name="str_contact">Wasiliana:</string>
     <string name="str_risks_reviewed">Hatari zilizohakikiwa:</string>
@@ -285,7 +283,7 @@ zitafutwa</string>
     <string name="str_pnc_child_weight">Uzito: %1$s kg</string>
     <string name="str_pnc_dob_label">Tarehe ya kuzaliwa</string>
 
-    <string name="str_pnc_clause">Baada ya kujifungua</string>
+    <string name="str_pnc_clause">Baada ya Kujifungua</string>
     <string name="str_pnc_circle_type_expected">inatarajiwa</string>
     <string name="str_pnc_circle_type_actual">halisi</string>
     <string name="str_pnc_circle_status_done">imefanyika</string>
@@ -295,7 +293,7 @@ zitafutwa</string>
     <string name="str_pnc_circle_color_red">nyekundu</string>
     <string name="str_child_illness_ari">ari</string>
     <string name="str_child_illness_sam">sam</string>
-    <string name="str_pnc_visit_button_label">Hudhurio baada ya kujifungua</string>
+    <string name="str_pnc_visit_button_label">Tembeleo baada ya kujifungua</string>
 
     <string name="ic_check_circle_blank">&#xe03e;</string>
     <string name="ic_keyboard_arrow_down">&#xe0c5;</string>
@@ -309,8 +307,8 @@ zitafutwa</string>
     <string name="str_provider_profile">Wasifu</string>
     <string name="device_time_ok">Muda kwenye kifaa hiki uko sahihi </string>
     <string name="timezone_mismatch">Tafadhali badili majira kuwa \'%1$s\' kwenye mipangilio ya kifaa kabla ya kuingia kwenye mfumo</string>
-    <string name="time_mismatch">Muda kwenye kifaa hiki sio sahihi. Tafadhali sahihisha kabla ya kuendelea</string>
-    <string name="time_error">Haijaweza kuamua kama muda kwenye kifaa hiki ni sahihi</string>
+    <string name="time_mismatch">Saa ya kwenye kifaa hiki sio sahihi. Rekebisha kabla ya kuendelea</string>
+    <string name="time_error">Imeshindikana kutambua kama saa ya kifaa hiki iko sahihi</string>
 
     <!-- bottom navigation menu -->
     <string name="clients_menu">Wateja</string>
@@ -335,16 +333,18 @@ zitafutwa</string>
     <string name="error_invalid_password">Neno la siri fupi sana</string>
     <string name="error_incorrect_password">Neno la siri sio sahihi</string>
     <string name="registration_info">Taarifa za usajili</string>
-    <string name="app_version">App version: %1$s (built on %2$s)</string>
-    <string name="show_password_text">Onesha neno la siri</string>
+    <string name="app_version">App Version: %1$s (built on %2$s)</string>
+    <string name="show_password_text">Onyesha neno la siri</string>
     <string name="application_module_text">OpenSRP \n Application</string>
     <string name="error_field_required">Sehemu hii inahitajika</string>
-    <string name="please_wait_message">Tafadhali subiri</string>
+    <string name="please_wait_message">Tafadhali Subiri</string>
     <string name="sync_failed_no_internet">Sync imeshindwa. Angalia mtandao wako.</string>
     <string name="syncing">Syncing...</string>
     <string name="sync_failed">Sync imeshindikana</string>
     <string name="sync_complete">Sync imekamilika</string>
-    <string name="manual_sync_triggered">Manual Sync triggered&#8230;</string>
+    <string name="manual_sync_triggered">Manual Sync Triggered&#8230;</string>
+    <string name="remote_login_generic_error">Hitalfu imetokea wakati wa kuingia server. Tafadhali jaribu tena.</string>
+    <string name="remote_login_base_url_missing_error">OpenSRP Base URL haipatikani. Tafadhali ongeza ndani ya settings na jaribu tena.</string>
 
     <!-- base register -->
     <string name="filter">Filter</string>
@@ -366,8 +366,8 @@ zitafutwa</string>
 
     <!--The barcode strings-->
     <string name="ok">OK</string>
-    <string name="permission_camera_rationale">Ufikiaji wa kamera unahitajika</string>
-    <string name="no_camera_permission">This application cannot run because it does not have the camera permission. The application will now exit.</string>
+    <string name="permission_camera_rationale">Access to the camera is needed for detection.</string>
+    <string name="no_camera_permission">This application cannot run because it does not have permission to access the camera. The application will now exit.</string>
     <string name="low_storage_error">Face detector dependencies cannot be downloaded due to low device storage</string>
     <string name="title_activity_main">Barcode Reader Sample</string>
     <string name="barcode_header">Click &quot;Read Barcode&quot; kusoma barcode</string>
@@ -379,22 +379,24 @@ zitafutwa</string>
     <string name="barcode_error">Hitilafu kwenye usomaji wa barcode: %1$s</string>
 
     <string name="allow_camera_management">Unatakiwa kuruhusu mfumo kutumia kamera ili kuscan msimbo wa QR&#8230;</string>
-    <string name="unauthorized_group">Kikundi cha watumiaji wako hakiruhusiwi kwenye kifaa hiki</string>
+    <string name="unauthorized_group">Kundi lako la halipatikani kwenye kifaa hiki</string>
     <string name="opensrp_url">http://27.147.129.50:9979</string>
-    <string name="no_internet_connectivity">Hakuna mtandao. Tafadhali hakikisha umeunganisha data</string>
-    <string name="unknown_response">Umeshindwa kuingia kwenye mfumo. Jaribu baadae</string>
-    <string name="unauthorized">Tafadhali anglia sifa za kuingia kwenye mfumo</string>
+    <string name="no_internet_connectivity">Hakuna mtandao. Tafadhali hakikisha mtandao wa data</string>
+    <string name="unknown_response">Imeshindikana kuingia. Tafadhali jaribu baadae</string>
+    <string name="unauthorized">Tafadhali angalia sifa za mtumiaji</string>
 
     <string name="account_disabled">Akaunti imefungwa</string>
-    <string name="account_disabled_logged_off">Umetolewa nje ya mfumo sababu akaunti yako imefungwa. Wasiliana na msimamizi wa mfumo</string>
+    <string name="account_disabled_logged_off">Umetolewa nje ya mfumo na akaunti yako imezuiliwa. Tafadhali wasiliana na msimaizi</string>
+    <string name="account_new_assignment_logged_off">Umetolewa nje ya mfumo. Ingia tena.</string>
+    <string name="default_location_revoked_logged_off">Umetolewa nje ya mfumo kwa sababu haupo mahali.</string>
 
     <!--Alerts-->
     <string name="invalid_url_massage">Tafadhali ingiza url sahihi</string>
     <string name="language_change_prepend_message">Uchaguzi wa lugha pendwa kuwa</string>
-    <string name="language_change_append_message">Tafadhali fungua tena mfumo</string>
-    <string name="photo_captured">Picha imepigwa</string>
+    <string name="language_change_append_message">Tafadhali anzisha upya mfumo</string>
+    <string name="photo_captured">Picha imechukuliwa</string>
 
-    <string name="log_data_type_provided_does_not_exist_in_the_sender">Aina ya data %s iliyotolewa haipatikani kwa mtumaji</string>
+    <string name="log_data_type_provided_does_not_exist_in_the_sender">Aina ya data %s iliyowekwa haipo kwa mtuma data</string>
 
     <string name="currently_processing_transferred_records">Rekodi zilizohamishwa zinafanyiwa kazi sasa</string>
     <string name="do_not_edit_client_records_until_complete">Usihariri rekodi za mteja mpaka mchakato ukamilike.</string>
@@ -411,8 +413,29 @@ zitafutwa</string>
     <string name="x_months_weeks">%1$dm %2$dw</string>
     <string name="x_years">%1$dy</string>
     <string name="x_years_months">%1$dy %2$dm</string>
-    <string name="msg_empty_url">URL haiwezekani kwa wazi</string>
-    <string name="sync_failed_malformed_url">Sync failed. Check Url Configuration</string>
-    <string name="sync_failed_timeout_error">Sync imeshindwa. Haikuunganishwa kwenye server</string>
+    <string name="msg_empty_url">URL haiwezi kuwa wazi</string>
+    <string name="sync_failed_malformed_url">Sync imeshindikana. Tafadhali angalia URL</string>
+    <string name="sync_failed_timeout_error">Sync imeshindikana. Server haikuunganishwa</string>
 
+    <string name="outdated_app">Mfumo huu ni wa zamani. Tafadhali ingiza toleo jipya ili kuendelea</string>
+    <string name="sync_upload_progress_float">Hatua iliyofikia sync %d%%</string>
+    <string name="cancelling">Ghairi...</string>
+    <string name="stopping_services">Simamisha huduma..</string>
+    <string name="performing_data_checks">Fanya ukaguzi wa data...</string>
+    <string name="app_reset_status">App Reset Status</string>
+    <string name="clearing_application_data">Futa data kwenye application</string>
+    <string name="clear_data_dialog_title">Unataka kufuta data ili kuingia na timu / eneo tofauti</string>
+    <string name="clear_data_dialog_message">Unajaribu kuingia na mtumiaji katika timu / eneo tofauti. Kutuma data isiyomalizika na kufuta data kwa mtumiaji %s kwenye Timu %s ni lazima. Je, unataka kuendelea?</string>
+    <string name="replication_error_occurred">Kosa la kurudia limetokea</string>
+    <string name="form_update_title">Huisha fomu</string>
+    <string name="form_update_message">Hii fomu imehuishwa</string>
+    <string name="current_corrupted_form">(Current Corrupted Form)</string>
+    <string name="rollback_dialog_title">Chagua fomu iliyopita</string>
+    <string name="cannot_select_corrupted_form_rollback">Huwezi kuchagua fomu hii kwa sababu imeharibika!</string>
+    <string name="form_changed_reopen_to_take_effect">Fomu imechaguliwa kikamilifu! Fungua tena ili mabadiriko yaweze kutokea</string>
+    <string name="component_desc_image_upload_service">Weka picha kwa OpenSRP server</string>
+    <string name="component_desc_account_service"> Manages user authentication and authorization</string>
+    <string name="component_desc_p2p_process_records_service">Processes the records when using peer to peer for file sharing</string>
+    <string name="new_db_encryption_version_migration">Umetolewa nje ya mfumo. Tafadhali ingia tena.</string>
+    <string name="account_removed">Umetolewa nje ya mfumo. Ingia tena.</string>
 </resources>

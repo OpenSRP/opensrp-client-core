@@ -1,7 +1,6 @@
 package org.smartregister.presenter;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.res.Resources;
 
 import org.junit.Before;
@@ -52,7 +51,7 @@ public class BaseLoginPresenterTest {
         doReturn(resources).when(context).getResources();
         doReturn("string").when(resources).getString(anyInt());
 
-        presenter.attemptLogin("", "");
+        presenter.attemptLogin("", "".toCharArray());
         verify(view).showErrorDialog(any());
     }
 }

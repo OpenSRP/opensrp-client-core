@@ -1,9 +1,11 @@
 package org.smartregister.shadows;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
-import android.support.design.widget.Snackbar;
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
+
 import android.view.View;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import org.robolectric.annotation.Implementation;
 import org.robolectric.annotation.Implements;

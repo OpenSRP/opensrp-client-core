@@ -1,5 +1,7 @@
 package org.smartregister.sample.application;
 
+import org.smartregister.AllConstants;
+import org.smartregister.BuildConfig;
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
 import org.smartregister.view.activity.DrishtiApplication;
@@ -23,9 +25,9 @@ public class SampleApplication extends DrishtiApplication {
         context.updateApplicationContext(getApplicationContext());
 
         //Initialize Modules
-        CoreLibrary.init(context, null);
+        CoreLibrary.init(context, new SampleSyncConfiguration(), BuildConfig.BUILD_TIMESTAMP);
 
-        getRepository().getReadableDatabase();
+        context.allSharedPreferences().savePreference(AllConstants.DRISHTI_BASE_URL, CoreLibrary.getInstance().context().getAppProperties().getProperty(AllConstants.DRISHTI_BASE_URL));
     }
 
     public static synchronized SampleApplication getInstance() {
@@ -36,11 +38,6 @@ public class SampleApplication extends DrishtiApplication {
     @Override
     public void logoutCurrentUser() {
 
-    }
-
-    @Override
-    public String getPassword() {
-        return "sample-password";
     }
 
 }

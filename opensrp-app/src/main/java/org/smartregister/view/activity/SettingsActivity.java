@@ -3,6 +3,7 @@ package org.smartregister.view.activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
@@ -32,8 +33,13 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     @Override
     protected void attachBaseContext(android.content.Context base) {
         // get language from prefs
+
         String lang = LangUtils.getLanguage(base.getApplicationContext());
-        super.attachBaseContext(LangUtils.setAppLocale(base, lang));
+        Configuration newConfiguration = LangUtils.setAppLocale(base, lang);
+
+        super.attachBaseContext(base);
+
+        applyOverrideConfiguration(newConfiguration);
     }
 
     @Override
@@ -86,7 +92,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     public void onClick(View view) {
 
         String newValue = baseUrlEditTextPreference.getEditText().getText().toString();
-        if (newValue != null && UrlUtil.isValidUrl(newValue)) {
+        if (newValue != null && UrlUtil.isValidUrl(newValue) && UrlUtil.isValidEnvironment(newValue)) {
             baseUrlEditTextPreference.onClick(null, DialogInterface.BUTTON_POSITIVE);
             dialog.dismiss();
         } else {
@@ -127,6 +133,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
                             } else {
                                 baseUrlEditTextPreference.getEditText().setError(getString(R.string.invalid_url_massage));
                             }
+                        } else if (!UrlUtil.isValidEnvironment(text)) {
+                            baseUrlEditTextPreference.getEditText().setError(getString(R.string.no_client_available_for_url));
                         } else {
                             baseUrlEditTextPreference.getEditText().setError(null);
                         }

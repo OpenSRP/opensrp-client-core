@@ -2,7 +2,7 @@ package org.smartregister.cursoradapter;
 
 import android.content.Context;
 import android.os.Build;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;

@@ -32,12 +32,12 @@ public class ReportRepository extends DrishtiRepository {
     }
 
     public void update(Report report) {
-        SQLiteDatabase database = masterRepository.getWritableDatabase();
+        SQLiteDatabase database = masterRepository().getWritableDatabase();
         database.replace(REPORT_TABLE_NAME, null, createValuesFor(report));
     }
 
     public List<Report> allFor(String... indicators) {
-        SQLiteDatabase database = masterRepository.getReadableDatabase();
+        SQLiteDatabase database = masterRepository().getReadableDatabase();
         Cursor cursor = database.rawQuery(
                 String.format("SELECT * FROM %s WHERE %s IN (%s)", REPORT_TABLE_NAME,
                         INDICATOR_COLUMN, insertPlaceholdersForInClause(indicators.length)),
@@ -46,7 +46,7 @@ public class ReportRepository extends DrishtiRepository {
     }
 
     public List<Report> all() {
-        SQLiteDatabase database = masterRepository.getReadableDatabase();
+        SQLiteDatabase database = masterRepository().getReadableDatabase();
         Cursor cursor = database
                 .query(REPORT_TABLE_NAME, REPORT_TABLE_COLUMNS, null, null, null, null, null);
         return readAll(cursor);

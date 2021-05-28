@@ -9,20 +9,21 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.robolectric.RobolectricTestRunner;
+import org.mockito.stubbing.Answer;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.AllConstants;
+import org.smartregister.BaseRobolectricUnitTest;
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
-import org.smartregister.SyncConfiguration;
+import org.smartregister.TestApplication;
 import org.smartregister.customshadows.ShadowOpenSRPImageLoader;
 import org.smartregister.domain.ProfileImage;
 import org.smartregister.p2p.model.DataType;
@@ -31,14 +32,14 @@ import org.smartregister.view.activity.DrishtiApplication;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.TreeSet;
 
 
 /**
  * Created by Ephraim Kigamba - nek.eam@gmail.com on 03-03-2020.
  */
-@RunWith(RobolectricTestRunner.class)
-@Config(sdk = 27, shadows = {ShadowOpenSRPImageLoader.class})
-public class P2PReceiverTransferDaoTest {
+@Config(shadows = {ShadowOpenSRPImageLoader.class})
+public class P2PReceiverTransferDaoTest extends BaseRobolectricUnitTest {
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -63,7 +64,10 @@ public class P2PReceiverTransferDaoTest {
 
     @Before
     public void setUp() throws Exception {
-        context = Mockito.spy(Context.getInstance());
+        context = Mockito.spy(CoreLibrary.getInstance().context());
+
+        ReflectionHelpers.setField(CoreLibrary.getInstance(), "context", context);
+
         Mockito.doReturn(RuntimeEnvironment.application).when(context).applicationContext();
         Mockito.doReturn(eventClientRepository).when(context).getEventClientRepository();
         Mockito.doReturn(structureRepository).when(context).getStructureRepository();
@@ -73,15 +77,13 @@ public class P2PReceiverTransferDaoTest {
         Mockito.doReturn(foreignEventClientRepository).when(context).getForeignEventClientRepository();
         Mockito.doReturn(true).when(context).hasForeignEvents();
 
-        CoreLibrary.init(context, Mockito.mock(SyncConfiguration.class));
         p2PReceiverTransferDao = Mockito.spy(new P2PReceiverTransferDao());
-        Mockito.doReturn(classifier).when(p2PReceiverTransferDao).getP2PClassifier();
+        ((TestApplication) TestApplication.getInstance()).setP2PClassifier(classifier);
     }
 
     @After
     public void tearDown() throws Exception {
-        ReflectionHelpers.setStaticField(Context.class, "context", null);
-        ReflectionHelpers.setStaticField(CoreLibrary.class, "instance", null);
+        initCoreLibrary();
     }
 
     @Test
@@ -102,7 +104,7 @@ public class P2PReceiverTransferDaoTest {
     }
 
     @Test
-    public void receiveJsonShouldCallEventClientRepositoryBatchInsertEvents() throws JSONException {
+    public void receiveJsonShouldCallEventClientRepositoryBatchInsertEventsWhenDataTypeIsEvent() throws JSONException {
         DataType dataType = new DataType(p2PReceiverTransferDao.event.getName(), DataType.Type.NON_MEDIA, 1);
         JSONObject jsonObject = new JSONObject();
         JSONArray jsonArray = new JSONArray();
@@ -113,7 +115,7 @@ public class P2PReceiverTransferDaoTest {
     }
 
     @Test
-    public void receiveJsonShouldCallEventClientRepositoryBatchInsertClients() throws JSONException {
+    public void receiveJsonShouldCallEventClientRepositoryBatchInsertClientsWhenDataTypeIsClient() throws JSONException {
         DataType dataType = new DataType(p2PReceiverTransferDao.client.getName(), DataType.Type.NON_MEDIA, 1);
         JSONObject jsonObject = new JSONObject();
         JSONArray jsonArray = new JSONArray();
@@ -124,7 +126,7 @@ public class P2PReceiverTransferDaoTest {
     }
 
     @Test
-    public void receiveJsonShouldCallStructuresRepositoryBatchInsertStructures() throws JSONException {
+    public void receiveJsonShouldCallStructuresRepositoryBatchInsertStructuresWhenDataTypeIsStructure() throws JSONException {
         DataType dataType = new DataType(p2PReceiverTransferDao.structure.getName(), DataType.Type.NON_MEDIA, 1);
         JSONArray jsonArray = new JSONArray();
 
@@ -133,7 +135,7 @@ public class P2PReceiverTransferDaoTest {
     }
 
     @Test
-    public void receiveJsonShouldCallTaskRepositoryBatchInsertTasks() throws JSONException {
+    public void receiveJsonShouldCallTaskRepositoryBatchInsertTasksWhenDataTypeIsTask() throws JSONException {
         DataType dataType = new DataType(p2PReceiverTransferDao.task.getName(), DataType.Type.NON_MEDIA, 1);
         JSONArray jsonArray = new JSONArray();
 
@@ -165,16 +167,12 @@ public class P2PReceiverTransferDaoTest {
     }
 
     @Test
-    public void receiveMultimediaShouldCallImageRepository() {
+    public void receiveMultimediaShouldCallImageRepositoryWhenDataTypeIsProfilePic() {
         long fileRecordId = 78873L;
 
         ArgumentCaptor<ProfileImage> profileImageArgumentCaptor = ArgumentCaptor.forClass(ProfileImage.class);
 
         DataType dataType = new DataType(p2PReceiverTransferDao.profilePic.getName(), DataType.Type.MEDIA, 1);
-
-        DrishtiApplication drishtiApplication = Mockito.mock(DrishtiApplication.class);
-        ReflectionHelpers.setStaticField(DrishtiApplication.class, "mInstance", drishtiApplication);
-        Mockito.doReturn(RuntimeEnvironment.application).when(drishtiApplication).getApplicationContext();
 
         HashMap<String, Object> multimediaDetails = new HashMap<>();
         multimediaDetails.put(ImageRepository.syncStatus_COLUMN, BaseRepository.TYPE_Unsynced);
@@ -196,17 +194,66 @@ public class P2PReceiverTransferDaoTest {
     public void receiveMultimediaShouldReturnNegative1() {
         long fileRecordId = 78873L;
 
-        ArgumentCaptor<ProfileImage> profileImageArgumentCaptor = ArgumentCaptor.forClass(ProfileImage.class);
-
         DataType dataType = new DataType(p2PReceiverTransferDao.profilePic.getName(), DataType.Type.MEDIA, 1);
         HashMap<String, Object> multimediaDetails = new HashMap<>();
         multimediaDetails.put(ImageRepository.syncStatus_COLUMN, BaseRepository.TYPE_Unsynced);
         multimediaDetails.put(ImageRepository.entityID_COLUMN, "isod-sdfsd-32432");
         File file = Mockito.mock(File.class);
-        //Mockito.doReturn(true).when(file.exists());
 
         Assert.assertEquals(-1, p2PReceiverTransferDao.receiveMultimedia(dataType, file, multimediaDetails, fileRecordId));
+    }
 
+    @Test
+    public void getDataTypesShouldReturnAClonedMatchOfDataTypes() {
+        TreeSet<DataType> dataTypes = p2PReceiverTransferDao.getDataTypes();
 
+        // Assert that the instance is not the same
+        Assert.assertTrue(p2PReceiverTransferDao.dataTypes != dataTypes);
+        Assert.assertEquals(p2PReceiverTransferDao.dataTypes.size(), dataTypes.size());
+        Assert.assertEquals(p2PReceiverTransferDao.dataTypes.first(), dataTypes.first());
+        Assert.assertEquals(p2PReceiverTransferDao.dataTypes.last(), dataTypes.last());
+    }
+
+    @Test
+    public void getP2PClassifier() {
+        Assert.assertEquals(DrishtiApplication.getInstance().getP2PClassifier(), p2PReceiverTransferDao.getP2PClassifier());
+    }
+
+    @Test
+    public void receiveJsonShouldCallForeignEventClientRepositoryBatchInsertEventsWhenDataTypeIsForeignEvent() throws JSONException {
+        DataType dataType = new DataType(p2PReceiverTransferDao.foreignEvent.getName(), DataType.Type.NON_MEDIA, 1);
+        JSONObject jsonObject = new JSONObject();
+        String foreignLocationId = "foreign-loco-loco";
+        jsonObject.put("locationId", foreignLocationId);
+        JSONArray jsonArray = new JSONArray();
+        jsonObject.put(AllConstants.ROWID, 0);
+        jsonArray.put(jsonObject);
+
+        Mockito.doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                JSONObject jsonObject1 = invocation.getArgument(0);
+
+                String locationId = jsonObject1.optString("locationId");
+                return locationId != null && locationId.equals(foreignLocationId);
+            }
+        }).when(classifier).isForeign(Mockito.any(JSONObject.class), Mockito.any(DataType.class));
+
+        // Call the method under test
+        p2PReceiverTransferDao.receiveJson(dataType, jsonArray);
+
+        // Verify method call
+        Mockito.verify(foreignEventClientRepository).batchInsertEvents(Mockito.eq(jsonArray), Mockito.eq(0L));
+    }
+
+    @Test
+    public void receiveJsonShouldCallForeignEventClientRepositoryBatchInsertClientsWhenDataTypeIsForeignClient() throws JSONException {
+        DataType dataType = new DataType(p2PReceiverTransferDao.foreignClient.getName(), DataType.Type.NON_MEDIA, 1);
+        JSONObject jsonObject = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+        jsonObject.put(AllConstants.ROWID, 0);
+        jsonArray.put(jsonObject);
+        p2PReceiverTransferDao.receiveJson(dataType, jsonArray);
+        Mockito.verify(eventClientRepository).batchInsertClients(Mockito.eq(jsonArray));
     }
 }

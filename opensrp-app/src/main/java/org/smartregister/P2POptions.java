@@ -1,6 +1,6 @@
 package org.smartregister;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import org.smartregister.p2p.authorizer.P2PAuthorizationService;
 import org.smartregister.p2p.callback.SyncFinishedCallback;
@@ -21,6 +21,7 @@ public class P2POptions {
     private SyncFinishedCallback syncFinishedCallback;
     @Nullable
     private RecalledIdentifier recalledIdentifier;
+    private String[] locationsFilter;
 
     private boolean enableP2PLibrary;
     private int batchSize = AllConstants.PeerToPeer.P2P_LIBRARY_DEFAULT_BATCH_SIZE;
@@ -80,5 +81,13 @@ public class P2POptions {
 
     public void setRecalledIdentifier(@Nullable RecalledIdentifier recalledIdentifier) {
         this.recalledIdentifier = recalledIdentifier;
+    }
+
+    public String[] getLocationsFilter() {
+        return locationsFilter;
+    }
+
+    public void setLocationsFilter(String[] locationsFilter) {
+        this.locationsFilter = locationsFilter;
     }
 }

@@ -4,6 +4,7 @@ import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
 import org.smartregister.R;
@@ -23,17 +24,22 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class PNCClientPreProcessorTest {
     @Mock
-    Context mockedContext;
+    private Context mockedContext;
+
+    @Mock
+    private CoreLibrary coreLibrary;
 
     @Before
     public void setUp() throws Exception {
         initMocks(this);
-        CoreLibrary.init(mockedContext);
+        ReflectionHelpers.setStaticField(CoreLibrary.class, "instance", coreLibrary);
+        doReturn(mockedContext).when(coreLibrary).context();
         when(mockedContext.getStringResource(R.string.str_pnc_circle_type_expected)).thenReturn("expected");
         when(mockedContext.getStringResource(R.string.str_pnc_circle_type_actual)).thenReturn("actual");
     }

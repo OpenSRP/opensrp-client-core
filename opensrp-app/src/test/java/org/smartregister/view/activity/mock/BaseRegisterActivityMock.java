@@ -2,10 +2,12 @@ package org.smartregister.view.activity.mock;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.View;
 
+import androidx.fragment.app.Fragment;
+
 import org.json.JSONObject;
+import org.smartregister.Context;
 import org.smartregister.R;
 import org.smartregister.view.activity.BaseRegisterActivity;
 import org.smartregister.view.contract.BaseRegisterContract;
@@ -14,6 +16,7 @@ import org.smartregister.view.fragment.BaseRegisterFragment;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Mockito.mock;
 
@@ -29,6 +32,11 @@ public class BaseRegisterActivityMock extends BaseRegisterActivity {
     }
 
     @Override
+    protected Context context(){
+        return mock(Context.class);
+    }
+
+    @Override
     protected void initializePresenter() {
         presenter = mock(BaseRegisterContract.Presenter.class);
     }
@@ -41,6 +49,11 @@ public class BaseRegisterActivityMock extends BaseRegisterActivity {
     @Override
     protected Fragment[] getOtherFragments() {
         return new Fragment[0];
+    }
+
+    @Override
+    public void startFormActivity(String formName, String entityId, Map<String, String> metaData) {
+        // mock do nothing
     }
 
     @Override
@@ -65,6 +78,11 @@ public class BaseRegisterActivityMock extends BaseRegisterActivity {
 
     @Override
     public void startRegistration() {
+        //mock do nothing
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
         //mock do nothing
     }
 

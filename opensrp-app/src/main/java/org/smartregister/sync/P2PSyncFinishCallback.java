@@ -1,7 +1,7 @@
 package org.smartregister.sync;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.smartregister.job.P2pServiceJob;
 import org.smartregister.p2p.callback.SyncFinishedCallback;

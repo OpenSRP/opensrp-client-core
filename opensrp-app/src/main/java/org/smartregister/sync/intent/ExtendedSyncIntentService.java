@@ -12,16 +12,10 @@ import timber.log.Timber;
 
 public class ExtendedSyncIntentService extends BaseSyncIntentService {
 
-    private ActionService actionService;
+    private ActionService actionService = CoreLibrary.getInstance().context().actionService();
 
     public ExtendedSyncIntentService() {
         super("ExtendedSyncIntentService");
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        actionService = CoreLibrary.getInstance().context().actionService();
-        return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
@@ -43,6 +37,4 @@ public class ExtendedSyncIntentService extends BaseSyncIntentService {
     private void startSyncValidation() {
         ValidateSyncDataServiceJob.scheduleJobImmediately(ValidateSyncDataServiceJob.TAG);
     }
-
-
 }

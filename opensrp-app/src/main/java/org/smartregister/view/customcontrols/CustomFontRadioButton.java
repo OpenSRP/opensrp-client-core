@@ -44,14 +44,8 @@ public class CustomFontRadioButton extends RadioButton {
     }
 
     public void setFontVariant(final FontVariant variant) {
-        setTypeface(cache.get(variant.name(), new CacheableData<Typeface>() {
-            @Override
-            public Typeface fetch() {
-                return Typeface.createFromAsset(
-                        CoreLibrary.getInstance().context().applicationContext().getAssets(),
-                        variant.fontFile());
-
-            }
-        }));
+        setTypeface(cache.get(variant.name(), () -> Typeface.createFromAsset(
+                CoreLibrary.getInstance().context().applicationContext().getAssets(),
+                variant.fontFile())));
     }
 }

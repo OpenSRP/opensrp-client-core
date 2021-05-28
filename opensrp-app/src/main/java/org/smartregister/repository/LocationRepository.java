@@ -1,6 +1,7 @@
 package org.smartregister.repository;
 
 import android.content.ContentValues;
+import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -9,16 +10,16 @@ import net.sqlcipher.Cursor;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.apache.commons.lang3.StringUtils;
-import org.smartregister.converters.LocationConverter;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.LocationProperty;
+import org.smartregister.domain.LocationTag;
 import org.smartregister.domain.PhysicalLocation;
 import org.smartregister.pathevaluator.dao.LocationDao;
 import org.smartregister.util.PropertiesConverter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import timber.log.Timber;
@@ -26,7 +27,7 @@ import timber.log.Timber;
 /**
  * Created by samuelgithengi on 11/23/18.
  */
-public class LocationRepository extends BaseRepository implements LocationDao {
+public class LocationRepository extends BaseRepository {
 
     protected static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HHmm")
             .registerTypeAdapter(LocationProperty.class, new PropertiesConverter()).create();
@@ -74,7 +75,17 @@ public class LocationRepository extends BaseRepository implements LocationDao {
         contentValues.put(GEOJSON, gson.toJson(location));
         contentValues.put(SYNC_STATUS, location.getSyncStatus());
         getWritableDatabase().replace(getLocationTableName(), null, contentValues);
+    }
 
+    /**
+     * Deletes jurisdiction locations which a user no longer has access to
+     *
+     * @param locationIdentifiers the set of jurisdiction identifiers to delete
+     */
+    public void deleteLocations(@NonNull Set<String> locationIdentifiers) {
+        getWritableDatabase().delete(LOCATION_TABLE,
+                String.format("%s IN (%s)", ID, StringUtils.repeat("?", ",", locationIdentifiers.size())),
+                locationIdentifiers.toArray(new String[]{}));
     }
 
     public List<Location> getAllLocations() {
@@ -135,7 +146,6 @@ public class LocationRepository extends BaseRepository implements LocationDao {
 
     }
 
-
     public Location getLocationByUUId(String uuid) {
         Cursor cursor = null;
         try {
@@ -153,7 +163,6 @@ public class LocationRepository extends BaseRepository implements LocationDao {
         return null;
 
     }
-
 
     public List<Location> getLocationsByParentId(String parentId) {
         return getLocationsByParentId(parentId, getLocationTableName());
@@ -177,7 +186,6 @@ public class LocationRepository extends BaseRepository implements LocationDao {
         }
         return locations;
     }
-
 
     public Location getLocationByName(String name) {
         Cursor cursor = null;
@@ -240,7 +248,6 @@ public class LocationRepository extends BaseRepository implements LocationDao {
                 cursor.close();
         }
         return locations;
-
     }
 
     protected Location readCursor(Cursor cursor) {
@@ -278,29 +285,21 @@ public class LocationRepository extends BaseRepository implements LocationDao {
         }
     }
 
-    @Override
-    public List<com.ibm.fhir.model.resource.Location> findJurisdictionsById(String id) {
-        PhysicalLocation location = getLocationById(id);
-        return Collections.singletonList(LocationConverter.convertPhysicalLocationToLocationResource(location));
-    }
+    /**
+     * Get a List of locations that match provided tag name
+     *
+     * @param tagName Tag name
+     * @return List of locations
+     */
+    public List<Location> getLocationsByTagName(String tagName) {
+        LocationTagRepository locationTagRepository = new LocationTagRepository();
+        List<LocationTag> locationTags = locationTagRepository.getLocationTagsByTagName(tagName);
 
-    @Override
-    public List<com.ibm.fhir.model.resource.Location> findLocationsById(String id) {
-        PhysicalLocation location = getLocationById(id,StructureRepository.STRUCTURE_TABLE);
-        return Collections.singletonList(LocationConverter.convertPhysicalLocationToLocationResource(location));
-    }
-
-    @Override
-    public List<com.ibm.fhir.model.resource.Location> findLocationByJurisdiction(String jurisdiction) {
-        return getLocationsByParentId(jurisdiction, StructureRepository.STRUCTURE_TABLE)
-                .stream()
-                .map(LocationConverter::convertPhysicalLocationToLocationResource)
+        List<String> locationIds = locationTags.stream()
+                .map(LocationTag::getLocationId)
                 .collect(Collectors.toList());
+
+        return getLocationsByIds(locationIds);
     }
 
-    @Override
-    public List<String> findChildLocationByJurisdiction(String s) {
-        // TODO implement this
-        return null;
-    }
 }

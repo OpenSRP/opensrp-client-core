@@ -19,7 +19,7 @@ import static org.junit.Assert.assertNotNull;
  */
 public class PlanDefinitionTest {
 
-    public static Gson gson = new GsonBuilder().registerTypeAdapter(DateTime.class, new DateTimeTypeConverter("yyyy-MM-dd HH:mm:ss.SSSZ"))
+    public static Gson gson = new GsonBuilder().registerTypeAdapter(DateTime.class, new DateTimeTypeConverter("yyyy-MM-dd"))
             .registerTypeAdapter(LocalDate.class, new DateTypeConverter())
             .disableHtmlEscaping()
             .create();

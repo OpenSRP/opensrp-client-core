@@ -1,10 +1,12 @@
 package org.smartregister.repository;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.smartregister.AllConstants;
 import org.smartregister.CoreLibrary;
+import org.smartregister.P2POptions;
 import org.smartregister.R;
 import org.smartregister.p2p.P2PLibrary;
 import org.smartregister.p2p.model.DataType;
@@ -25,40 +27,62 @@ import timber.log.Timber;
 
 public class P2PSenderTransferDao extends BaseP2PTransferDao implements SenderTransferDao {
 
+    private static final String SEPARATOR = "~";
+
     @Nullable
     @Override
     public TreeSet<DataType> getDataTypes() {
-        return (TreeSet<DataType>) dataTypes.clone();
+        TreeSet<DataType> dataTypeTreeSet = new TreeSet<>();
+
+        if (locationFilterEnabled()) {
+            for (String location : getP2POptions().getLocationsFilter()) {
+                for (DataType dataType : dataTypes) {
+                    dataTypeTreeSet.add(new DataType(dataType.getName() + SEPARATOR + location, dataType.getType(), dataTypeTreeSet.size()));
+                }
+            }
+            return dataTypeTreeSet;
+        } else {
+            return new TreeSet<>(dataTypes);
+        }
+    }
+
+    private boolean locationFilterEnabled() {
+        return getP2POptions() != null && !ArrayUtils.isEmpty(getP2POptions().getLocationsFilter());
     }
 
     @Nullable
     @Override
-    public JsonData getJsonData(@NonNull DataType dataType, long l, int i) {
-        if (dataType.getName().equals(event.getName())) {
+    public JsonData getJsonData(@NonNull DataType dataType, long lastRecordId, int batchSize) {
+        String locationId = null;
+        if (locationFilterEnabled()) {
+            String[] dataTypeParams = dataType.getName().split(SEPARATOR);
+            locationId = dataTypeParams.length == 1 ? null : dataTypeParams[1];
+        }
+        if (dataType.getName().startsWith(event.getName())) {
             return CoreLibrary.getInstance().context()
-                    .getEventClientRepository().getEvents(l, i);
-        } else if (dataType.getName().equals(client.getName())) {
+                    .getEventClientRepository().getEvents(lastRecordId, batchSize, locationId);
+        } else if (dataType.getName().startsWith(client.getName())) {
 
             if (DrishtiApplication.getInstance().getP2PClassifier() == null) {
                 return CoreLibrary.getInstance().context()
-                        .getEventClientRepository().getClients(l, i);
+                        .getEventClientRepository().getClients(lastRecordId, batchSize, locationId);
             } else {
                 return CoreLibrary.getInstance().context()
-                        .getEventClientRepository().getClientsWithLastLocationID(l, i);
+                        .getEventClientRepository().getClientsWithLastLocationID(lastRecordId, batchSize);
             }
 
-        } else if (dataType.getName().equals(structure.getName())) {
+        } else if (dataType.getName().startsWith(structure.getName())) {
             return CoreLibrary.getInstance().context()
-                    .getStructureRepository().getStructures(l, i);
-        } else if (dataType.getName().equals(task.getName())) {
+                    .getStructureRepository().getStructures(lastRecordId, batchSize, locationId);
+        } else if (dataType.getName().startsWith(task.getName())) {
             return CoreLibrary.getInstance().context()
-                    .getTaskRepository().getTasks(l, i);
-        } else if (CoreLibrary.getInstance().context().hasForeignEvents() && dataType.getName().equals(foreignClient.getName())) {
+                    .getTaskRepository().getTasks(lastRecordId, batchSize, locationId);
+        } else if (CoreLibrary.getInstance().context().hasForeignEvents() && dataType.getName().startsWith(foreignClient.getName())) {
             return CoreLibrary.getInstance().context()
-                    .getForeignEventClientRepository().getClients(l, i);
-        } else if (CoreLibrary.getInstance().context().hasForeignEvents() && dataType.getName().equals(foreignEvent.getName())) {
+                    .getForeignEventClientRepository().getClients(lastRecordId, batchSize, locationId);
+        } else if (CoreLibrary.getInstance().context().hasForeignEvents() && dataType.getName().startsWith(foreignEvent.getName())) {
             return CoreLibrary.getInstance().context()
-                    .getForeignEventClientRepository().getEvents(l, i);
+                    .getForeignEventClientRepository().getEvents(lastRecordId, batchSize, locationId);
         } else {
             Timber.e(P2PLibrary.getInstance().getContext().getString(R.string.log_data_type_provided_does_not_exist_in_the_sender)
                     , dataType.getName());
@@ -68,10 +92,10 @@ public class P2PSenderTransferDao extends BaseP2PTransferDao implements SenderTr
 
     @Nullable
     @Override
-    public MultiMediaData getMultiMediaData(@NonNull DataType dataType, long l) {
+    public MultiMediaData getMultiMediaData(@NonNull DataType dataType, long lastRecordId) {
         if (dataType.getName().equalsIgnoreCase(profilePic.getName())) {
             HashMap<String, Object> imageDetails = CoreLibrary.getInstance().context()
-                    .imageRepository().getImage(l);
+                    .imageRepository().getImage(lastRecordId);
 
             if (imageDetails != null) {
                 File inputFile = new File((String) imageDetails.get(ImageRepository.filepath_COLUMN));
@@ -107,4 +131,7 @@ public class P2PSenderTransferDao extends BaseP2PTransferDao implements SenderTr
         }
     }
 
+    public P2POptions getP2POptions() {
+        return CoreLibrary.getInstance().getP2POptions();
+    }
 }

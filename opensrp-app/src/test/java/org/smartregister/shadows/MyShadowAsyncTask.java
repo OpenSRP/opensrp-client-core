@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import org.robolectric.annotation.Implementation;
 import org.robolectric.annotation.Implements;
 import org.robolectric.annotation.RealObject;
-import org.robolectric.shadows.ShadowAsyncTask;
 
 import java.util.concurrent.Executor;
 

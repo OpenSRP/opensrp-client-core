@@ -5,21 +5,27 @@ import com.google.gson.reflect.TypeToken;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.json.JSONException;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.powermock.reflect.Whitebox;
+import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.BaseRobolectricUnitTest;
+import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
+import org.smartregister.DristhiConfiguration;
 import org.smartregister.SyncConfiguration;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.LocationTag;
 import org.smartregister.domain.Response;
 import org.smartregister.domain.ResponseStatus;
+import org.smartregister.domain.jsonmapping.util.LocationTree;
 import org.smartregister.exception.NoHttpResponseException;
 import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.BaseRepository;
@@ -30,6 +36,7 @@ import org.smartregister.repository.StructureRepository;
 import org.smartregister.service.HTTPAgent;
 import org.smartregister.view.activity.DrishtiApplication;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +44,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -78,6 +86,15 @@ public class LocationServiceHelperTest extends BaseRobolectricUnitTest {
 
     private String structureJSon = "{\"geometry\":{\"coordinates\":[28.351322951711495,-15.419607299156059],\"type\":\"Point\"},\"id\":\"3c35325e-4a34-4730-b67d-c824d6e783ba\",\"properties\":{\"effectiveStartDate\":\"2019-06-11T1129\",\"geographicLevel\":0,\"parentId\":\"3951\",\"status\":\"Pending Review\",\"type\":\"Mosquito Collection Point\",\"uid\":\"f8e27dee-81d7-4a5e-997c-b9d670a676f7\",\"version\":0},\"serverVersion\":1560245526899,\"syncStatus\":\"Unsynced\",\"type\":\"Feature\"}";
 
+    @Mock
+    private CoreLibrary coreLibrary;
+
+    @Mock
+    private Context context;
+
+    @Mock
+    private DristhiConfiguration configuration;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -100,7 +117,6 @@ public class LocationServiceHelperTest extends BaseRobolectricUnitTest {
 
     @Test
     public void fetchOpenMrsLocationsByTeamIds() throws JSONException, NoHttpResponseException {
-
         Mockito.doReturn(new Response<>(ResponseStatus.success,
                 "[{\"locations\":[{\"display\":\"Tabata Dampo - Unified\",\"uuid\":\"fb7ed5db-138d-4e6f-94d8-bc443b58dadb\"}]," +
                         "\"team\":{\"location\":{\"display\":\"Madona - Unified\",\"uuid\":\"bcf5a36d-fb53-4de9-9813-01f1d480e3fe\"}}}]"))
@@ -171,7 +187,7 @@ public class LocationServiceHelperTest extends BaseRobolectricUnitTest {
         assertFalse(expectedLocation.getGeometry() == null);
 
         Mockito.doReturn(new Response<>(ResponseStatus.success,    // returned on first call
-                LocationServiceHelper.locationGson.toJson(locations)).withTotalRecords(1l),
+                        LocationServiceHelper.locationGson.toJson(locations)).withTotalRecords(1l),
 
                 new Response<>(ResponseStatus.success,             //returned on second call
                         LocationServiceHelper.locationGson.toJson(new ArrayList<>())).withTotalRecords(0l))
@@ -216,7 +232,6 @@ public class LocationServiceHelperTest extends BaseRobolectricUnitTest {
         verify(locationServiceHelper).syncLocationsStructures(false);
         verify(locationServiceHelper).syncCreatedStructureToServer();
         verify(locationServiceHelper).syncCreatedStructureToServer();
-
     }
 
     @Test
@@ -238,7 +253,6 @@ public class LocationServiceHelperTest extends BaseRobolectricUnitTest {
         String requestString = stringArgumentCaptor.getAllValues().get(1);
         assertEquals(LocationServiceHelper.locationGson.toJson(structures), requestString);
         verify(structureRepository).markStructuresAsSynced(expectedStructure.getId());
-
     }
 
     @Test
@@ -260,7 +274,86 @@ public class LocationServiceHelperTest extends BaseRobolectricUnitTest {
         String requestString = stringArgumentCaptor.getAllValues().get(1);
         assertEquals(LocationServiceHelper.locationGson.toJson(locations), requestString);
         verify(locationRepository).markLocationsAsSynced(expectedLocation.getId());
-
     }
 
+    @Test
+    public void testFetchAllLocations() {
+        Mockito.doReturn(new Response<>(ResponseStatus.success,
+                "[{\"type\":\"Feature\",\"id\":\"c2aa34c2-789b-467e-a0ab-9ea3d61632cf\",\"properties\":{\"status\":\"Active\",\"parentId\":\"\",\"name\":\"Level1\",\"geographicLevel\":1,\"version\":0},\"serverVersion\":0,\"locationTags\":[{\"id\":1,\"active\":true,\"name\":\"County\",\"description\":\"County Location Tag\"}]}," +
+                        "{\"type\":\"Feature\",\"id\":\"9dee11ba-d352-4df5-9efa-4607723b316e\",\"properties\":{\"status\":\"Active\",\"parentId\":\"c2aa34c2-789b-467e-a0ab-9ea3d61632cf\",\"name\":\"Level2\",\"geographicLevel\":2,\"version\":0},\"serverVersion\":0,\"locationTags\":[{\"id\":2,\"active\":true,\"name\":\"Subcounty\",\"description\":\"Subcounty Location Tag\"}]}]"))
+                .when(httpAgent).fetch(stringArgumentCaptor.capture());
+
+        locationServiceHelper.fetchAllLocations();
+        verify(locationServiceHelper).fetchAllLocations(ArgumentMatchers.anyInt());
+        verify(locationRepository, Mockito.atLeastOnce()).addOrUpdate(Mockito.any(Location.class));
+
+        String syncUrl = stringArgumentCaptor.getAllValues().get(0);
+        assertEquals("https://sample-stage.smartregister.org/opensrp//rest/location/getAll?is_jurisdiction=true&serverVersion=0&limit=2000", syncUrl);
+    }
+
+    @Test
+    public void testGetFormattedBaseUrlStripsEndingSlashDelimiter() {
+        String url = "https://base.url/";
+
+        ReflectionHelpers.setStaticField(CoreLibrary.class, "instance", coreLibrary);
+        Mockito.doReturn(context).when(coreLibrary).context();
+        Mockito.doReturn(configuration).when(context).configuration();
+        Mockito.doReturn(url).when(configuration).dristhiBaseURL();
+
+        LocationServiceHelper spyLocationServiceHelper = Mockito.spy(locationServiceHelper);
+        String baseUrl = spyLocationServiceHelper.getFormattedBaseUrl();
+        assertNotNull(baseUrl);
+        assertEquals(url.substring(0, url.length() - 1), baseUrl);
+    }
+
+    @Test
+    public void testGetLocationHierarchyReturnsNullWhenRequestFails() {
+        String parentLocation = "1c7ba751-35e8-4b46-9e53-3cb8fd193697";
+
+        Mockito.doReturn(new Response<>(ResponseStatus.failure, ""))
+                .when(httpAgent).fetch(stringArgumentCaptor.capture());
+
+        LocationTree tree = locationServiceHelper.getLocationHierarchy(parentLocation);
+
+        String expectedUrl = MessageFormat.format("{0}{1}{2}", locationServiceHelper.getFormattedBaseUrl(), LocationServiceHelper.LOCATION_HIERARCHY_URL, parentLocation);
+        assertEquals(expectedUrl, stringArgumentCaptor.getValue());
+        assertNull(tree);
+    }
+
+    @Test
+    public void testGetLocationHierarchyReturnsEmptyTreeForInvalidParentLocationId() {
+        String parentLocation = "1c7ba751-35e8-4b46-9e53-3cb8fd193697";
+
+        Mockito.doReturn(new Response<>(ResponseStatus.success, "{}"))
+                .when(httpAgent).fetch(stringArgumentCaptor.capture());
+
+        LocationTree tree = locationServiceHelper.getLocationHierarchy(parentLocation);
+
+        String expectedUrl = MessageFormat.format("{0}{1}{2}", locationServiceHelper.getFormattedBaseUrl(), LocationServiceHelper.LOCATION_HIERARCHY_URL, parentLocation);
+        assertEquals(expectedUrl, stringArgumentCaptor.getValue());
+        assertNotNull(tree);
+        assertEquals(0, tree.getLocationsHierarchy().size());
+    }
+
+    @Test
+    public void testGetLocationHierarchyReturnsTreeForValidParentLocationId() {
+        String parentLocation = "1c7ba751-35e8-4b46-9e53-3cb8fd193697";
+        String hierarchy = "{\"locationsHierarchy\":{\"map\":{\"1c7ba751-35e8-4b46-9e53-3cb8fd193697\":{\"id\":\"1c7ba751-35e8-4b46-9e53-3cb8fd193697\",\"label\":\"Indonesia Division 1\",\"node\":{\"locationId\":\"1c7ba751-35e8-4b46-9e53-3cb8fd193697\",\"name\":\"Indonesia Division 1\",\"attributes\":{\"geographicLevel\":0},\"voided\":false},\"children\":{\"2c7ba751-35e8-4b46-9e53-3cb8fd193697\":{\"id\":\"2c7ba751-35e8-4b46-9e53-3cb8fd193697\",\"label\":\"Indonesia Location 1\",\"node\":{\"locationId\":\"2c7ba751-35e8-4b46-9e53-3cb8fd193697\",\"name\":\"Indonesia Location 1\",\"parentLocation\":{\"locationId\":\"1c7ba751-35e8-4b46-9e53-3cb8fd193697\",\"voided\":false},\"attributes\":{\"geographicLevel\":0},\"voided\":false},\"parent\":\"1c7ba751-35e8-4b46-9e53-3cb8fd193697\"},\"3c7ba751-35e8-4b46-9e53-3cb8fd193697\":{\"id\":\"3c7ba751-35e8-4b46-9e53-3cb8fd193697\",\"label\":\"Indonesia Location 2\",\"node\":{\"locationId\":\"3c7ba751-35e8-4b46-9e53-3cb8fd193697\",\"name\":\"Indonesia Location 2\",\"parentLocation\":{\"locationId\":\"1c7ba751-35e8-4b46-9e53-3cb8fd193697\",\"voided\":false},\"attributes\":{\"geographicLevel\":0},\"voided\":false},\"parent\":\"1c7ba751-35e8-4b46-9e53-3cb8fd193697\"},\"4c7ba751-35e8-4b46-9e53-3cb8fd193697\":{\"id\":\"4c7ba751-35e8-4b46-9e53-3cb8fd193697\",\"label\":\"Indonesia Location 3\",\"node\":{\"locationId\":\"4c7ba751-35e8-4b46-9e53-3cb8fd193697\",\"name\":\"Indonesia Location 3\",\"parentLocation\":{\"locationId\":\"1c7ba751-35e8-4b46-9e53-3cb8fd193697\",\"voided\":false},\"attributes\":{\"geographicLevel\":0},\"voided\":false},\"parent\":\"1c7ba751-35e8-4b46-9e53-3cb8fd193697\"}}}},\"parentChildren\":{\"1c7ba751-35e8-4b46-9e53-3cb8fd193697\":[\"2c7ba751-35e8-4b46-9e53-3cb8fd193697\",\"3c7ba751-35e8-4b46-9e53-3cb8fd193697\",\"4c7ba751-35e8-4b46-9e53-3cb8fd193697\"]}}}";
+
+        Mockito.doReturn(new Response<>(ResponseStatus.success, hierarchy))
+                .when(httpAgent).fetch(stringArgumentCaptor.capture());
+
+        LocationTree tree = locationServiceHelper.getLocationHierarchy(parentLocation);
+
+        String expectedUrl = MessageFormat.format("{0}{1}{2}", locationServiceHelper.getFormattedBaseUrl(), LocationServiceHelper.LOCATION_HIERARCHY_URL, parentLocation);
+        assertEquals(expectedUrl, stringArgumentCaptor.getValue());
+        assertNotNull(tree);
+        assertTrue(tree.hasLocation(parentLocation));
+        assertEquals(3, tree.getLocationsHierarchy().get(parentLocation).getChildren().size());
+    }
+
+    @After
+    public void tearDown() {
+        ReflectionHelpers.setStaticField(CoreLibrary.class, "instance", null);
+    }
 }

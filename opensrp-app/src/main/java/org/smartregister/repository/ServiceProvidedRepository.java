@@ -38,12 +38,12 @@ public class ServiceProvidedRepository extends DrishtiRepository {
     }
 
     public void add(ServiceProvided serviceProvided) {
-        SQLiteDatabase database = masterRepository.getWritableDatabase();
+        SQLiteDatabase database = masterRepository().getWritableDatabase();
         database.insert(SERVICE_PROVIDED_TABLE_NAME, null, createValuesFor(serviceProvided));
     }
 
     public List<ServiceProvided> findByEntityIdAndServiceNames(String entityId, String... names) {
-        SQLiteDatabase database = masterRepository.getReadableDatabase();
+        SQLiteDatabase database = masterRepository().getReadableDatabase();
         Cursor cursor = database.rawQuery(
                 format("SELECT * FROM %s WHERE %s = ? AND %s IN (%s) " + "ORDER BY " + "DATE"
                                 + "(%s)", SERVICE_PROVIDED_TABLE_NAME, ENTITY_ID_COLUMN,
@@ -54,7 +54,7 @@ public class ServiceProvidedRepository extends DrishtiRepository {
     }
 
     public List<ServiceProvided> all() {
-        SQLiteDatabase database = masterRepository.getReadableDatabase();
+        SQLiteDatabase database = masterRepository().getReadableDatabase();
         Cursor cursor = database
                 .query(SERVICE_PROVIDED_TABLE_NAME, SERVICE_PROVIDED_TABLE_COLUMNS, null, null,
                         null, null, DATE_ID_COLUMN);

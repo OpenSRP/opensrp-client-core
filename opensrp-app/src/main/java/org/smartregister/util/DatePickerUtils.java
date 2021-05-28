@@ -16,14 +16,6 @@ public class DatePickerUtils {
 
     private static final int SPINNER_COUNT = 3;
 
-    public static void themeDatePicker(DatePickerDialog dialog, char[] ymdOrder) {
-        if (!dialog.isShowing()) {
-            throw new IllegalStateException("Dialog must be showing");
-        }
-
-        themeDatePicker(dialog.getDatePicker(), ymdOrder);
-    }
-
     public static void preventShowingKeyboard(DatePicker datePicker) {
         datePicker.setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
     }

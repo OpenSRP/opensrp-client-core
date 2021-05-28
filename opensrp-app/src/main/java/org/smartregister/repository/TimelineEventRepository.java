@@ -34,12 +34,12 @@ public class TimelineEventRepository extends DrishtiRepository {
     }
 
     public void add(TimelineEvent timelineEvent) {
-        SQLiteDatabase database = masterRepository.getWritableDatabase();
+        SQLiteDatabase database = masterRepository().getWritableDatabase();
         database.insert(TIMELINEEVENT_TABLE_NAME, null, createValuesFor(timelineEvent));
     }
 
     public List<TimelineEvent> allFor(String caseId) {
-        SQLiteDatabase database = masterRepository.getReadableDatabase();
+        SQLiteDatabase database = masterRepository().getReadableDatabase();
         Cursor cursor = database.query(TIMELINEEVENT_TABLE_NAME, TIMELINEEVENT_TABLE_COLUMNS,
                 CASEID_COLUMN + "= ?", new String[]{caseId}, null, null, null);
 
@@ -47,7 +47,7 @@ public class TimelineEventRepository extends DrishtiRepository {
     }
 
     public void deleteAllTimelineEventsForEntity(String caseId) {
-        SQLiteDatabase database = masterRepository.getWritableDatabase();
+        SQLiteDatabase database = masterRepository().getWritableDatabase();
         database.delete(TIMELINEEVENT_TABLE_NAME, CASEID_COLUMN + " = ?", new String[]{caseId});
     }
 

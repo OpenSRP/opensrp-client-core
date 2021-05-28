@@ -33,7 +33,6 @@ import org.smartregister.domain.ReportMonth;
 import org.smartregister.domain.form.FormSubmission;
 import org.smartregister.provider.SmartRegisterClientsProvider;
 import org.smartregister.util.PaginationHolder;
-import org.smartregister.util.Utils;
 import org.smartregister.util.ViewHelper;
 import org.smartregister.view.contract.SmartRegisterClient;
 import org.smartregister.view.customcontrols.CustomFontTextView;
@@ -579,8 +578,7 @@ public abstract class SecuredNativeSmartRegisterActivity extends SecuredActivity
         }
 
         public void refresh() {
-            pageInfoView.setText(format(getResources().getString(R.string.str_page_info),
-                    (getCurrentPageCount()), (clientsAdapter.pageCount())));
+            pageInfoView.setText(getFormattedPaginationInfoText(getCurrentPageCount(), clientsAdapter.pageCount()));
             nextPageView.setVisibility(clientsAdapter.hasNextPage() ? VISIBLE : INVISIBLE);
             previousPageView.setVisibility(clientsAdapter.hasPreviousPage() ? VISIBLE : INVISIBLE);
         }
@@ -644,4 +642,7 @@ public abstract class SecuredNativeSmartRegisterActivity extends SecuredActivity
         }
     }
 
+    protected String getFormattedPaginationInfoText(int currentPage, int pageCount) {
+        return format(getResources().getString(R.string.str_page_info), currentPage, pageCount);
+    }
 }

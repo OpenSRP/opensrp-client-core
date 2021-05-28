@@ -33,8 +33,8 @@
     <string name="settings_logout_confirm_dialog_message">Are you sure you want to log out? All the data will be cleared.</string>
     <string name="unsynced_forms_count_message">Forms Unsynced</string>
 
-    <string name="str_next">"Next &gt;&gt;"</string>
-    <string name="str_previous">"&lt;&lt; Previous"</string>
+    <string name="str_next">Next &gt;&gt;</string>
+    <string name="str_previous">&lt;&lt; Previous</string>
     <string name="str_page_info">Page {0} of {1}</string>
 
     <string name="header_name">NAME</string>
@@ -343,6 +343,8 @@
     <string name="sync_failed">Sync Failed</string>
     <string name="sync_complete">Sync Complete</string>
     <string name="manual_sync_triggered">Manual Sync Triggered&#8230;</string>
+    <string name="remote_login_generic_error">Error occurred during Login in with server. Please try again...</string>
+    <string name="remote_login_base_url_missing_error">OpenSRP Base URL is missing. Please add it in Setting and try again</string>
 
     <!-- base register -->
     <string name="filter">Filter</string>
@@ -385,6 +387,8 @@
 
     <string name="account_disabled">Account Disabled</string>
     <string name="account_disabled_logged_off">You have been logged off as your account has been disabled. Please contact your administrator.</string>
+    <string name="account_new_assignment_logged_off">You have been logged off as your account has new assignments. Log in again so that new assignments take effect</string>
+    <string name="default_location_revoked_logged_off">You have been logged off as access to your default location has been revoked</string>
 
     <!--Alerts-->
     <string name="invalid_url_massage">Please enter a valid url.</string>
@@ -423,5 +427,16 @@
     <string name="clear_data_dialog_title">Do you want to clear data to login with a different team/location</string>
     <string name="clear_data_dialog_message">You are trying to login with a user in a different team/location. Upload of pending data and clearing of data for user %s in Team %s is required. Do you want to continue?</string>
     <string name="replication_error_occurred">Replication error occurred</string>
-
+    <string name="form_update_title">Form Update</string>
+    <string name="form_update_message">This form has content updates</string>
+    <string name="current_corrupted_form">(Current Corrupted Form)</string>
+    <string name="rollback_dialog_title">Select a rollback form</string>
+    <string name="cannot_select_corrupted_form_rollback">You cannot select this form because it\'s corrupted!</string>
+    <string name="form_changed_reopen_to_take_effect">Form has been successfully selected! Reopen this form for the changes to take effect</string>
+    <string name="component_desc_image_upload_service">Uploads images to the OpenSRP server</string>
+    <string name="component_desc_account_service"> Manages user authentication and authorization</string>
+    <string name="component_desc_p2p_process_records_service">Processes the records when using peer to peer for file sharing</string>
+    <string name="new_db_encryption_version_migration">You have been logged off as your application database encryption version has changed. Please login in again to complete the upgrade.</string>
+    <string name="account_removed">You have been logged off as your account has been removed from the accounts manager.</string>
+    <string name="no_client_available_for_url">No auth client available for the URL</string>
 </resources>

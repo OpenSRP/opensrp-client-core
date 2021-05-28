@@ -1,9 +1,9 @@
 package org.smartregister.sync.intent;
 
-import android.app.IntentService;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 import org.smartregister.CoreLibrary;
 import org.smartregister.domain.FetchStatus;
@@ -82,7 +82,8 @@ public class P2pProcessRecordsService extends BaseSyncIntentService {
         }
     }
 
-    private void sendSyncStatusBroadcastMessage(FetchStatus fetchStatus) {
+    @VisibleForTesting
+    protected void sendSyncStatusBroadcastMessage(FetchStatus fetchStatus) {
         CoreLibrary.getInstance().context().applicationContext().sendBroadcast(Utils.completeSync(fetchStatus));
     }
 

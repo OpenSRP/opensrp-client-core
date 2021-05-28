@@ -21,7 +21,7 @@ public class SyncLocationsByLevelAndTagsIntentService extends BaseSyncIntentServ
 
         try {
             locationServiceHelper.fetchLocationsByLevelAndTags();
-        }catch (Exception e){
+        } catch (Exception e){
             Timber.e(e);
         }
     }

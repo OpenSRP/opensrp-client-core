@@ -18,7 +18,7 @@ package org.smartregister.barcode;
 
 import android.Manifest;
 import android.content.Context;
-import android.support.annotation.RequiresPermission;
+import androidx.annotation.RequiresPermission;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;

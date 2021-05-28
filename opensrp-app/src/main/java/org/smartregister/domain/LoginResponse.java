@@ -9,6 +9,7 @@ public enum LoginResponse {
     MALFORMED_URL("Incorrect url"),
     UNKNOWN_RESPONSE("Dristhi login failed. Try later"),
     UNAUTHORIZED("Please check the credentials"),
+    UNAUTHORIZED_CLIENT("Please check the oauth client credentials"),
     TIMEOUT("The server could not be reached. Try again"),
     SUCCESS_WITH_EMPTY_RESPONSE("The server returned an empty response. Try again"),
     SUCCESS_WITHOUT_USER_DETAILS("User information was not accessible. Try again"),

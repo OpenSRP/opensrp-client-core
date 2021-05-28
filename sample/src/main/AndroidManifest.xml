@@ -26,6 +26,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".BasicActivity" />
+        <activity
+            android:name=".SampleLoginActivity"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/AppThemeNoTitle"></activity>
     </application>
 
 </manifest>

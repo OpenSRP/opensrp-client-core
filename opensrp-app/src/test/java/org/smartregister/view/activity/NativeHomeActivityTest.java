@@ -10,14 +10,14 @@ import org.mockito.Mock;
 import org.powermock.reflect.Whitebox;
 import org.robolectric.Robolectric;
 import org.robolectric.RuntimeEnvironment;
-import org.smartregister.BaseUnitTest;
+import org.smartregister.BaseRobolectricUnitTest;
 import org.smartregister.CoreLibrary;
 import org.smartregister.R;
 import org.smartregister.service.ZiggyService;
 import org.smartregister.view.activity.mock.NativeHomeActivityMock;
 
 
-public class NativeHomeActivityTest extends BaseUnitTest {
+public class NativeHomeActivityTest extends BaseRobolectricUnitTest {
 
     private NativeHomeActivityMock homeActivity;
 

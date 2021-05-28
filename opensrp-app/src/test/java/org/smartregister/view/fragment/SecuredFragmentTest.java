@@ -1,7 +1,6 @@
 package org.smartregister.view.fragment;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.MenuItem;
 
 import org.junit.Assert;
@@ -19,13 +18,10 @@ import org.smartregister.AllConstants;
 import org.smartregister.BaseUnitTest;
 import org.smartregister.Context;
 import org.smartregister.R;
-import org.smartregister.event.Listener;
 import org.smartregister.service.UserService;
 import org.smartregister.view.activity.DrishtiApplication;
 import org.smartregister.view.activity.SecuredActivity;
 import org.smartregister.view.controller.ANMController;
-import org.smartregister.view.controller.FormController;
-import org.smartregister.view.controller.NavigationController;
 
 /**
  * Created by ndegwamartin on 2020-04-07.
@@ -36,9 +32,6 @@ public class SecuredFragmentTest extends BaseUnitTest {
 
     @Mock
     private ANMController anmController;
-
-    @Mock
-    private Bundle bundle;
 
     @Mock
     private Context context;
@@ -84,6 +77,7 @@ public class SecuredFragmentTest extends BaseUnitTest {
         Assert.assertNotNull(securedFragment);
     }
 
+    /*
     @Test
     public void testOnCreateInitializesFragmentFields() {
 
@@ -100,6 +94,8 @@ public class SecuredFragmentTest extends BaseUnitTest {
         Assert.assertNotNull(navigationController);
 
     }
+
+     */
 
     @Test
     public void assertOnResumeLogsOutCurrentUserIfContextIsUserLoggedOutIsTrue() {
@@ -174,23 +170,6 @@ public class SecuredFragmentTest extends BaseUnitTest {
         securedFragment.logoutUser();
 
         Mockito.verify(userService).logout();
-
-    }
-
-    @Test
-    public void assertLogoutUserNavigatesToLoginPage() {
-
-        Mockito.doNothing().when(securedFragment).startActivity(ArgumentMatchers.any(Intent.class));
-        Mockito.doNothing().when(userService).logout();
-
-        securedFragment.logoutUser();
-
-        Mockito.verify(securedFragment).startActivity(intentArgumentCaptor.capture());
-        Intent navigationIntent = intentArgumentCaptor.getValue();
-
-        Assert.assertNotNull(navigationIntent);
-
-        Assert.assertEquals("org.smartregister.view.activity.LoginActivity", navigationIntent.getComponent().getClassName());
 
     }
 

@@ -1,7 +1,7 @@
 package org.smartregister.sync.helper;
 
 import android.content.Context;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.VisibleForTesting;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

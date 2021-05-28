@@ -55,18 +55,18 @@ public class ChildRepository extends DrishtiRepository {
     }
 
     public void add(Child child) {
-        SQLiteDatabase database = masterRepository.getWritableDatabase();
+        SQLiteDatabase database = masterRepository().getWritableDatabase();
         database.insert(CHILD_TABLE_NAME, null, createValuesFor(child));
     }
 
     public void update(Child child) {
-        SQLiteDatabase database = masterRepository.getWritableDatabase();
+        SQLiteDatabase database = masterRepository().getWritableDatabase();
         database.update(CHILD_TABLE_NAME, createValuesFor(child), ID_COLUMN + " = ?",
                 new String[]{child.caseId()});
     }
 
     public List<Child> all() {
-        SQLiteDatabase database = masterRepository.getReadableDatabase();
+        SQLiteDatabase database = masterRepository().getReadableDatabase();
         Cursor cursor = database
                 .query(CHILD_TABLE_NAME, CHILD_TABLE_COLUMNS, IS_CLOSED_COLUMN + " = ?",
                         new String[]{NOT_CLOSED}, null, null, null, null);
@@ -74,7 +74,7 @@ public class ChildRepository extends DrishtiRepository {
     }
 
     public Child find(String caseId) {
-        SQLiteDatabase database = masterRepository.getReadableDatabase();
+        SQLiteDatabase database = masterRepository().getReadableDatabase();
         Cursor cursor = database.query(CHILD_TABLE_NAME, CHILD_TABLE_COLUMNS, ID_COLUMN + " = ?",
                 new String[]{caseId}, null, null, null, null);
         List<Child> children = readAll(cursor);
@@ -86,7 +86,7 @@ public class ChildRepository extends DrishtiRepository {
     }
 
     public List<Child> findChildrenByCaseIds(String... caseIds) {
-        SQLiteDatabase database = masterRepository.getReadableDatabase();
+        SQLiteDatabase database = masterRepository().getReadableDatabase();
         Cursor cursor = database.rawQuery(
                 String.format("SELECT * FROM %s WHERE %s IN (%s)", CHILD_TABLE_NAME, ID_COLUMN,
                         insertPlaceholdersForInClause(caseIds.length)), caseIds);
@@ -94,14 +94,14 @@ public class ChildRepository extends DrishtiRepository {
     }
 
     public void updateDetails(String caseId, Map<String, String> details) {
-        SQLiteDatabase database = masterRepository.getWritableDatabase();
+        SQLiteDatabase database = masterRepository().getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(DETAILS_COLUMN, new Gson().toJson(details));
         database.update(CHILD_TABLE_NAME, values, ID_COLUMN + " = ?", new String[]{caseId});
     }
 
     public List<Child> findByMotherCaseId(String caseId) {
-        SQLiteDatabase database = masterRepository.getReadableDatabase();
+        SQLiteDatabase database = masterRepository().getReadableDatabase();
         Cursor cursor = database
                 .query(CHILD_TABLE_NAME, CHILD_TABLE_COLUMNS, MOTHER_ID_COLUMN + " = ?",
                         new String[]{caseId}, null, null, null, null);
@@ -109,7 +109,7 @@ public class ChildRepository extends DrishtiRepository {
     }
 
     public long count() {
-        return longForQuery(masterRepository.getReadableDatabase(),
+        return longForQuery(masterRepository().getReadableDatabase(),
                 "SELECT COUNT(1) FROM " + CHILD_TABLE_NAME + " WHERE " + IS_CLOSED_COLUMN + " = ?",
                 new String[]{NOT_CLOSED});
     }
@@ -119,7 +119,7 @@ public class ChildRepository extends DrishtiRepository {
     }
 
     public List<Child> allChildrenWithMotherAndEC() {
-        SQLiteDatabase database = masterRepository.getReadableDatabase();
+        SQLiteDatabase database = masterRepository().getReadableDatabase();
         Cursor cursor = database.rawQuery(
                 "SELECT " + tableColumnsForQuery(CHILD_TABLE_NAME, CHILD_TABLE_COLUMNS) + ", "
                         + tableColumnsForQuery(MOTHER_TABLE_NAME, MOTHER_TABLE_COLUMNS) + ", "
@@ -149,7 +149,7 @@ public class ChildRepository extends DrishtiRepository {
     private void markAsClosed(String caseId) {
         ContentValues values = new ContentValues();
         values.put(IS_CLOSED_COLUMN, TRUE.toString());
-        masterRepository.getWritableDatabase()
+        masterRepository().getWritableDatabase()
                 .update(CHILD_TABLE_NAME, values, ID_COLUMN + " = " + "?", new String[]{caseId});
     }
 
@@ -269,14 +269,14 @@ public class ChildRepository extends DrishtiRepository {
     }
 
     public void updatePhotoPath(String caseId, String imagePath) {
-        SQLiteDatabase database = masterRepository.getWritableDatabase();
+        SQLiteDatabase database = masterRepository().getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(PHOTO_PATH_COLUMN, imagePath);
         database.update(CHILD_TABLE_NAME, values, ID_COLUMN + " = ?", new String[]{caseId});
     }
 
     public List<Child> findAllChildrenByECId(String ecId) {
-        SQLiteDatabase database = masterRepository.getReadableDatabase();
+        SQLiteDatabase database = masterRepository().getReadableDatabase();
         Cursor cursor = database.rawQuery(
                 "SELECT " + tableColumnsForQuery(CHILD_TABLE_NAME, CHILD_TABLE_COLUMNS) + " FROM "
                         + CHILD_TABLE_NAME + ", " + MOTHER_TABLE_NAME + ", " + EC_TABLE_NAME
@@ -291,7 +291,7 @@ public class ChildRepository extends DrishtiRepository {
     }
 
     public void delete(String childId) {
-        SQLiteDatabase database = masterRepository.getWritableDatabase();
+        SQLiteDatabase database = masterRepository().getWritableDatabase();
         database.delete(CHILD_TABLE_NAME, ID_COLUMN + "= ?", new String[]{childId});
     }
 }

@@ -9,7 +9,8 @@ buildscript {
 
     dependencies {
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.11.0"
-        classpath 'gradle.plugin.org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.10.1'
+        classpath 'com.android.tools.build:gradle:4.0.0'
+        classpath 'gradle.plugin.org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.10.2'
         classpath 'org.smartregister:gradle-jarjar-plugin:1.0.0-SNAPSHOT'
     }
 }
@@ -39,8 +40,8 @@ subprojects {
     ext.androidToolsBuildGradle     = '4.0.0'
     ext.androidBuildToolsVersion    = '29.0.3'
     ext.androidMinSdkVersion        = 18
-    ext.androidCompileSdkVersion    = 28
-    ext.androidTargetSdkVersion     = 28
+    ext.androidCompileSdkVersion    = 29
+    ext.androidTargetSdkVersion     = 29
 
     ext.androidAnnotationsVersion = '3.0.1'
     ext.androidAnnotationsAPIVersion = '3.0.1'

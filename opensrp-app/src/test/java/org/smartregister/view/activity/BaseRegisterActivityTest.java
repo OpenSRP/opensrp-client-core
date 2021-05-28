@@ -4,15 +4,16 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.Snackbar;
-import android.support.design.widget.SnackbarContentLayout;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.vision.barcode.Barcode;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.snackbar.SnackbarContentLayout;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -22,6 +23,7 @@ import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowToast;
+import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.AllConstants;
 import org.smartregister.AllConstants.BARCODE;
 import org.smartregister.BaseRobolectricUnitTest;
@@ -85,8 +87,13 @@ public class BaseRegisterActivityTest extends BaseRobolectricUnitTest {
     @Before
     public void setUp() {
         Whitebox.setInternalState(CoreLibrary.getInstance().context(), "ziggyService", ziggyService);
-        controller = Robolectric.buildActivity(BaseRegisterActivityMock.class).create().start().resume();
+        controller = Robolectric.buildActivity(BaseRegisterActivityMock.class).create().start();
         activity = controller.get();
+    }
+
+    @After
+    public void tearDown() {
+        ReflectionHelpers.setStaticField(CoreLibrary.class, "instance", null);
     }
 
     @Test

@@ -2,15 +2,17 @@ package org.smartregister.service;
 
 import android.annotation.TargetApi;
 import android.os.Build;
+import android.os.Bundle;
 import android.security.KeyPairGeneratorSpec;
-import android.support.annotation.VisibleForTesting;
 import android.util.Base64;
 
+import androidx.annotation.VisibleForTesting;
+
 import org.apache.commons.lang3.StringUtils;
+import org.smartregister.BuildConfig;
 import org.smartregister.CoreLibrary;
 import org.smartregister.DristhiConfiguration;
-import org.smartregister.SyncConfiguration;
-import org.smartregister.SyncFilter;
+import org.smartregister.account.AccountHelper;
 import org.smartregister.domain.LoginResponse;
 import org.smartregister.domain.Response;
 import org.smartregister.domain.TimeStatus;
@@ -22,10 +24,13 @@ import org.smartregister.domain.jsonmapping.util.TeamLocation;
 import org.smartregister.domain.jsonmapping.util.TeamMember;
 import org.smartregister.repository.AllSettings;
 import org.smartregister.repository.AllSharedPreferences;
+import org.smartregister.security.PasswordHash;
+import org.smartregister.security.SecurityHelper;
 import org.smartregister.sync.SaveANMLocationTask;
 import org.smartregister.sync.SaveANMTeamTask;
 import org.smartregister.sync.SaveUserInfoTask;
 import org.smartregister.util.AssetHandler;
+import org.smartregister.util.CredentialsHelper;
 import org.smartregister.util.Session;
 import org.smartregister.view.activity.DrishtiApplication;
 
@@ -42,11 +47,14 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -57,6 +65,7 @@ import timber.log.Timber;
 
 import static org.smartregister.AllConstants.ENGLISH_LANGUAGE;
 import static org.smartregister.AllConstants.ENGLISH_LOCALE;
+import static org.smartregister.AllConstants.JURISDICTION_IDS;
 import static org.smartregister.AllConstants.KANNADA_LANGUAGE;
 import static org.smartregister.AllConstants.KANNADA_LOCALE;
 import static org.smartregister.AllConstants.OPENSRP_AUTH_USER_URL_PATH;
@@ -69,7 +78,6 @@ public class UserService {
     private static final String KEYSTORE = "AndroidKeyStore";
     private static final String CIPHER = "RSA/ECB/PKCS1Padding";
     private static final String CIPHER_PROVIDER = "AndroidOpenSSL";
-    private static final String CIPHER_TEXT_CHARACTER_CODE = "UTF-8";
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
 
@@ -166,7 +174,7 @@ public class UserService {
         }
 
         if (!result.equals(TimeStatus.OK)) {
-            forceRemoteLogin();
+            forceRemoteLogin(allSharedPreferences.fetchRegisteredANM());
         }
 
         return result;
@@ -205,48 +213,76 @@ public class UserService {
         return TimeStatus.ERROR;
     }
 
-    public boolean isValidLocalLogin(String userName, String password) {
+    public boolean isValidLocalLogin(String userName, byte[] password) {
         return allSharedPreferences.fetchRegisteredANM().equals(userName) && DrishtiApplication.getInstance().getRepository()
-                .canUseThisPassword(password) && !allSharedPreferences.fetchForceRemoteLogin();
+                .canUseThisPassword(password) && !allSharedPreferences.fetchForceRemoteLogin(userName);
     }
 
-    public boolean isUserInValidGroup(final String userName, final String password) {
+    public boolean isUserInValidGroup(final String userName, final char[] password) {
         // Check if everything OK for local login
-        if (keyStore != null && userName != null && password != null && !allSharedPreferences
-                .fetchForceRemoteLogin()) {
-            String username = userName.equalsIgnoreCase(allSharedPreferences.fetchRegisteredANM()) ? allSharedPreferences.fetchRegisteredANM() : userName;
-            try {
-                KeyStore.PrivateKeyEntry privateKeyEntry = getUserKeyPair(username);
-                if (privateKeyEntry != null) {
-                    // Compare stored encrypted password with provided password
-                    String encryptedPassword = allSharedPreferences.
-                            fetchEncryptedPassword(username);
-                    String decryptedPassword = decryptString(privateKeyEntry, encryptedPassword);
+        if (keyStore != null && userName != null && password != null && !allSharedPreferences.fetchForceRemoteLogin(userName)) {
 
-                    if (password.equals(decryptedPassword)) {
-                        String groupId = getGroupId(username, privateKeyEntry);
-                        if (groupId != null) {
-                            return isValidGroupId(groupId);
-                        }
-                    }
+            byte[] storedHash = null;
+            byte[] passwordHash = null;
+            try {
+
+                // Compare stored password hash with provided password hash
+                storedHash = getLocalAuthenticationCredentials(userName);
+
+                passwordHash = generatePasswordHash(userName, password);
+
+                if (storedHash != null && Arrays.equals(storedHash, passwordHash)) {
+
+                    return isValidDBPassword(getDBAuthenticationCredentials(userName));
                 }
             } catch (Exception e) {
                 Timber.e(e);
+            } finally {
+                SecurityHelper.clearArray(password);
+                SecurityHelper.clearArray(passwordHash);
+                SecurityHelper.clearArray(storedHash);
             }
         }
 
         return false;
     }
 
-    private boolean isValidGroupId(String groupId) {
-        return DrishtiApplication.getInstance().getRepository().canUseThisPassword(groupId);
+    @VisibleForTesting
+    protected byte[] generatePasswordHash(String userName, char[] password) {
+        byte[] passwordSalt = null;
+        try {
+            passwordSalt = SecurityHelper.nullSafeBase64Decode(AccountHelper.getAccountManagerValue(AccountHelper.INTENT_KEY.ACCOUNT_LOCAL_PASSWORD_SALT, userName, CoreLibrary.getInstance().getAccountAuthenticatorXml().getAccountType()));
+            return SecurityHelper.hashPassword(password, passwordSalt);
+        } catch (Exception e) {
+            Timber.e(e);
+        } finally {
+            SecurityHelper.clearArray(passwordSalt);
+        }
+
+        return null;
     }
 
-    public String getGroupId(String userName) {
+
+    @VisibleForTesting
+    protected byte[] getLocalAuthenticationCredentials(String username) {
+        return DrishtiApplication.getInstance().credentialsProvider().getCredentials(username, CredentialsHelper.CREDENTIALS_TYPE.LOCAL_AUTH);
+    }
+
+    @VisibleForTesting
+    protected byte[] getDBAuthenticationCredentials(String username) {
+        return DrishtiApplication.getInstance().credentialsProvider().getCredentials(username, CredentialsHelper.CREDENTIALS_TYPE.DB_AUTH);
+    }
+
+
+    private boolean isValidDBPassword(byte[] password) {
+        return DrishtiApplication.getInstance().getRepository().canUseThisPassword(password);
+    }
+
+    public byte[] getDecryptedAccountValue(String userName, String key) {
         if (keyStore != null && userName != null) {
             try {
                 KeyStore.PrivateKeyEntry privateKeyEntry = getUserKeyPair(userName);
-                return getGroupId(userName, privateKeyEntry);
+                return getDecryptedAccountValue(userName, privateKeyEntry, key);
             } catch (Exception e) {
                 Timber.e(e);
             }
@@ -254,15 +290,34 @@ public class UserService {
         return null;
     }
 
-    public String getGroupId(String userName, KeyStore.PrivateKeyEntry privateKeyEntry) {
+    private byte[] getDecryptedAccountValue(String userName, KeyStore.PrivateKeyEntry privateKeyEntry, String key) {
         if (privateKeyEntry != null) {
-            String encryptedGroupId = allSharedPreferences.fetchEncryptedGroupId(userName);
-            if (encryptedGroupId != null) {
+
+            String encryptedSecretKey = AccountHelper.getAccountManagerValue(key, userName, CoreLibrary.getInstance().getAccountAuthenticatorXml().getAccountType());
+
+            if (encryptedSecretKey != null) {
                 try {
-                    return decryptString(privateKeyEntry, encryptedGroupId);
+                    return decryptString(privateKeyEntry, encryptedSecretKey);
                 } catch (Exception e) {
                     Timber.e(e);
                 }
+            }
+        }
+        return null;
+    }
+
+    public List<String> getUserRoles(String userName){
+        String roles = AccountHelper.getAccountManagerValue(AccountHelper.INTENT_KEY.ACCOUNT_ROLES, userName, CoreLibrary.getInstance().getAccountAuthenticatorXml().getAccountType());
+        return Arrays.asList(roles);
+    }
+
+    public byte[] getDecryptedPassphraseValue(String userName) {
+        if (keyStore != null && userName != null) {
+            try {
+                KeyStore.PrivateKeyEntry privateKeyEntry = getUserKeyPair(userName);
+                return decryptString(privateKeyEntry, allSharedPreferences.getPassphrase(CoreLibrary.getInstance().getSyncConfiguration().getEncryptionParam().name(), userName));
+            } catch (Exception e) {
+                Timber.e(e);
             }
         }
         return null;
@@ -280,28 +335,23 @@ public class UserService {
         if (userName.equals(pioneerUser)) {
             return true;
         } else {
-            String userGroupId = getGroupId(userName);
-            String pioneerGroupId = getGroupId(pioneerUser);
+            byte[] currentUserSecretKey = getDecryptedPassphraseValue(userName);
+            byte[] pioneerUserSecretKey = getDecryptedPassphraseValue(pioneerUser);
 
-            if (userGroupId != null && userGroupId.equals(pioneerGroupId)) {
-                return isValidGroupId(userGroupId);
+            if (currentUserSecretKey != null && Arrays.equals(pioneerUserSecretKey, currentUserSecretKey)) {
+                return isValidDBPassword(currentUserSecretKey);
             }
         }
 
         return false;
     }
 
-    public LoginResponse isValidRemoteLogin(String userName, String password) {
+    public LoginResponse fetchUserDetails(String accessToken) {
         String requestURL;
 
         requestURL = configuration.dristhiBaseURL() + OPENSRP_AUTH_USER_URL_PATH;
 
-        LoginResponse loginResponse = httpAgent
-                .urlCanBeAccessWithGivenCredentials(requestURL, userName, password);
-
-        if (loginResponse != null && loginResponse.equals(LoginResponse.SUCCESS)) {
-            saveUserGroup(userName, password, loginResponse.payload());
-        }
+        LoginResponse loginResponse = httpAgent.fetchUserDetails(requestURL, accessToken);
 
         return loginResponse;
     }
@@ -315,59 +365,35 @@ public class UserService {
         return httpAgent.fetch(requestURL);
     }
 
-    private boolean loginWith(String userName, String password) {
+    public boolean localLoginWith(String userName) {
         boolean loginSuccessful = true;
-        if (usesGroupIdAsDBPassword(userName)) {
-            String encryptedGroupId = allSharedPreferences.fetchEncryptedGroupId(userName);
-            try {
-                KeyStore.PrivateKeyEntry privateKeyEntry = getUserKeyPair(userName);
-                if (privateKeyEntry != null) {
-                    String groupId = decryptString(privateKeyEntry, encryptedGroupId);
-                    setupContextForLogin(userName, groupId);
+
+        try {
+
+            byte[] secretKey = getDecryptedPassphraseValue(userName);
+            if (secretKey != null) {
+                setupContextForLogin(secretKey);
+
+                if (!allSharedPreferences.fetchRegisteredANM().equalsIgnoreCase(userName)) {
+                    allSharedPreferences.updateANMUserName(userName);
                 }
-            } catch (Exception e) {
-                Timber.e(e);
-                loginSuccessful = false;
-            }
-        } else {
-            setupContextForLogin(userName, password);
+
+                DrishtiApplication.getInstance().getRepository().getReadableDatabase();
+            } else
+                return false;
+
+        } catch (Exception e) {
+            Timber.e(e);
+            loginSuccessful = false;
         }
-        String username = userName;
-        if (allSharedPreferences.fetchRegisteredANM().equalsIgnoreCase(userName))
-            username = allSharedPreferences.fetchRegisteredANM();
-        allSharedPreferences.updateANMUserName(username);
-        DrishtiApplication.getInstance().getRepository().getReadableDatabase();
-        allSettings.registerANM(username, password);
+
         return loginSuccessful;
     }
 
-    /**
-     * Checks whether to use the groupId for the current user to decrypt the database
-     *
-     * @param userName The user to check
-     * @return TRUE if the user decrypts the database using the groupId
-     */
-    private boolean usesGroupIdAsDBPassword(String userName) {
-        try {
-            if (keyStore != null && keyStore.containsAlias(userName)) {
-                if (allSharedPreferences.fetchEncryptedGroupId(userName) != null) {
-                    return true;
-                }
-            }
-        } catch (Exception e) {
-            Timber.e(e);
-        }
-        return false;
-    }
-
-    public void localLogin(String userName, String password) {
-        loginWith(userName, password);
-    }
-
-    public void remoteLogin(String userName, String password, LoginResponseData userInfo) {
+    public void processLoginResponseDataForUser(String userName, LoginResponseData userInfo) {
         String username = userInfo.user != null && StringUtils.isNotBlank(userInfo.user.getUsername())
                 ? userInfo.user.getUsername() : userName;
-        boolean loginSuccessful = loginWith(username, password);
+        boolean loginSuccessful = localLoginWith(username);
         saveAnmLocation(getUserLocation(userInfo));
         saveAnmTeam(getUserTeam(userInfo));
         saveUserInfo(getUserData(userInfo));
@@ -377,6 +403,7 @@ public class UserService {
         saveDefaultTeamId(username, getUserDefaultTeamId(userInfo));
         saveServerTimeZone(userInfo);
         saveJurisdictions(userInfo.jurisdictions);
+        saveJurisdictionIds(userInfo.jurisdictionIds);
         saveOrganizations(getUserTeam(userInfo));
         if (loginSuccessful &&
                 (StringUtils.isBlank(getUserDefaultLocationId(userInfo)) ||
@@ -385,11 +412,11 @@ public class UserService {
                         StringUtils.isNotBlank(allSharedPreferences.fetchDefaultTeamId(username))) &&
                 (getUserLocation(userInfo) != null ||
                         StringUtils.isNotBlank(allSettings.fetchANMLocation())))
-            allSharedPreferences.saveForceRemoteLogin(false);
+            allSharedPreferences.saveForceRemoteLogin(false, username);
     }
 
-    public void forceRemoteLogin() {
-        allSharedPreferences.saveForceRemoteLogin(true);
+    public void forceRemoteLogin(String userName) {
+        allSharedPreferences.saveForceRemoteLogin(true, userName);
     }
 
     public User getUserData(LoginResponseData userInfo) {
@@ -513,12 +540,31 @@ public class UserService {
             allSharedPreferences.savePreference(OPERATIONAL_AREAS, android.text.TextUtils.join(",", jurisdictions));
     }
 
+    public void saveJurisdictionIds(Set<String> jurisdictionIds) {
+        if (jurisdictionIds != null && !jurisdictionIds.isEmpty())
+            allSharedPreferences.savePreference(JURISDICTION_IDS, android.text.TextUtils.join(",", jurisdictionIds));
+    }
+
+    public Set<String> fetchJurisdictionIds() {
+        String jurisdictionIds = allSharedPreferences.getPreference(JURISDICTION_IDS);
+        return Arrays.stream(StringUtils.split(jurisdictionIds, ",")).collect(Collectors.toSet());
+    }
+
     public void saveOrganizations(TeamMember teamMember) {
         if (teamMember != null && teamMember.team != null) {
             List<Long> organizations = teamMember.team.organizationIds;
             if (organizations != null && !organizations.isEmpty())
-                allSharedPreferences.savePreference(ORGANIZATION_IDS, android.text.TextUtils.join(",", organizations));
+                saveOrganizations(organizations);
         }
+    }
+
+    public void saveOrganizations(List<Long> organizations) {
+        allSharedPreferences.savePreference(ORGANIZATION_IDS, android.text.TextUtils.join(",", organizations));
+    }
+
+    public Set<Long> fetchOrganizations() {
+        String organizationIds = allSharedPreferences.getPreference(ORGANIZATION_IDS);
+        return Arrays.stream(StringUtils.split(organizationIds, ",")).map(Long::parseLong).collect(Collectors.toSet());
     }
 
     public void saveUserInfo(User user) {
@@ -545,54 +591,73 @@ public class UserService {
      * @param userInfo The user's info from the
      *                 endpoint (should contain the {team}.{team}.{uuid} key)
      */
-    public void saveUserGroup(String userName, String password, LoginResponseData userInfo) {
-        String username = userInfo.user != null && StringUtils.isNotBlank(userInfo.user.getUsername())
-                ? userInfo.user.getUsername() : userName;
+    public Bundle saveUserCredentials(String userName, char[] password, LoginResponseData userInfo) {
+        Bundle bundle = new Bundle();
+
+        String username = userInfo.user != null && StringUtils.isNotBlank(userInfo.user.getUsername()) ? userInfo.user.getUsername() : userName;
+        bundle.putString(AccountHelper.INTENT_KEY.ACCOUNT_NAME, username);
+
         if (keyStore != null && username != null) {
+
             try {
+
                 KeyStore.PrivateKeyEntry privateKeyEntry = createUserKeyPair(username);
 
                 if (password == null) {
-                    return;
+                    return null;
                 }
 
-
-                String groupId = null;
-
-                SyncConfiguration syncConfiguration = CoreLibrary.getInstance().getSyncConfiguration();
-                if (syncConfiguration.getEncryptionParam() != null) {
-                    SyncFilter syncFilter = syncConfiguration.getEncryptionParam();
-                    if (SyncFilter.TEAM.equals(syncFilter) || SyncFilter.TEAM_ID.equals(syncFilter)) {
-                        groupId = getUserDefaultTeamId(userInfo);
-                    } else if (SyncFilter.LOCATION.equals(syncFilter) || SyncFilter.LOCATION_ID.equals(syncFilter)) {
-                        groupId = getUserLocationId(userInfo);
-                    } else if (SyncFilter.PROVIDER.equals(syncFilter)) {
-                        groupId = username + "-" + password;
-                    }
-                }
-
-                if (StringUtils.isBlank(groupId)) {
-                    return;
+                PasswordHash localAuthHash = DrishtiApplication.getInstance().credentialsProvider().generateLocalAuthCredentials(password);
+                if (localAuthHash == null) {
+                    return null;
                 }
 
                 if (privateKeyEntry != null) {
-                    // First save the encrypted password
-                    String encryptedPassword = encryptString(privateKeyEntry, password);
-                    allSharedPreferences.saveEncryptedPassword(username, encryptedPassword);
 
-                    // Then save the encrypted group
-                    String encryptedGroupId = encryptString(privateKeyEntry, groupId);
-                    allSharedPreferences.saveEncryptedGroupId(username, encryptedGroupId);
+                    // Save the encrypted secret key for local login
+                    String encryptedLocalAuthHash = encryptString(privateKeyEntry, localAuthHash.getPassword());
+                    bundle.putString(AccountHelper.INTENT_KEY.ACCOUNT_LOCAL_PASSWORD, encryptedLocalAuthHash);
+                    bundle.putString(AccountHelper.INTENT_KEY.ACCOUNT_LOCAL_PASSWORD_SALT, Base64.encodeToString(localAuthHash.getSalt(), Base64.DEFAULT));
 
-                    // Finally, save the pioneer user
-                    if (allSharedPreferences.fetchPioneerUser() == null) {
+                    //Save db credentials
+                    if (CredentialsHelper.shouldMigrate() || !username.equals(allSharedPreferences.fetchPioneerUser())) {
+
+                        byte[] passphrase = DrishtiApplication.getInstance().credentialsProvider().generateDBCredentials(SecurityHelper.toChars(localAuthHash.getPassword()), userInfo);
+                        byte[] oldPassword = allSharedPreferences.getDBEncryptionVersion() == 0 ? getGroupId(username) : DrishtiApplication.getInstance().credentialsProvider().getCredentials(username, CredentialsHelper.CREDENTIALS_TYPE.DB_AUTH);
+
+                        if (oldPassword != null && !Arrays.equals(passphrase, oldPassword)) {
+                            try {
+
+                                DrishtiApplication.getInstance().getRepository().getReadableDatabase(SecurityHelper.toChars(oldPassword)).changePassword(SecurityHelper.toChars(passphrase));
+                                DrishtiApplication.getInstance().credentialsProvider().saveCredentials(CredentialsHelper.CREDENTIALS_TYPE.DB_AUTH, encryptString(privateKeyEntry, passphrase), username);
+
+                            } catch (Exception e) {
+                                Timber.e("Database encryption migration to version %s failed!!! ", BuildConfig.DB_ENCRYPTION_VERSION);
+                                Timber.e(e);
+                            }
+
+                        } else {
+
+                            DrishtiApplication.getInstance().credentialsProvider().saveCredentials(CredentialsHelper.CREDENTIALS_TYPE.DB_AUTH, encryptString(privateKeyEntry, passphrase), username);
+                        }
+                    }
+
+                    //Save pioneer user
+                    if (StringUtils.isBlank(allSharedPreferences.fetchPioneerUser())) {
                         allSharedPreferences.savePioneerUser(username);
                     }
+
                 }
+
             } catch (Exception e) {
                 Timber.e(e);
+            } finally {
+
+                SecurityHelper.clearArray(password);
             }
         }
+
+        return bundle;
     }
 
     public boolean hasARegisteredUser() {
@@ -601,21 +666,28 @@ public class UserService {
 
     public void logout() {
         logoutSession();
-        allSettings.registerANM("", "");
+        allSettings.registerANM("");
         allSettings.savePreviousFetchIndex("0");
-        DrishtiApplication.getInstance().getRepository().deleteRepository();
+        configuration.getDrishtiApplication().getRepository().deleteRepository();
     }
 
     public void logoutSession() {
         session().expire();
+        clearApplicationPasswordReference();
         ON_LOGOUT.notifyListeners(true);
+    }
+
+    private void clearApplicationPasswordReference() {
+
+        SecurityHelper.clearArray(configuration.getDrishtiApplication().getPassword());
+        configuration.getDrishtiApplication().setPassword(null);
     }
 
     public boolean hasSessionExpired() {
         return session().hasExpired();
     }
 
-    protected void setupContextForLogin(String userName, String password) {
+    protected void setupContextForLogin(byte[] password) {
         session().start(session().lengthInMilliseconds());
         configuration.getDrishtiApplication().setPassword(password);
         session().setPassword(password);
@@ -683,12 +755,11 @@ public class UserService {
      *
      * @param privateKeyEntry Keypair to use to decrypt the string
      * @param cipherText      String to be decrypted
-     * @return Plain text derived from the cipher text
+     * @return char array of text derived from the cipher text
      * @throws Exception
      */
     @VisibleForTesting
-    protected String decryptString(KeyStore.PrivateKeyEntry privateKeyEntry, String cipherText)
-            throws Exception {
+    protected byte[] decryptString(KeyStore.PrivateKeyEntry privateKeyEntry, String cipherText) throws Exception {
 
         Cipher output;
         if (Build.VERSION.SDK_INT >= 23) {
@@ -714,18 +785,18 @@ public class UserService {
             bytes[i] = values.get(i);
         }
 
-        return new String(bytes, 0, bytes.length, CIPHER_TEXT_CHARACTER_CODE);
+        return bytes;
     }
 
     /**
      * Encrypts a string using the provided keypair
      *
      * @param privateKeyEntry The keypair to use to encrypt the text
-     * @param plainText       The plain text to encrypt (should be at most 256bytes)
+     * @param plainTextBytes  The plain text to encrypt (should be at most 256bytes)
      * @return Cipher text corresponding to the plain text
      * @throws Exception
      */
-    private String encryptString(KeyStore.PrivateKeyEntry privateKeyEntry, String plainText)
+    private String encryptString(KeyStore.PrivateKeyEntry privateKeyEntry, byte[] plainTextBytes)
             throws Exception {
         RSAPublicKey publicKey = (RSAPublicKey) privateKeyEntry.getCertificate().getPublicKey();
 
@@ -739,7 +810,7 @@ public class UserService {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         CipherOutputStream cipherOutputStream = new CipherOutputStream(outputStream, input);
-        cipherOutputStream.write(plainText.getBytes(CIPHER_TEXT_CHARACTER_CODE));
+        cipherOutputStream.write(plainTextBytes);
         cipherOutputStream.close();
 
         byte[] vals = outputStream.toByteArray();
@@ -749,5 +820,33 @@ public class UserService {
 
     public KeyStore getKeyStore() {
         return keyStore;
+    }
+
+    @Deprecated
+    public byte[] getGroupId(String userName) {
+        if (keyStore != null && userName != null) {
+            try {
+                KeyStore.PrivateKeyEntry privateKeyEntry = getUserKeyPair(userName);
+                return getGroupId(userName, privateKeyEntry);
+            } catch (Exception e) {
+                Timber.e(e);
+            }
+        }
+        return null;
+    }
+
+    @Deprecated
+    public byte[] getGroupId(String userName, KeyStore.PrivateKeyEntry privateKeyEntry) {
+        if (privateKeyEntry != null) {
+            String encryptedGroupId = allSharedPreferences.fetchEncryptedGroupId(userName);
+            if (encryptedGroupId != null) {
+                try {
+                    return decryptString(privateKeyEntry, encryptedGroupId);
+                } catch (Exception e) {
+                    Timber.e(e);
+                }
+            }
+        }
+        return null;
     }
 }

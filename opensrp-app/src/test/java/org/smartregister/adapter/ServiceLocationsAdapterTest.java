@@ -18,6 +18,7 @@ import org.smartregister.R;
 import org.smartregister.location.helper.LocationHelper;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -79,7 +80,7 @@ public class ServiceLocationsAdapterTest extends BaseUnitTest {
     public void testGetLocationNames() {
         ServiceLocationsAdapter adapter = getAdapterWithFakeClients();
 
-        ArrayList<String> names = adapter.getLocationNames();
+        List<String> names = adapter.getLocationNames();
 
         Assert.assertEquals(names.get(0), "test1");
     }

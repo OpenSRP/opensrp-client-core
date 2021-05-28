@@ -12,13 +12,13 @@ public class BaseLoginModel implements BaseLoginContract.Model {
 
     @Override
     public org.smartregister.Context getOpenSRPContext() {
-        return  CoreLibrary.getInstance().context();
+        return CoreLibrary.getInstance().context();
 
     }
 
     @Override
-    public boolean isPasswordValid(String password) {
-        return !TextUtils.isEmpty(password) && password.length() > 1;
+    public boolean isPasswordValid(char[] password) {
+        return password != null && password.length > 1;
     }
 
     @Override

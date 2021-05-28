@@ -33,8 +33,8 @@
     <string name="settings_logout_confirm_dialog_message">Êtes-vous certain de vouloir se déconnecter? Tous les données seront effacées.</string>
     <string name="unsynced_forms_count_message">Formulaires non-synchronisés</string>
 
-    <string name="str_next">Prochain &gt;&gt;</string>
-    <string name="str_previous">&lt;&lt; Dernier</string>
+    <string name="str_next">Suivante &gt;&gt;</string>
+    <string name="str_previous">&lt;&lt; Précédente</string>
     <string name="str_page_info">Page {0} de {1}</string>
 
     <string name="header_name">Nom</string>
@@ -412,5 +412,6 @@
     <string name="msg_empty_url">l\'addresse URL ne peut pas être vide.</string>
     <string name="sync_failed_malformed_url">Synchronisation échouée. Vérifier configuration URL.</string>
     <string name="sync_failed_timeout_error">Synchronisation échouée. Impossible de connecter au serveur.</string>
+    <string name="account_removed">Vous avez été déconnecté car votre compte a été supprimé du gestionnaire de compte.</string>
 
 </resources>

@@ -5,7 +5,6 @@ import android.database.DataSetObserver;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.VisibleForTesting;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -19,6 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.annotation.VisibleForTesting;
 
 import org.joda.time.LocalDate;
 import org.smartregister.R;
@@ -439,8 +440,7 @@ public abstract class SecuredNativeSmartRegisterFragment extends SecuredFragment
         }
 
         public void refresh() {
-            pageInfoView.setText(format(getResources().getString(R.string.str_page_info),
-                    (getCurrentPageCount()), (clientsAdapter.pageCount())));
+            pageInfoView.setText(getFormattedPaginationInfoText(getCurrentPageCount(), clientsAdapter.pageCount()));
             nextPageView.setVisibility(clientsAdapter.hasNextPage() ? VISIBLE : INVISIBLE);
             previousPageView.setVisibility(clientsAdapter.hasPreviousPage() ? VISIBLE : INVISIBLE);
         }
@@ -493,5 +493,9 @@ public abstract class SecuredNativeSmartRegisterFragment extends SecuredFragment
             searchView.setText("");
         }
 
+    }
+
+    protected String getFormattedPaginationInfoText(int currentPage, int pageCount) {
+        return format(getResources().getString(R.string.str_page_info), currentPage, pageCount);
     }
 }

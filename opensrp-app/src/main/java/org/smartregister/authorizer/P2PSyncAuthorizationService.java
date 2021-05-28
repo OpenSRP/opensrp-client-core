@@ -1,6 +1,6 @@
 package org.smartregister.authorizer;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.smartregister.AllConstants;
 import org.smartregister.p2p.authorizer.P2PAuthorizationService;

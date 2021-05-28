@@ -6,13 +6,13 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <android.support.design.widget.AppBarLayout
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:popupTheme="@style/AppTheme.PopupOverlay"
         android:theme="@style/AppTheme.AppBarOverlay">
 
-        <android.support.v7.widget.Toolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/register_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -23,8 +23,8 @@
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
             <include layout="@layout/top_base_register_bar" />
-        </android.support.v7.widget.Toolbar>
+        </androidx.appcompat.widget.Toolbar>
 
-    </android.support.design.widget.AppBarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
 </LinearLayout>

@@ -3,15 +3,13 @@ package org.smartregister;
 import android.os.Build;
 import android.view.View;
 
-import org.junit.runner.RunWith;
+import org.junit.Before;
+import org.mockito.MockitoAnnotations;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
-import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.customshadows.FontTextViewShadow;
-import org.smartregister.shadows.ShadowDrawableResourcesImpl;
+import org.smartregister.view.UnitTest;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,8 +18,7 @@ import java.util.Collection;
  * Created by onaio on 29/08/2017.
  */
 
-@RunWith(RobolectricTestRunner.class)
-@Config(application = TestApplication.class, shadows = {FontTextViewShadow.class, ShadowDrawableResourcesImpl.class}, sdk = Build.VERSION_CODES.P)
+@Config(shadows = {FontTextViewShadow.class}, sdk = Build.VERSION_CODES.O_MR1)
 @PowerMockIgnore({"org.mockito.*",
         "org.robolectric.*",
         "android.*",
@@ -36,12 +33,17 @@ import java.util.Collection;
         "javax.activation.*",
         "org.springframework.context.*",
         "org.apache.log4j.*"})
-public abstract class BaseUnitTest {
+public abstract class BaseUnitTest extends UnitTest {
     protected static final int INITIALS_RESOURCE_ID = R.drawable.bottom_bar_initials_background;
     protected static final String INITIALS_TEXT = "TR";
     protected static final String TEST_BASE_ENTITY_ID = "23ka2-3e23h2-n3g2i4-9q3b-yts4-20";
     protected static final String TEST_FORM_NAME = "child_enrollment.json";
     protected static final String TEST_RANDOM_STRING = "random text string";
+
+    @Before
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+    }
 
     public void resetWindowManager() {
 
@@ -80,5 +82,4 @@ public abstract class BaseUnitTest {
         System.out.println("Resetting Window Manager");
 
     }
-
 }

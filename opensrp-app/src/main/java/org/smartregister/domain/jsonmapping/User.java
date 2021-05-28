@@ -16,7 +16,7 @@ public class User extends BaseEntity {
 
     private String username;
 
-    private String password;
+    private char[] password;
 
     private String salt;
 
@@ -36,14 +36,14 @@ public class User extends BaseEntity {
         super(baseEntityId);
     }
 
-    public User(String baseEntityId, String username, String password, String salt) {
+    public User(String baseEntityId, String username, char[] password, String salt) {
         super(baseEntityId);
         this.username = username;
         this.password = password;
         this.salt = salt;
     }
 
-    public User(String baseEntityId, String username, String password, String salt, String status, List<String> roles, List<String> permissions) {
+    public User(String baseEntityId, String username, char[] password, String salt, String status, List<String> roles, List<String> permissions) {
         super(baseEntityId);
         this.username = username;
         this.password = password;
@@ -53,7 +53,7 @@ public class User extends BaseEntity {
         this.permissions = permissions;
     }
 
-    public User(String baseEntityId, String username, String password, String preferredName, String salt, String status, List<String> roles,
+    public User(String baseEntityId, String username, char[] password, String preferredName, String salt, String status, List<String> roles,
                 List<String> permissions) {
         super(baseEntityId);
         this.username = username;
@@ -73,11 +73,11 @@ public class User extends BaseEntity {
         this.username = username;
     }
 
-    public String getPassword() {
+    public char[] getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(char[] password) {
         this.password = password;
     }
 
@@ -172,7 +172,7 @@ public class User extends BaseEntity {
         return this;
     }
 
-    public User withPassword(String password) {
+    public User withPassword(char[] password) {
         this.password = password;
         return this;
     }

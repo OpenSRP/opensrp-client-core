@@ -1,8 +1,8 @@
 package org.smartregister.repository;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -80,7 +80,7 @@ public class P2PReceiverTransferDao extends BaseP2PTransferDao implements Receiv
             return 0;
         }
 
-        if (dataType.getName().equals(event.getName())) {
+        if (dataType.getName().startsWith(event.getName())) {
 
             Timber.e("Received %s total events", String.valueOf(jsonArray.length()));
 
@@ -92,7 +92,7 @@ public class P2PReceiverTransferDao extends BaseP2PTransferDao implements Receiv
             if (foreignData.length() > 0)
                 foreignEventClientRepository.batchInsertEvents(foreignData, 0);
 
-        } else if (dataType.getName().equals(client.getName())) {
+        } else if (dataType.getName().startsWith(client.getName())) {
 
             Timber.e("Received %s clients", String.valueOf(jsonArray.length()));
 
@@ -104,13 +104,13 @@ public class P2PReceiverTransferDao extends BaseP2PTransferDao implements Receiv
             if (foreignData.length() > 0)
                 foreignEventClientRepository.batchInsertClients(foreignData);
 
-        } else if (dataType.getName().equals(structure.getName())) {
+        } else if (dataType.getName().startsWith(structure.getName())) {
             Timber.e("Received %s structures", String.valueOf(jsonArray.length()));
             structureRepository.batchInsertStructures(jsonArray);
-        } else if (dataType.getName().equals(task.getName())) {
+        } else if (dataType.getName().startsWith(task.getName())) {
             Timber.e("Received %s tasks", String.valueOf(jsonArray.length()));
             taskRepository.batchInsertTasks(jsonArray);
-        } else if (dataType.getName().equals(foreignClient.getName())) {
+        } else if (dataType.getName().startsWith(foreignClient.getName())) {
 
             Timber.e("Received %s foreign clients", String.valueOf(jsonArray.length()));
 
@@ -122,7 +122,7 @@ public class P2PReceiverTransferDao extends BaseP2PTransferDao implements Receiv
             if (foreignData.length() > 0)
                 foreignEventClientRepository.batchInsertClients(foreignData);
 
-        } else if (dataType.getName().equals(foreignEvent.getName())) {
+        } else if (dataType.getName().startsWith(foreignEvent.getName())) {
 
             Timber.e("Received %s foreign events", String.valueOf(jsonArray.length()));
 

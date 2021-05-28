@@ -1,34 +1,23 @@
 package org.smartregister.repository;
 
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 
 import org.apache.commons.lang3.StringUtils;
+import org.smartregister.AllConstants;
+import org.smartregister.CoreLibrary;
+import org.smartregister.util.Log;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import static org.smartregister.AllConstants.CURRENT_LOCALITY;
-import static org.smartregister.AllConstants.DEFAULT_LOCALE;
-import static org.smartregister.AllConstants.DEFAULT_LOCALITY_ID_PREFIX;
-import static org.smartregister.AllConstants.DEFAULT_TEAM_ID_PREFIX;
-import static org.smartregister.AllConstants.DEFAULT_TEAM_PREFIX;
-import static org.smartregister.AllConstants.DRISHTI_BASE_URL;
-import static org.smartregister.AllConstants.ENCRYPTED_GROUP_ID_PREFIX;
-import static org.smartregister.AllConstants.ENCRYPTED_PASSWORD_PREFIX;
-import static org.smartregister.AllConstants.FORCE_REMOTE_LOGIN;
-import static org.smartregister.AllConstants.IS_SYNC_INITIAL_KEY;
-import static org.smartregister.AllConstants.IS_SYNC_IN_PROGRESS_PREFERENCE_KEY;
-import static org.smartregister.AllConstants.LANGUAGE_PREFERENCE_KEY;
-import static org.smartregister.AllConstants.PIONEER_USER;
-import static org.smartregister.AllConstants.SERVER_TIMEZONE;
-import static org.smartregister.AllConstants.USER_LOCALITY_ID_PREFIX;
-import static org.smartregister.util.Log.logError;
-import static org.smartregister.util.Log.logInfo;
+import java.util.HashSet;
+import java.util.Set;
 
 public class AllSharedPreferences {
     public static final String ANM_IDENTIFIER_PREFERENCE_KEY = "anmIdentifier";
+    public static final String ANM_IDENTIFIER_SET_PREFERENCE_KEY = "anmIdentifierSet";
     private static final String HOST = "HOST";
     private static final String PORT = "PORT";
     private static final String LAST_SYNC_DATE = "LAST_SYNC_DATE";
@@ -42,6 +31,8 @@ public class AllSharedPreferences {
     private static final String PEER_TO_PEER_SYNC_LAST_FOREIGN_PROCESSED_RECORD = "PEER_TO_PEER_SYNC_LAST_FOREIGN_PROCESSED_RECORD";
     public static final String MANIFEST_VERSION = "MANIFEST_VERSION";
     public static final String FORMS_VERSION = "FORMS_VERSION";
+    private static final String ENCRYPTED_PASSPHRASE_KEY = "ENCRYPTED_PASSPHRASE_KEY";
+    private static final String DB_ENCRYPTION_VERSION = "DB_ENCRYPTION_VERSION";
     private SharedPreferences preferences;
 
     public AllSharedPreferences(SharedPreferences preferences) {
@@ -51,146 +42,142 @@ public class AllSharedPreferences {
 
     public void updateANMUserName(String userName) {
         preferences.edit().putString(ANM_IDENTIFIER_PREFERENCE_KEY, userName).commit();
+
+        Set<String> anmIdentifiers = new HashSet<>(preferences.getStringSet(ANM_IDENTIFIER_SET_PREFERENCE_KEY, new HashSet<>()));
+        anmIdentifiers.add(userName);
+        preferences.edit().putStringSet(ANM_IDENTIFIER_SET_PREFERENCE_KEY, anmIdentifiers).commit();
     }
 
     public String fetchRegisteredANM() {
         return preferences.getString(ANM_IDENTIFIER_PREFERENCE_KEY, "").trim();
     }
 
-    public boolean fetchForceRemoteLogin() {
-        return preferences.getBoolean(FORCE_REMOTE_LOGIN, true);
+    public boolean isRegisteredANM(String userName) {
+        return preferences.getStringSet(ANM_IDENTIFIER_SET_PREFERENCE_KEY, new HashSet<>()).contains(userName);
     }
 
-    public void saveForceRemoteLogin(boolean forceRemoteLogin) {
-        preferences.edit().putBoolean(FORCE_REMOTE_LOGIN, forceRemoteLogin).commit();
+    public boolean fetchForceRemoteLogin(String username) {
+        return preferences.getBoolean(new StringBuffer(AllConstants.FORCE_REMOTE_LOGIN).append('_').append(username).toString(), true);
+    }
+
+    public void saveForceRemoteLogin(boolean forceRemoteLogin, String username) {
+        preferences.edit().putBoolean(new StringBuffer(AllConstants.FORCE_REMOTE_LOGIN).append('_').append(username).toString(), forceRemoteLogin).commit();
     }
 
     public String fetchServerTimeZone() {
-        return preferences.getString(SERVER_TIMEZONE, null);
+        return preferences.getString(AllConstants.SERVER_TIMEZONE, null);
     }
 
     public void saveServerTimeZone(String serverTimeZone) {
-        preferences.edit().putString(SERVER_TIMEZONE, serverTimeZone).commit();
+        preferences.edit().putString(AllConstants.SERVER_TIMEZONE, serverTimeZone).commit();
     }
 
-    public String fetchEncryptedPassword(String username) {
+    public String fetchEncryptedGroupId(String username) {
         if (username != null) {
-            return preferences.getString(ENCRYPTED_PASSWORD_PREFIX + username, null);
+            return preferences.getString(AllConstants.ENCRYPTED_GROUP_ID_PREFIX + username, null);
         }
         return null;
     }
 
-    public void saveEncryptedPassword(String username, String password) {
-        if (username != null) {
-            preferences.edit().putString(ENCRYPTED_PASSWORD_PREFIX + username, password).commit();
-        }
-    }
-
     public String fetchPioneerUser() {
-        return preferences.getString(PIONEER_USER, null);
+        return preferences.getString(AllConstants.PIONEER_USER, null);
     }
 
     public void savePioneerUser(String username) {
-        preferences.edit().putString(PIONEER_USER, username).commit();
+        preferences.edit().putString(AllConstants.PIONEER_USER, username).commit();
     }
 
     public void saveDefaultLocalityId(String username, String localityId) {
         if (username != null) {
-            preferences.edit().putString(DEFAULT_LOCALITY_ID_PREFIX + username, localityId)
+            preferences.edit().putString(AllConstants.DEFAULT_LOCALITY_ID_PREFIX + username, localityId)
                     .commit();
         }
     }
 
     public String fetchDefaultLocalityId(String username) {
         if (username != null) {
-            return preferences.getString(DEFAULT_LOCALITY_ID_PREFIX + username, null);
+            return preferences.getString(AllConstants.DEFAULT_LOCALITY_ID_PREFIX + username, null);
         }
         return null;
     }
 
     public void saveUserLocalityId(String username, String localityId) {
         if (username != null) {
-            preferences.edit().putString(USER_LOCALITY_ID_PREFIX + username, localityId)
+            preferences.edit().putString(AllConstants.USER_LOCALITY_ID_PREFIX + username, localityId)
                     .commit();
         }
     }
 
     public String fetchUserLocalityId(String username) {
         if (username != null) {
-            return preferences.getString(USER_LOCALITY_ID_PREFIX + username, null);
+            return preferences.getString(AllConstants.USER_LOCALITY_ID_PREFIX + username, null);
         }
         return null;
     }
 
     public void saveDefaultTeam(String username, String team) {
         if (username != null) {
-            preferences.edit().putString(DEFAULT_TEAM_PREFIX + username, team)
+            preferences.edit().putString(AllConstants.DEFAULT_TEAM_PREFIX + username, team)
                     .commit();
         }
     }
 
     public String fetchDefaultTeam(String username) {
         if (username != null) {
-            return preferences.getString(DEFAULT_TEAM_PREFIX + username, null);
+            return preferences.getString(AllConstants.DEFAULT_TEAM_PREFIX + username, null);
         }
         return null;
     }
 
     public void saveDefaultTeamId(String username, String teamId) {
         if (username != null) {
-            preferences.edit().putString(DEFAULT_TEAM_ID_PREFIX + username, teamId)
+            preferences.edit().putString(AllConstants.DEFAULT_TEAM_ID_PREFIX + username, teamId)
                     .commit();
         }
     }
 
     public String fetchDefaultTeamId(String username) {
         if (username != null) {
-            return preferences.getString(DEFAULT_TEAM_ID_PREFIX + username, null);
+            return preferences.getString(AllConstants.DEFAULT_TEAM_ID_PREFIX + username, null);
         }
         return null;
     }
 
     public String fetchCurrentLocality() {
-        return preferences.getString(CURRENT_LOCALITY, null);
+        return preferences.getString(AllConstants.CURRENT_LOCALITY, null);
     }
 
     public void saveCurrentLocality(String currentLocality) {
-        preferences.edit().putString(CURRENT_LOCALITY, currentLocality).commit();
+        preferences.edit().putString(AllConstants.CURRENT_LOCALITY, currentLocality).commit();
     }
 
-    public String fetchEncryptedGroupId(String username) {
-        if (username != null) {
-            return preferences.getString(ENCRYPTED_GROUP_ID_PREFIX + username, null);
-        }
-        return null;
+    public String fetchCurrentDataStrategy() {
+        return preferences.getString(AllConstants.DATA_STRATEGY, AllConstants.DATA_CAPTURE_STRATEGY.NORMAL);
     }
 
-    public void saveEncryptedGroupId(String username, String groupId) {
-        if (username != null) {
-            preferences.edit().putString(ENCRYPTED_GROUP_ID_PREFIX + username, groupId).commit();
-        }
+    public void saveCurrentDataStrategy(String currentDataStrategy) {
+        preferences.edit().putString(AllConstants.DATA_STRATEGY, currentDataStrategy).commit();
     }
 
     public String fetchLanguagePreference() {
-        return preferences.getString(LANGUAGE_PREFERENCE_KEY, DEFAULT_LOCALE).trim();
+        return preferences.getString(AllConstants.LANGUAGE_PREFERENCE_KEY, AllConstants.DEFAULT_LOCALE).trim();
     }
 
     public void saveLanguagePreference(String languagePreference) {
-        preferences.edit().putString(LANGUAGE_PREFERENCE_KEY, languagePreference).commit();
+        preferences.edit().putString(AllConstants.LANGUAGE_PREFERENCE_KEY, languagePreference).commit();
     }
 
     public Boolean fetchIsSyncInProgress() {
-        return preferences.getBoolean(IS_SYNC_IN_PROGRESS_PREFERENCE_KEY, false);
+        return preferences.getBoolean(AllConstants.IS_SYNC_IN_PROGRESS_PREFERENCE_KEY, false);
     }
 
     public void saveIsSyncInProgress(Boolean isSyncInProgress) {
-        preferences.edit().putBoolean(IS_SYNC_IN_PROGRESS_PREFERENCE_KEY, isSyncInProgress)
-                .commit();
+        preferences.edit().putBoolean(AllConstants.IS_SYNC_IN_PROGRESS_PREFERENCE_KEY, isSyncInProgress).commit();
     }
 
     public String fetchBaseURL(String baseurl) {
 
-        String url = preferences.getString(DRISHTI_BASE_URL, baseurl);
+        String url = preferences.getString(AllConstants.DRISHTI_BASE_URL, baseurl);
         return StringUtils.isNotBlank(url) && url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
 
     }
@@ -241,6 +228,10 @@ public class AllSharedPreferences {
         return preferences.getString(key, "");
     }
 
+    public boolean getBooleanPreference(String key) {
+        return preferences.getBoolean(key, false);
+    }
+
     public void updateUrl(String baseUrl) {
         try {
 
@@ -249,14 +240,14 @@ public class AllSharedPreferences {
             String base = url.getProtocol() + "://" + url.getHost();
             int port = url.getPort();
 
-            logInfo("Base URL: " + base);
-            logInfo("Port: " + port);
+            Log.logInfo("Base URL: " + base);
+            Log.logInfo("Port: " + port);
 
             saveHost(base);
             savePort(port);
 
         } catch (MalformedURLException e) {
-            logError("Malformed Url: " + baseUrl);
+            Log.logError("Malformed Url: " + baseUrl);
         }
     }
 
@@ -269,11 +260,11 @@ public class AllSharedPreferences {
     }
 
     public void saveIsSyncInitial(boolean initialSynStatus) {
-        preferences.edit().putBoolean(IS_SYNC_INITIAL_KEY, initialSynStatus).commit();
+        preferences.edit().putBoolean(AllConstants.IS_SYNC_INITIAL_KEY, initialSynStatus).commit();
     }
 
     public Boolean fetchIsSyncInitial() {
-        return preferences.getBoolean(IS_SYNC_INITIAL_KEY, false);
+        return preferences.getBoolean(AllConstants.IS_SYNC_INITIAL_KEY, false);
     }
 
     public long fetchLastCheckTimeStamp() {
@@ -363,6 +354,36 @@ public class AllSharedPreferences {
     @Nullable
     public SharedPreferences getPreferences() {
         return preferences;
+    }
+
+    public String getPassphrase(String encryptionParam, String username) {
+        return preferences.getString(new StringBuffer(ENCRYPTED_PASSPHRASE_KEY).append('_').append(encryptionParam).append('_').append(username).toString(), null);
+    }
+
+    public void savePassphrase(String passphrase, String encryptionParam, String username) {
+        preferences.edit().putString(new StringBuffer(ENCRYPTED_PASSPHRASE_KEY).append('_').append(encryptionParam).append('_').append(username).toString(), passphrase).commit();
+    }
+
+    /**
+     * Allows migration of older passphrase so that is linked to pioneer user
+     **/
+    public void migratePassphrase() {
+        if (CoreLibrary.getInstance().getSyncConfiguration() == null) {
+            return;
+        }
+        String encryptionParam = CoreLibrary.getInstance().getSyncConfiguration().getEncryptionParam().name();
+        String passphrase = preferences.getString(new StringBuffer(ENCRYPTED_PASSPHRASE_KEY).append('_').append(encryptionParam).toString(), null);
+        if (passphrase != null) {
+            savePassphrase(passphrase, encryptionParam, fetchPioneerUser());
+        }
+    }
+
+    public int getDBEncryptionVersion() {
+        return preferences.getInt(DB_ENCRYPTION_VERSION, 0);
+    }
+
+    public void setDBEncryptionVersion(int encryptionVersion) {
+        preferences.edit().putInt(DB_ENCRYPTION_VERSION, encryptionVersion).commit();
     }
 }
 

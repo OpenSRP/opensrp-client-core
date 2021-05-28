@@ -1,7 +1,7 @@
 package org.smartregister.multitenant.check;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.WorkerThread;
+import androidx.annotation.NonNull;
+import androidx.annotation.WorkerThread;
 
 import org.smartregister.exception.PreResetAppOperationException;
 import org.smartregister.repository.TaskRepository;

@@ -3,6 +3,8 @@ package org.smartregister.util;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.os.Build;
+import android.os.LocaleList;
 import android.preference.PreferenceManager;
 
 import org.smartregister.repository.AllSharedPreferences;
@@ -25,19 +27,34 @@ public class LangUtils {
         return allSharedPreferences.fetchLanguagePreference();
     }
 
-    public static Context setAppLocale(Context context, String language) {
-        Locale locale = new Locale(language);
-
+    public static Configuration setAppLocale(Context context, String language) {
         Resources res = context.getResources();
-        Configuration conf = res.getConfiguration();
-        conf.setLocale(locale);
+        Configuration configuration = res.getConfiguration();
+
         try {
-            context = context.createConfigurationContext(conf);
+            Locale locale = new Locale(language);
+
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                configuration.setLocale(locale);
+
+                LocaleList localeList = new LocaleList(locale);
+                LocaleList.setDefault(localeList);
+                configuration.setLocales(localeList);
+
+                context.createConfigurationContext(configuration);
+
+            } else {
+                configuration.locale = locale;
+                res.updateConfiguration(configuration, res.getDisplayMetrics());
+            }
+
+
         } catch (Exception e) {
             Timber.e(e);
         }
 
-        return context;
+        return configuration;
     }
 
 }

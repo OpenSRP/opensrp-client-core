@@ -44,7 +44,7 @@ public class AssetHandler {
             } else if (jsonMap.containsKey(fileName)) {
                 Object o = jsonMap.get(fileName);
                 if (clazz.isAssignableFrom(o.getClass())) {
-                    return clazz.cast(jsonMap.get(fileName));
+                    return clazz.cast(o);
                 } else {
                     return null;
                 }

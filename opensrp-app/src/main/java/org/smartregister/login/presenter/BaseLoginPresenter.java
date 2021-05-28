@@ -11,6 +11,7 @@ import android.widget.ScrollView;
 import org.smartregister.Context;
 import org.smartregister.R;
 import org.smartregister.repository.AllSharedPreferences;
+import org.smartregister.security.SecurityHelper;
 import org.smartregister.view.contract.BaseLoginContract;
 
 import java.lang.ref.WeakReference;
@@ -42,7 +43,7 @@ public abstract class BaseLoginPresenter implements BaseLoginContract.Presenter 
     }
 
     @Override
-    public void attemptLogin(String username, String password) {
+    public void attemptLogin(String username, char[] password) {
         if (!mLoginView.get().isAppVersionAllowed()) {
             getLoginView().showErrorDialog(getLoginView()
                     .getActivityContext().getResources().getString(R.string.outdated_app));
@@ -69,7 +70,7 @@ public abstract class BaseLoginPresenter implements BaseLoginContract.Presenter 
         }
 
         if (!cancel) {
-            mLoginInteractor.login(mLoginView, username.trim(), password.trim());
+            mLoginInteractor.login(mLoginView, username.trim(), password);
 
         }
     }
@@ -138,6 +139,11 @@ public abstract class BaseLoginPresenter implements BaseLoginContract.Presenter 
     }
 
     @Override
+    public char[] getPassword() {
+        return SecurityHelper.readValue(getLoginView().getPasswordEditText().getText());
+    }
+
+    @Override
     public Context getOpenSRPContext() {
         return mLoginModel.getOpenSRPContext();
     }
@@ -153,6 +159,10 @@ public abstract class BaseLoginPresenter implements BaseLoginContract.Presenter 
     public void setLoginModel(BaseLoginContract.Model mLoginModel) {
         this.mLoginModel = mLoginModel;
 
+    }
+
+    public void setLoginView(WeakReference<BaseLoginContract.View> mLoginView) {
+        this.mLoginView = mLoginView;
     }
 
     public String getJsonViewFromPreference(String viewKey) {

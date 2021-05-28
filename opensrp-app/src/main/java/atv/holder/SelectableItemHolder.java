@@ -56,7 +56,7 @@ public class SelectableItemHolder extends TreeNode.BaseNodeViewHolder<String> {
         view.findViewById(R.id.bot_line).setVisibility(View.INVISIBLE);
         if (node.isLeaf()) {
             ((PrintView) view.findViewById(R.id.arrowview))
-                    .setIconText(R.string.ic_check_circle_blank);
+                    .setIconText(view.getContext().getString(R.string.ic_check_circle_blank));
         }
 //        if(node.isFirstChild()){
 //            view.findViewById(R.id.top_line).setVisibility(View.INVISIBLE);

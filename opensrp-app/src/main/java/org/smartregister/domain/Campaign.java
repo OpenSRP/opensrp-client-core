@@ -15,7 +15,7 @@ public class Campaign {
 
     private TaskStatus status;
 
-    private ExecutionPeriod executionPeriod;
+    private Period executionPeriod;
 
     private DateTime authoredOn;
 
@@ -57,11 +57,11 @@ public class Campaign {
         this.status = status;
     }
 
-    public ExecutionPeriod getExecutionPeriod() {
+    public Period getExecutionPeriod() {
         return executionPeriod;
     }
 
-    public void setExecutionPeriod(ExecutionPeriod executionPeriod) {
+    public void setExecutionPeriod(Period executionPeriod) {
         this.executionPeriod = executionPeriod;
     }
 

@@ -7,7 +7,7 @@ import net.sqlcipher.database.SQLiteDatabase;
 
 import org.apache.commons.lang3.StringUtils;
 import org.smartregister.domain.Campaign;
-import org.smartregister.domain.ExecutionPeriod;
+import org.smartregister.domain.Period;
 import org.smartregister.util.DateUtil;
 
 import java.util.ArrayList;
@@ -124,9 +124,9 @@ public class CampaignRepository extends BaseRepository {
         if (cursor.getString(cursor.getColumnIndex(STATUS)) != null) {
             campaign.setStatus(TaskStatus.valueOf(cursor.getString(cursor.getColumnIndex(STATUS))));
         }
-        ExecutionPeriod executionPeriod = new ExecutionPeriod();
-        executionPeriod.setStart(DateUtil.getDateFromMillis(cursor.getLong(cursor.getColumnIndex(START))));
-        executionPeriod.setEnd(DateUtil.getDateFromMillis(cursor.getLong(cursor.getColumnIndex(END))));
+        Period executionPeriod = new Period();
+        executionPeriod.setStart(DateUtil.getDateTimeFromMillis(cursor.getLong(cursor.getColumnIndex(START))));
+        executionPeriod.setEnd(DateUtil.getDateTimeFromMillis(cursor.getLong(cursor.getColumnIndex(END))));
         campaign.setExecutionPeriod(executionPeriod);
 
         campaign.setAuthoredOn(DateUtil.getDateTimeFromMillis(cursor.getLong(cursor.getColumnIndex(AUTHORED_ON))));

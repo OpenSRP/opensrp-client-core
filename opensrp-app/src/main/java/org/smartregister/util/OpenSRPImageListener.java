@@ -7,7 +7,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader.ImageContainer;
 import com.android.volley.toolbox.ImageLoader.ImageListener;
 
-public abstract class OpenSRPImageListener implements ImageListener {
+public class OpenSRPImageListener implements ImageListener {
 
     private final ImageView imageView;
     private final RemoteViews remoteView;
@@ -29,7 +29,7 @@ public abstract class OpenSRPImageListener implements ImageListener {
     public OpenSRPImageListener(ImageView imageView, String entityId, int defaultImageResId, int
             errorImageResId) {
         this(imageView, defaultImageResId, errorImageResId);
-        this.entityId = entityId;
+        setEntityId(entityId);
     }
 
     public OpenSRPImageListener(RemoteViews remoteView, int imageViewId, int defaultImageResId,
@@ -75,6 +75,14 @@ public abstract class OpenSRPImageListener implements ImageListener {
 
     public void setEntityId(String entityId) {
         this.entityId = entityId;
+    }
+
+    public RemoteViews getRemoteView() {
+        return remoteView;
+    }
+
+    public int getImageViewId() {
+        return imageViewId;
     }
 
     @Override
