@@ -1,11 +1,12 @@
 package org.smartregister.view.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -394,22 +395,27 @@ public abstract class BaseRegisterFragment extends RecyclerViewFragment implemen
     }
 
     @VisibleForTesting
+    protected void showShortToast(Context context, String message) {
+        Utils.showShortToast(context, message);
+    }
+
+    @VisibleForTesting
     protected void refreshSyncStatusViews(FetchStatus fetchStatus) {
         if (isSyncing()) {
-            Utils.showShortToast(getActivity(), getActivity().getString(R.string.syncing));
+            showShortToast(getActivity(), getActivity().getString(R.string.syncing));
             Timber.i(getActivity().getString(R.string.syncing));
             refreshSyncProgressSpinner();
         } else {
             if (fetchStatus != null) {
                 if (fetchStatus.equals(FetchStatus.fetchedFailed)) {
                     if (fetchStatus.displayValue().equals(ResponseErrorStatus.malformed_url.name())) {
-                        Utils.showShortToast(getActivity(), getActivity().getString(R.string.sync_failed_malformed_url));
+                        showShortToast(getActivity(), getActivity().getString(R.string.sync_failed_malformed_url));
                         Timber.i(getActivity().getString(R.string.sync_failed_malformed_url));
                     } else if (fetchStatus.displayValue().equals(ResponseErrorStatus.timeout.name())) {
-                        Utils.showShortToast(getActivity(), getActivity().getString(R.string.sync_failed_timeout_error));
+                        showShortToast(getActivity(), getActivity().getString(R.string.sync_failed_timeout_error));
                         Timber.i(getActivity().getString(R.string.sync_failed_timeout_error));
                     } else {
-                        Utils.showShortToast(getActivity(), getActivity().getString(R.string.sync_failed));
+                        showShortToast(getActivity(), getActivity().getString(R.string.sync_failed));
                         Timber.i(getActivity().getString(R.string.sync_failed));
                     }
                     refreshSyncProgressSpinner();
@@ -417,11 +423,11 @@ public abstract class BaseRegisterFragment extends RecyclerViewFragment implemen
                     setRefreshList(true);
                     renderView();
 
-                    Utils.showShortToast(getActivity(), getActivity().getString(R.string.sync_complete));
+                    showShortToast(getActivity(), getActivity().getString(R.string.sync_complete));
                     Timber.i(getActivity().getString(R.string.sync_complete));
                 } else if (fetchStatus.equals(FetchStatus.noConnection)) {
 
-                    Utils.showShortToast(getActivity(), getActivity().getString(R.string.sync_failed_no_internet));
+                    showShortToast(getActivity(), getActivity().getString(R.string.sync_failed_no_internet));
                     Timber.i(getActivity().getString(R.string.sync_failed_no_internet));
                     refreshSyncProgressSpinner();
                 } else {

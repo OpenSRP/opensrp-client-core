@@ -1,6 +1,6 @@
 package org.smartregister.view.interactor;
 
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.VisibleForTesting;
 
 import org.jetbrains.annotations.NotNull;
 import org.smartregister.util.AppExecutors;

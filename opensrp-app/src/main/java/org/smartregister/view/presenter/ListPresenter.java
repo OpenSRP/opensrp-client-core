@@ -1,7 +1,7 @@
 package org.smartregister.view.presenter;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.jetbrains.annotations.NotNull;
 import org.smartregister.util.AppExecutors;

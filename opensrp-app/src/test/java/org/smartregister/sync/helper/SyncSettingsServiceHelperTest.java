@@ -48,6 +48,7 @@ public class SyncSettingsServiceHelperTest extends BaseRobolectricUnitTest {
     @Mock
     private SQLiteDatabase sqLiteDatabase;
     private String settingsResponse = "[{\"identifier\":\"site_characteristics\",\"settings\":[{\"settingMetadataId\":\"4\",\"serverVersion\":1594125118616,\"description\":\"Is the HIV prevalence consistently &amp;gt; 1% in pregnant women attending antenatal clinics at your facility?\",\"label\":\"Generalized HIV epidemic\",\"type\":\"Setting\",\"value\":\"true\",\"uuid\":\"e42f3e1f-e8b9-4694-8efa-f021e66b5691\",\"key\":\"site_anc_hiv\",\"settingIdentifier\":\"site_characteristics\"},{\"settingMetadataId\":\"1\",\"serverVersion\":1594125118616,\"description\":\"\\\"Are all of the following in place at your facility: \\r\\n1. A protocol or standard operating procedure for Intimate Partner Violence (IPV); \\r\\n2. A health worker trained on how to ask about IPV and how to provide the minimum response or beyond;\\r\\n3. A private setting; \\r\\n4. A way to ensure confidentiality; \\r\\n5. Time to allow for appropriate disclosure; and\\r\\n6. A system for referral in place. \\\"\",\"label\":\"Minimum requirements for IPV assessment\",\"type\":\"Setting\",\"value\":\"true\",\"uuid\":\"fb2ca30f-3de5-4bfc-a2d2-987e9c383cd7\",\"key\":\"site_ipv_assess\",\"settingIdentifier\":\"site_characteristics\"}],\"serverVersion\":1593791975015,\"providerId\":\"demo\",\"locationId\":\"44de66fb-e6c6-4bae-92bb-386dfe626eba\",\"teamId\":\"6c8d2b9b-2246-47c2-949b-4fe29e888cc8\",\"_rev\":\"v1\",\"team\":\"Bukesa\",\"_id\":\"9918b87c-a71f-462d-b1c9-33a2d50e4c15\",\"type\":\"Setting\"}]";
+    private static final String SAMPLE_TEST_TOKEN = "Sample_TOKEN";
 
     @Before
     public void setUp() {
@@ -81,10 +82,13 @@ public class SyncSettingsServiceHelperTest extends BaseRobolectricUnitTest {
 
         List<String> params = new ArrayList<>();
         params.add("locationId=location-uuid");
-        Mockito.doReturn(params).when(syncConfiguration).getExtraSettingsParameters();
 
-        Mockito.doReturn(new Response<>(ResponseStatus.success, settingsResponse)).when(syncSettingsServiceHelper).getResponse(ArgumentMatchers.anyString());
+        Mockito.doReturn(params).when(syncConfiguration).getExtraSettingsParameters();
+        Mockito.doReturn(new Response<>(ResponseStatus.success, settingsResponse)).when(syncSettingsServiceHelper).getResponse(ArgumentMatchers.anyString(), ArgumentMatchers.anyString());
+        Mockito.doReturn(SAMPLE_TEST_TOKEN).when(syncSettingsServiceHelper).getAccessToken();
+
         int size = syncSettingsServiceHelper.processIntent();
+
         Assert.assertEquals(3, size);
     }
 }

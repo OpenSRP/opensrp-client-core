@@ -93,6 +93,7 @@ android {
         versionName project.VERSION_NAME
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
         buildConfigField "long", "BUILD_TIMESTAMP", System.currentTimeMillis() + "L"
+        buildConfigField "int", "DB_ENCRYPTION_VERSION", '1'
     }
 
     sourceSets {
@@ -164,25 +165,74 @@ configurations.all {
 
 dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.5'
-    implementation 'net.zetetic:android-database-sqlcipher:4.1.3'
-    implementation 'com.android.support:multidex:1.0.3'
+    implementation 'net.zetetic:android-database-sqlcipher:4.2.0'
+    implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'org.codehaus.jackson:jackson-core-asl:1.9.13'
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support:support-v4:28.0.0'
-    implementation "org.apache.httpcomponents:httpmime:4.2.3"
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation "org.apache.httpcomponents:httpmime:4.5.6"
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.10'
-    implementation group: 'com.google.guava', name: 'guava', version: '20.0'
+    implementation group: 'com.google.guava', name: 'guava', version: '24.1-jre'
     implementation group: 'commons-io', name: 'commons-io', version: '2.4'
-    implementation 'org.apache.commons:commons-lang3:3.2'
+    implementation 'org.apache.commons:commons-lang3:3.9'
     implementation 'org.mozilla:rhino:1.7R4'
     implementation 'com.ocpsoft:ocpsoft-pretty-time:1.0.7'
-    api 'joda-time:joda-time:2.10.3'
-    implementation 'com.github.bmelnychuk:atv:1.2.9'
-    implementation 'com.github.johnkil.print:print:1.2.3'
+    api 'joda-time:joda-time:2.10.5'
+    implementation('com.github.bmelnychuk:atv:1.2.9') {
+        exclude group: 'com.google.android', module: 'android'
+    }
+
+    implementation('com.github.johnkil.print:print:1.3.1') {
+        exclude group: 'com.google.android', module: 'android'
+    }
 
     implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') {
         transitive = true
     }
+
+    implementation('ch.acra:acra:4.5.0') {
+        exclude group: 'org.json', module: 'json'
+    }
+
+    implementation 'com.github.ybq:Android-SpinKit:1.4.0'
+    implementation 'com.mcxiaoke.volley:library:1.0.19'
+
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    annotationProcessor fileTree(include: ['butterknife*.jar'], dir: 'libs')
+
+    implementation 'com.cloudant:cloudant-http:2.7.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.preference:preference:1.1.1'
+    implementation 'androidx.security:security-crypto:1.0.0-rc03'
+
+    implementation('com.google.android.material:material:1.1.0') {
+        exclude group: 'com.android.support', module: 'recyclerview-v7'
+    }
+
+    implementation('com.evernote:android-job:1.2.6') {
+        exclude group: 'com.google.android', module: 'android'
+    }
+
+    implementation group: 'commons-validator', name: 'commons-validator', version: '1.6'
+    implementation('de.hdodenhof:circleimageview:3.1.0') {
+        exclude group: 'com.google.android', module: 'android'
+    }
+
+    implementation('org.smartregister:android-p2p-sync:0.3.7-SNAPSHOT') {
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude group: 'com.android.support', module: 'appcompat-v7'
+        exclude group: 'android.arch.core', module: 'runtime'
+    }
+
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    compileOnly 'org.projectlombok:lombok:1.18.12'
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
+
+    implementation 'org.smartregister:opensrp-client-utils:0.0.2-SNAPSHOT'
+
+    implementation 'org.smartregister:opensrp-plan-evaluator:1.5.1-SNAPSHOT'
+
+    implementation 'xerces:xercesImpl:2.12.0'
 
     implementation('ch.acra:acra:4.5.0') {
         exclude group: 'org.json', module: 'json'
@@ -204,42 +254,31 @@ dependencies {
     implementation 'com.evernote:android-job:1.2.6'
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.6'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
-
-    implementation('org.smartregister:android-p2p-sync:0.3.7-SNAPSHOT') {
-        exclude group: 'com.android.support', module: 'support-v4'
-        exclude group: 'com.android.support', module: 'appcompat-v7'
-        exclude group: 'android.arch.core', module: 'runtime'
-    }
-
-    implementation 'org.smartregister:opensrp-client-utils:0.0.2-SNAPSHOT'
-
-    implementation 'org.smartregister:opensrp-plan-evaluator:0.0.19-SNAPSHOT'
-
     implementation 'xerces:xercesImpl:2.12.0'
-}
 
-dependencies {
+    // Add the dependency for the Performance Monitoring library
+    implementation 'com.google.firebase:firebase-perf:19.0.7'
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestImplementation 'junit:junit:4.12'
 
-    testImplementation group: 'com.google.android', name: 'android-test', version: '4.1.1.4'
+    androidTestImplementation 'junit:junit:4.13'
+
     testImplementation 'org.apache.maven:maven-ant-tasks:2.1.3'
-    testImplementation 'org.mockito:mockito-core:1.9.5'
+    testImplementation 'org.mockito:mockito-core:3.1.0'
     testAnnotationProcessor fileTree(include: ['butterknife*.jar'], dir: 'libs')
 
-    testImplementation('org.robolectric:robolectric:4.0') {
+    testImplementation('org.robolectric:robolectric:4.3.1') {
         exclude group: 'com.google.guava', module: 'guava'
         exclude group: 'org.apache.maven', module: 'maven-model'
         exclude group: 'com.android.support'
         exclude group: 'androidx.test'
         exclude group: 'com.thoughtworks.xstream', module: 'xstream'
     }
-    testImplementation('org.robolectric:shadows-multidex:4.0') {
+
+    testImplementation('org.robolectric:shadows-multidex:4.3.1') {
         exclude group: 'com.google.guava', module: 'guava'
     }
 
-    testImplementation "org.robolectric:shadows-support-v4:3.3.2"
     // PowerMock
     def powerMockVersion = '2.0.4'
     testImplementation "org.powermock:powermock-module-junit4:$powerMockVersion"
@@ -248,6 +287,8 @@ dependencies {
     testImplementation "org.powermock:powermock-api-mockito2:$powerMockVersion"
     testImplementation("org.powermock:powermock-classloading-xstream:$powerMockVersion")
 
+    def fragmentVersion = "1.2.5"
+    testImplementation "androidx.fragment:fragment-testing:$fragmentVersion"
 }
 
 task clearJar(type: Delete) {

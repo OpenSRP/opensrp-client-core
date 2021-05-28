@@ -1,6 +1,7 @@
 package org.smartregister.util;
 
 import org.smartregister.AllConstants;
+import org.smartregister.security.SecurityHelper;
 
 import java.util.Date;
 
@@ -9,7 +10,7 @@ import static org.joda.time.DateTimeConstants.MINUTES_PER_HOUR;
 import static org.joda.time.DateTimeConstants.SECONDS_PER_MINUTE;
 
 public class Session {
-    private String password;
+    private byte[] password;
     private String repositoryName = AllConstants.DATABASE_NAME;
     private long sessionExpiryTime = 0;
 
@@ -17,7 +18,7 @@ public class Session {
         return 24 * MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MILLIS_PER_SECOND;
     }
 
-    public String password() {
+    public byte[] password() {
         return password;
     }
 
@@ -25,7 +26,7 @@ public class Session {
         return repositoryName;
     }
 
-    public Session setPassword(String password) {
+    public Session setPassword(byte[] password) {
         this.password = password;
         return this;
     }
@@ -51,6 +52,8 @@ public class Session {
     }
 
     public void expire() {
+        SecurityHelper.clearArray(this.password);
+        this.password = null;
         setSessionExpiryTimeTo(new Date().getTime() - 1);
     }
 

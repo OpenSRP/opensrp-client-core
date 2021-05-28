@@ -1,6 +1,6 @@
 package org.smartregister.util;
 
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.VisibleForTesting;
 
 import java.util.concurrent.Callable;
 

@@ -1,9 +1,11 @@
 package org.smartregister.sync.helper;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
+
+import com.google.firebase.perf.metrics.Trace;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -37,16 +39,28 @@ import java.util.Set;
 
 import timber.log.Timber;
 
+import static org.smartregister.AllConstants.COUNT;
+import static org.smartregister.AllConstants.PerformanceMonitoring.ACTION;
+import static org.smartregister.AllConstants.PerformanceMonitoring.FETCH;
+import static org.smartregister.AllConstants.PerformanceMonitoring.PUSH;
+import static org.smartregister.AllConstants.PerformanceMonitoring.TASK_SYNC;
+import static org.smartregister.AllConstants.PerformanceMonitoring.TEAM;
+import static org.smartregister.util.PerformanceMonitoringUtils.addAttribute;
+import static org.smartregister.util.PerformanceMonitoringUtils.clearTraceAttributes;
+import static org.smartregister.util.PerformanceMonitoringUtils.initTrace;
+import static org.smartregister.util.PerformanceMonitoringUtils.startTrace;
+import static org.smartregister.util.PerformanceMonitoringUtils.stopTrace;
+
 public class TaskServiceHelper extends BaseHelper {
 
-    private AllSharedPreferences allSharedPreferences = CoreLibrary.getInstance().context().allSharedPreferences();
+    private final AllSharedPreferences allSharedPreferences;
 
     protected final Context context;
     private TaskRepository taskRepository;
     public static final String TASK_LAST_SYNC_DATE = "TASK_LAST_SYNC_DATE";
-    public static final String UPDATE_STATUS_URL = "/rest/task/update_status";
-    public static final String ADD_TASK_URL = "/rest/task/add";
-    public static final String SYNC_TASK_URL = "/rest/task/sync";
+    public static final String UPDATE_STATUS_URL = "/rest/v2/task/update_status";
+    public static final String ADD_TASK_URL = "/rest/v2/task/add";
+    public static final String SYNC_TASK_URL = "/rest/v2/task/sync";
 
     private static final String TASKS_NOT_PROCESSED = "Tasks with identifiers not processed: ";
 
@@ -56,12 +70,19 @@ public class TaskServiceHelper extends BaseHelper {
 
     private boolean syncByGroupIdentifier = true;
 
+    private Trace taskSyncTrace;
+
+    private String team;
+
     private long totalRecords;
 
     private SyncProgress syncProgress;
 
+    private TaskServiceProcessor taskServiceProcessor;
+
     /**
      * If set to false tasks will sync by owner otherwise defaults to sync by group identifier
+     *
      * @param syncByGroupIdentifier flag for determining if tasks should be synced by group identifier
      *                              or owner (username)
      */
@@ -84,12 +105,19 @@ public class TaskServiceHelper extends BaseHelper {
     public TaskServiceHelper(TaskRepository taskRepository) {
         this.context = CoreLibrary.getInstance().context().applicationContext();
         this.taskRepository = taskRepository;
+        this.allSharedPreferences = CoreLibrary.getInstance().context().allSharedPreferences();
+        this.taskSyncTrace = initTrace(TASK_SYNC);
+        String providerId = allSharedPreferences.fetchRegisteredANM();
+        team = allSharedPreferences.fetchDefaultTeam(providerId);
+        this.taskServiceProcessor = TaskServiceProcessor.getInstance();
     }
 
     public List<Task> syncTasks() {
+        List<Task> fetchedTasks = fetchTasksFromServer();
+        taskServiceProcessor.processDuplicateTasks();
         syncCreatedTaskToServer();
         syncTaskStatusToServer();
-        return fetchTasksFromServer();
+        return fetchedTasks;
     }
 
     protected List<String> getLocationIds() {
@@ -108,7 +136,7 @@ public class TaskServiceHelper extends BaseHelper {
         syncProgress.setSyncEntity(SyncEntity.TASKS);
         syncProgress.setTotalRecords(totalRecords);
 
-        List<Task> tasks = batchFetchTasksFromServer(planDefinitions,groups, new ArrayList<>(), true);
+        List<Task> tasks = batchFetchTasksFromServer(planDefinitions, groups, new ArrayList<>(), true);
 
         syncProgress.setPercentageSynced(Utils.calculatePercentage(totalRecords, tasks.size()));
         sendSyncProgressBroadcast(syncProgress, context);
@@ -127,8 +155,12 @@ public class TaskServiceHelper extends BaseHelper {
         try {
             long maxServerVersion = 0L;
             String tasksResponse = fetchTasks(planDefinitions, groups, serverVersion, returnCount);
+            startTaskTrace(FETCH, 0);
             List<Task> tasks = taskGson.fromJson(tasksResponse, new TypeToken<List<Task>>() {
             }.getType());
+
+            addAttribute(taskSyncTrace, COUNT, String.valueOf(tasks.size()));
+            stopTrace(taskSyncTrace);
             if (tasks != null && tasks.size() > 0) {
                 for (Task task : tasks) {
                     try {
@@ -256,6 +288,7 @@ public class TaskServiceHelper extends BaseHelper {
         HTTPAgent httpAgent = getHttpAgent();
         List<Task> tasks = taskRepository.getAllUnsynchedCreatedTasks();
         if (!tasks.isEmpty()) {
+            startTaskTrace(PUSH, tasks.size());
             String jsonPayload = taskGson.toJson(tasks);
             String baseUrl = CoreLibrary.getInstance().context().configuration().dristhiBaseURL();
             Response<String> response = httpAgent.postWithJsonResponse(
@@ -263,6 +296,7 @@ public class TaskServiceHelper extends BaseHelper {
                             baseUrl,
                             ADD_TASK_URL),
                     jsonPayload);
+            stopTrace(taskSyncTrace);
             if (response.isFailure()) {
                 Timber.e("Failed to create new tasks on server.: %s", response.payload());
                 return;
@@ -281,9 +315,16 @@ public class TaskServiceHelper extends BaseHelper {
         }
     }
 
-    @VisibleForTesting
-    protected HTTPAgent getHttpAgent() {
+    private HTTPAgent getHttpAgent() {
         return CoreLibrary.getInstance().context().getHttpAgent();
+    }
+
+    private void startTaskTrace(String action, int count) {
+        clearTraceAttributes(taskSyncTrace);
+        addAttribute(taskSyncTrace, TEAM, team);
+        addAttribute(taskSyncTrace, ACTION, action);
+        addAttribute(taskSyncTrace, COUNT, String.valueOf(count));
+        startTrace(taskSyncTrace);
     }
 }
 

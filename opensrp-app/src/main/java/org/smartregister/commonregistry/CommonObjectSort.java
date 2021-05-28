@@ -1,6 +1,6 @@
 package org.smartregister.commonregistry;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.smartregister.view.contract.SmartRegisterClient;
 import org.smartregister.view.contract.SmartRegisterClients;

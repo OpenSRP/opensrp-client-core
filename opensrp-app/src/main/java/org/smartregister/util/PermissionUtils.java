@@ -2,8 +2,8 @@ package org.smartregister.util;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,7 +49,7 @@ public class PermissionUtils {
 
     }
 
-    public static boolean verifyPermissionGranted(String permissions[], int[] grantResults, String... permissionsToVerify) {
+    public static boolean verifyPermissionGranted(String[] permissions, int[] grantResults, String... permissionsToVerify) {
         Map<String, Integer> perms = new HashMap<>();
         // Initialize the map with both permissions
         for (String permission : permissionsToVerify) {

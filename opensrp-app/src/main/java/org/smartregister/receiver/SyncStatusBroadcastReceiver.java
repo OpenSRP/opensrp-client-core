@@ -136,7 +136,7 @@ public class SyncStatusBroadcastReceiver extends BroadcastReceiver {
         }
     }
 
-    private void startExtendedSync() {
+    protected void startExtendedSync() {
         ExtendedSyncServiceJob.scheduleJobImmediately(ExtendedSyncServiceJob.TAG);
     }
 

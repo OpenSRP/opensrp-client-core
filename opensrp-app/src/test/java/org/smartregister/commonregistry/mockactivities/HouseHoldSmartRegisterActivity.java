@@ -4,8 +4,10 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -40,7 +42,7 @@ public class HouseHoldSmartRegisterActivity extends SecuredNativeSmartRegisterAc
     public int currentPage;
 
     public String[] formNames = new String[]{};
-    public android.support.v4.app.Fragment mBaseFragment = null;
+    public Fragment mBaseFragment = null;
     static Context mockactivitycontext;
 
     @Override
@@ -212,7 +214,7 @@ public class HouseHoldSmartRegisterActivity extends SecuredNativeSmartRegisterAc
 
     }
 
-    public android.support.v4.app.Fragment findFragmentByPosition(int position) {
+    public Fragment findFragmentByPosition(int position) {
         FragmentPagerAdapter fragmentPagerAdapter = mPagerAdapter;
         return getSupportFragmentManager().findFragmentByTag("android:switcher:" + mPager.getId() + ":" + fragmentPagerAdapter.getItemId(position));
     }

@@ -13,18 +13,19 @@ import org.smartregister.location.helper.LocationHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author Jason Rogena - jrogena@ona.io
  * @since 03/03/2017
  */
 public class ServiceLocationsAdapter extends BaseAdapter {
-    private final ArrayList<String> locationNames;
+    private final List<String> locationNames;
     private final HashMap<String, View> views;
     private final Context context;
     private String selectedLocation;
 
-    public ServiceLocationsAdapter(Context context, ArrayList<String> locationNames) {
+    public ServiceLocationsAdapter(Context context, List<String> locationNames) {
         this.context = context;
         this.locationNames = locationNames == null ? new ArrayList<>() : locationNames;
         this.views = new HashMap<>();
@@ -91,7 +92,7 @@ public class ServiceLocationsAdapter extends BaseAdapter {
         return locationNames.get(position);
     }
 
-    public ArrayList<String> getLocationNames() {
+    public List<String> getLocationNames() {
         return locationNames;
     }
 }

@@ -3,9 +3,11 @@ package org.smartregister;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.MockitoAnnotations;
 import org.smartregister.repository.AllAlerts;
 import org.smartregister.repository.AllReports;
 import org.smartregister.repository.AllServicesProvided;
+import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.AllTimelineEvents;
 import org.smartregister.repository.CampaignRepository;
 import org.smartregister.repository.ClientFormRepository;
@@ -50,6 +52,7 @@ public class ContextTest extends BaseUnitTest {
 
     @Before
     public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
         context = Context.getInstance();
     }
 
@@ -301,5 +304,11 @@ public class ContextTest extends BaseUnitTest {
     public void testGetClientFormRepository() {
         ClientFormRepository clientFormRepository = context.getClientFormRepository();
         Assert.assertNotNull(clientFormRepository);
+    }
+
+    @Test
+    public void testAllSharedPreferences() {
+        AllSharedPreferences allSharedPreferences = context.allSharedPreferences();
+        Assert.assertNotNull(allSharedPreferences);
     }
 }

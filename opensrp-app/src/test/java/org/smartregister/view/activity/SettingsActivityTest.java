@@ -80,6 +80,7 @@ public class SettingsActivityTest extends BaseUnitTest {
         Mockito.verify(sharedPreferences).savePort(8080);
 
         Mockito.verify(sharedPreferences).saveHost(HOSTURL);
+        ReflectionHelpers.setField(CoreLibrary.getInstance().context(), "allSharedPreferences", null);
     }
 
 
@@ -113,6 +114,5 @@ public class SettingsActivityTest extends BaseUnitTest {
         Toast toast = ShadowToast.getLatestToast();
         assertEquals(Toast.LENGTH_SHORT, toast.getDuration());
         assertEquals(RuntimeEnvironment.application.getString(R.string.invalid_url_massage), ShadowToast.getTextOfLatestToast());
-
     }
 }

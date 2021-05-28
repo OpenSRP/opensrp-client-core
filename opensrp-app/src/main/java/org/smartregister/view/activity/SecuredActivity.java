@@ -3,10 +3,10 @@ package org.smartregister.view.activity;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BaseTransientBottomBar;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,6 +17,7 @@ import android.view.ViewTreeObserver;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.apache.commons.collections.MapUtils;
 import org.smartregister.AllConstants;
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
@@ -162,6 +163,12 @@ public abstract class SecuredActivity extends MultiLanguageActivity implements P
 
     public void startFormActivity(String formName, String entityId, String metaData) {
         launchForm(formName, entityId, metaData, FormActivity.class);
+    }
+
+    public void startFormActivity(String formName, String entityId, Map<String, String> metaData) {
+        String metaDataString = MapUtils.getString(metaData, FIELD_OVERRIDES_PARAM, "");
+
+        launchForm(formName, entityId, metaDataString, FormActivity.class);
     }
 
     public void startMicroFormActivity(String formName, String entityId, String metaData) {

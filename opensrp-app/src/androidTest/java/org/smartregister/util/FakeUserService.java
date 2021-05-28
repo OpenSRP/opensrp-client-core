@@ -22,29 +22,29 @@ public class FakeUserService extends UserService {
     }
 
     @Override
-    public boolean isValidLocalLogin(String userName, String password) {
+    public boolean isValidLocalLogin(String userName, byte[] password) {
         assertExpectedCredentials(userName, password);
         actualCalls.add("local");
         return shouldSucceedLocalLogin;
     }
 
     @Override
-    public LoginResponse isValidRemoteLogin(String userName, String password) {
+    public LoginResponse isValidRemoteLogin(String userName, char[] password) {
         assertExpectedCredentials(userName, password);
         actualCalls.add("remote");
         return shouldSucceedRemoteLogin;
     }
 
     @Override
-    public void localLogin(String userName, String password) {
-        super.setupContextForLogin(userName, password);
+    public void localLogin(String userName, char[] password) {
+        super.setupContextForLogin(password);
         actualCalls.add("login");
         assertExpectedCredentials(userName, password);
     }
 
 
-    public void remoteLogin(String userName, String password, String anmLocation) {
-        super.setupContextForLogin(userName, password);
+    public void remoteLogin(String userName, char[] password, String anmLocation) {
+        super.setupContextForLogin(password);
         actualCalls.add("login");
         assertExpectedCredentials(userName, password);
     }
@@ -65,7 +65,7 @@ public class FakeUserService extends UserService {
         super.logoutSession();
     }
 
-    private void assertExpectedCredentials(String userName, String password) {
+    private void assertExpectedCredentials(String userName, char[] password) {
         if (!expectedUserName.equals(userName)) {
             throw new RuntimeException("Expected user: " + expectedUserName + ". Actual: " + userName);
         }

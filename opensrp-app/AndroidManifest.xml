@@ -1,109 +1,159 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="org.smartregister"
+    android:installLocation="auto"
     android:versionCode="32"
-    android:versionName="3.0.1"
-    android:installLocation="auto">
+    android:versionName="3.0.1">
+
+    <uses-sdk tools:overrideLibrary="androidx.security" />
 
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission
+        android:name="android.permission.GET_ACCOUNTS"
+        android:maxSdkVersion="22" />
 
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
 
     <application
-        android:label="@string/app_name"
         android:clearTaskOnLaunch="true"
+        android:label="@string/app_name"
         android:largeHeap="true">
         <service
+            android:name=".service.ImageUploadSyncService"
+            android:description="@string/component_desc_image_upload_service"
             android:enabled="true"
-            android:name=".service.ImageUploadSyncService" />
+            android:exported="false" />
+
+        <service
+            android:name=".account.AccountService"
+            android:description="@string/component_desc_account_service"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
 
         <activity
             android:name=".view.activity.ReportsActivity"
-            android:theme="@style/AppThemeNoTitle"
-            android:screenOrientation="landscape" />
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppThemeNoTitle" />
         <activity
             android:name=".view.activity.VideosActivity"
-            android:theme="@style/AppThemeNoTitle"
-            android:screenOrientation="landscape" />
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppThemeNoTitle" />
         <activity
             android:name=".view.activity.ReportIndicatorListViewActivity"
-            android:theme="@style/AppThemeNoTitle"
-            android:screenOrientation="landscape" />
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppThemeNoTitle" />
         <activity
             android:name=".view.activity.ReportIndicatorDetailActivity"
-            android:theme="@style/AppThemeNoTitle"
-            android:screenOrientation="landscape" />
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppThemeNoTitle" />
         <activity
             android:name=".view.activity.ReportIndicatorCaseListActivity"
-            android:theme="@style/AppThemeNoTitle"
-            android:screenOrientation="landscape" />
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppThemeNoTitle" />
         <activity
             android:name=".view.activity.EligibleCoupleDetailActivity"
-            android:theme="@style/AppThemeNoTitle"
-            android:screenOrientation="landscape" />
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:theme="@style/AppThemeNoTitle" />
         <activity
             android:name=".view.activity.CameraLaunchActivity"
-            android:theme="@android:style/Theme.Holo.NoActionBar"
-            android:screenOrientation="landscape" />
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.Holo.NoActionBar" />
         <activity
             android:name=".view.activity.FormActivity"
-            android:theme="@style/AppThemeNoTitle"
-            android:screenOrientation="portrait" />
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeNoTitle" />
         <activity
             android:name=".view.activity.MicroFormActivity"
-            android:theme="@android:style/Theme.Holo.Dialog.NoActionBar"
-            android:screenOrientation="landscape" />
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.Holo.Dialog.NoActionBar" />
         <activity
             android:name=".view.activity.NativeECSmartRegisterActivity"
+            android:exported="false"
             android:screenOrientation="landscape"
             android:theme="@style/AppThemeNoTitle" />
         <activity
             android:name=".view.activity.BarcodeScanActivity"
             android:configChanges="keyboardHidden|orientation"
+            android:exported="false"
             android:screenOrientation="portrait" />
 
         <activity
             android:name=".view.activity.NativeHomeActivity"
+            android:exported="false"
             android:screenOrientation="landscape" />
 
         <activity
             android:name=".view.activity.SettingsActivity"
+            android:exported="false"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
 
-        <receiver android:name=".view.receiver.SyncBroadcastReceiver" />
-        <receiver android:name=".view.receiver.ConnectivityChangeReceiver">
+        <receiver
+            android:name=".view.receiver.SyncBroadcastReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".view.receiver.ConnectivityChangeReceiver"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".view.receiver.TimeChangedBroadcastReceiver">
+
+        <receiver
+            android:name=".view.receiver.TimeChangedBroadcastReceiver"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.TIME_SET" />
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
             </intent-filter>
         </receiver>
 
-        <service android:name=".service.intentservices.ReplicationIntentService" />
+        <service
+            android:name=".service.intentservices.ReplicationIntentService"
+            android:exported="false" />
 
-        <service android:name=".sync.intent.P2pProcessRecordsService"/>
+        <service
+            android:name=".sync.intent.P2pProcessRecordsService"
+            android:description="@string/component_desc_p2p_process_records_service"
+            android:exported="false" />
 
         <meta-data
             android:name="com.google.android.gms.vision.Dependencies"
             android:value="barcode" />
 
-        <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
-
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
     </application>
 </manifest>

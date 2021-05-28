@@ -1,5 +1,7 @@
 package org.smartregister.location.helper;
 
+import android.util.Pair;
+
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.junit.After;
@@ -11,9 +13,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.powermock.reflect.Whitebox;
-import android.util.Pair;
 import org.robolectric.util.ReflectionHelpers;
-import org.smartregister.AllConstants;
 import org.smartregister.BaseRobolectricUnitTest;
 import org.smartregister.CoreLibrary;
 import org.smartregister.domain.form.FormLocation;
@@ -32,6 +32,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 
 public class LocationHelperTest extends BaseRobolectricUnitTest {
 
@@ -178,62 +180,14 @@ public class LocationHelperTest extends BaseRobolectricUnitTest {
 
         String locationIds = spiedLocationHelper.locationIdsFromHierarchy();
 
+        assertNotNull(spiedLocationHelper.getLocationIds());
         Mockito.verify(spiedLocationHelper).locationsFromHierarchy(Mockito.eq(true), Mockito.nullable(String.class));
         assertEquals("718b2864-7d6a-44c8-b5b6-bb375f82654e,2c3a0ebd-f79d-4128-a6d3-5dfbffbd01c8", locationIds);
-    }
 
-
-    @Test
-    public void testLocationsFromHierarchyWhenAllowedLevelsContainsReveal() {
-        ReflectionHelpers.setStaticField(LocationHelper.class, "instance", null);
-        ArrayList<String> allowedLevels = new ArrayList<>();
-        allowedLevels.add("Rural Health Centre");
-        allowedLevels.add("Operational Area");
-        allowedLevels.add("Canton");
-        allowedLevels.add("Village");
-        allowedLevels.add("reveal");
-
-        LocationHelper.init(allowedLevels, "Rural Health Centre");
-        locationHelper = LocationHelper.getInstance();
-
-        AllSettings allSettings = Mockito.spy(CoreLibrary.getInstance().context().allSettings());
-        ReflectionHelpers.setField(CoreLibrary.getInstance().context(), "allSettings", allSettings);
-        SettingsRepository settingsRepository = ReflectionHelpers.getField(allSettings, "settingsRepository");
-        settingsRepository.updateMasterRepository(repository);
-
-        AllSharedPreferences allSharedPreferences = Mockito.spy(CoreLibrary.getInstance().context().allSharedPreferences());
-        ReflectionHelpers.setField(locationHelper, "allSharedPreferences", allSharedPreferences);
-        ANMLocationController anmLocationController = Mockito.spy(CoreLibrary.getInstance().context().anmLocationController());
-        ReflectionHelpers.setField(CoreLibrary.getInstance().context(), "anmLocationController", anmLocationController);
-
-        Mockito.doReturn("NL1").when(allSharedPreferences).fetchRegisteredANM();
-        Mockito.doReturn("97809856-5c31-5a4e-abb2-efe152a0b715").when(allSharedPreferences).fetchDefaultTeamId(Mockito.nullable(String.class));
-        Mockito.doReturn(anmLocation1)
-                .when(anmLocationController).get();
-
-        LocationHelper spiedLocationHelper = Mockito.spy(locationHelper);
-        ReflectionHelpers.setStaticField(LocationHelper.class, "instance", spiedLocationHelper);
-
-        List<String> campaignIds = new ArrayList<>();
-        campaignIds.add("campaign-1");
-        campaignIds.add("campaign-2");
-        campaignIds.add("campaign-3");
-
-        List<String> operationalArea = new ArrayList<>();
-        operationalArea.add("operational-area-1");
-        operationalArea.add("operational-area-2");
-        operationalArea.add("operational-area-3");
-
-        ReflectionHelpers.setField(spiedLocationHelper, "allCampaigns", campaignIds);
-        ReflectionHelpers.setField(spiedLocationHelper, "allOperationalArea", operationalArea);
-
-        ArrayList<String> locations = spiedLocationHelper.locationsFromHierarchy(true, null);
-
-        Mockito.verify(allSharedPreferences).savePreference(Mockito.eq(AllConstants.CAMPAIGNS), Mockito.eq("campaign-1,campaign-2,campaign-3"));
-        Mockito.verify(allSharedPreferences).savePreference(Mockito.eq(AllConstants.OPERATIONAL_AREAS), Mockito.eq("operational-area-1,operational-area-2,operational-area-3"));
-        assertEquals(2, locations.size());
-        assertEquals("ed7c4a07-6e02-4784-ae9a-9cd41cfef390", locations.get(0));
-        assertEquals("1b0ba804-54c3-40ef-820b-a8eaffa5d054", locations.get(1));
+        List<String> locationNames = spiedLocationHelper.locationNamesFromHierarchy("MOH Jhpiego Facility Name");
+        assertNotNull(spiedLocationHelper.getLocationNames());
+        assertTrue(locationNames.contains("Huruma"));
+        assertTrue(locationNames.contains("Kabila Village"));
     }
 
     @Test
@@ -277,7 +231,6 @@ public class LocationHelperTest extends BaseRobolectricUnitTest {
         assertEquals(0, formLocationsList.size());
     }
 
-
     @Test
     public void testGenerateLocationHierarchyTreeWithMapShouldReturnListWithOtherFormLocationOnly() {
         locationHelper = Mockito.spy(locationHelper);
@@ -298,8 +251,6 @@ public class LocationHelperTest extends BaseRobolectricUnitTest {
         assertEquals("", formLocation.level);
     }
 
-
-
     @Test
     public void testGenerateLocationHierarchyTreeWithMapAndOtherOptionFalseShouldReturnEmptyList() {
         locationHelper = Mockito.spy(locationHelper);
@@ -313,7 +264,6 @@ public class LocationHelperTest extends BaseRobolectricUnitTest {
         List<FormLocation> formLocationsList = locationHelper.generateLocationHierarchyTree(false, allowedLevels, map);
         assertEquals(0, formLocationsList.size());
     }
-
 
     @Test
     public void testGenerateLocationHierarchyTreeWithMapShouldReturnListWithZambiaFormLocation() {
@@ -341,16 +291,41 @@ public class LocationHelperTest extends BaseRobolectricUnitTest {
         assertEquals(1, formLocation.nodes.size());
     }
 
+    @Test
+    public void testGenerateLocationHierarchyTreeWithMapShouldReturnListWithZambiaFormLocationAndLocationTags() {
+        locationHelper = Mockito.spy(locationHelper);
+        String locationData = "{\"locationsHierarchy\":{\"map\":{\"9c3e8715-1c59-44db-9709-2b49f440ef00\":{\"children\":{\"2e823ceb-4de6-41ac-8025-e2ae3512a331\":{\"children\":{\"620332e0-6108-4611-bac5-8b48d20051c9\":{\"children\":{\"ed7c4a07-6e02-4784-ae9a-9cd41cfef390\":{\"children\":{\"1b0ba804-54c3-40ef-820b-a8eaffa5d054\":{\"id\":\"1b0ba804-54c3-40ef-820b-a8eaffa5d054\",\"label\":\"ra_ksh_5\",\"node\":{\"locationId\":\"1b0ba804-54c3-40ef-820b-a8eaffa5d054\",\"name\":\"ra_ksh_5\",\"parentLocation\":{\"locationId\":\"ed7c4a07-6e02-4784-ae9a-9cd41cfef390\",\"name\":\"ra Kashikishi HAHC\",\"parentLocation\":{\"locationId\":\"620332e0-6108-4611-bac5-8b48d20051c9\",\"name\":\"ra Nchelenge\",\"serverVersion\":0,\"voided\":false},\"serverVersion\":0,\"voided\":false},\"tags\":[\"Operational Area\"],\"serverVersion\":0,\"voided\":false},\"parent\":\"ed7c4a07-6e02-4784-ae9a-9cd41cfef390\"}},\"id\":\"ed7c4a07-6e02-4784-ae9a-9cd41cfef390\",\"label\":\"ra Kashikishi HAHC\",\"node\":{\"locationId\":\"ed7c4a07-6e02-4784-ae9a-9cd41cfef390\",\"name\":\"ra Kashikishi HAHC\",\"parentLocation\":{\"locationId\":\"620332e0-6108-4611-bac5-8b48d20051c9\",\"name\":\"ra Nchelenge\",\"parentLocation\":{\"locationId\":\"2e823ceb-4de6-41ac-8025-e2ae3512a331\",\"name\":\"ra Luapula\",\"serverVersion\":0,\"voided\":false},\"serverVersion\":0,\"voided\":false},\"tags\":[\"Village\"],\"serverVersion\":0,\"voided\":false},\"parent\":\"620332e0-6108-4611-bac5-8b48d20051c9\"}},\"id\":\"620332e0-6108-4611-bac5-8b48d20051c9\",\"label\":\"ra Nchelenge\",\"node\":{\"locationId\":\"620332e0-6108-4611-bac5-8b48d20051c9\",\"name\":\"ra Nchelenge\",\"parentLocation\":{\"locationId\":\"2e823ceb-4de6-41ac-8025-e2ae3512a331\",\"name\":\"ra Luapula\",\"parentLocation\":{\"locationId\":\"9c3e8715-1c59-44db-9709-2b49f440ef00\",\"name\":\"ra Zambia\",\"serverVersion\":0,\"voided\":false},\"serverVersion\":0,\"voided\":false},\"tags\":[\"District\"],\"serverVersion\":0,\"voided\":false},\"parent\":\"2e823ceb-4de6-41ac-8025-e2ae3512a331\"}},\"id\":\"2e823ceb-4de6-41ac-8025-e2ae3512a331\",\"label\":\"ra Luapula\",\"node\":{\"locationId\":\"2e823ceb-4de6-41ac-8025-e2ae3512a331\",\"name\":\"ra Luapula\",\"parentLocation\":{\"locationId\":\"9c3e8715-1c59-44db-9709-2b49f440ef00\",\"name\":\"ra Zambia\",\"serverVersion\":0,\"voided\":false},\"tags\":[\"Province\"],\"serverVersion\":0,\"voided\":false},\"parent\":\"9c3e8715-1c59-44db-9709-2b49f440ef00\"}},\"id\":\"9c3e8715-1c59-44db-9709-2b49f440ef00\",\"label\":\"ra Zambia\",\"node\":{\"locationId\":\"9c3e8715-1c59-44db-9709-2b49f440ef00\",\"name\":\"ra Zambia\",\"tags\":[\"Country\"],\"serverVersion\":0,\"voided\":false}}},\"parentChildren\":{\"9c3e8715-1c59-44db-9709-2b49f440ef00\":[\"2e823ceb-4de6-41ac-8025-e2ae3512a331\"],\"ed7c4a07-6e02-4784-ae9a-9cd41cfef390\":[\"1b0ba804-54c3-40ef-820b-a8eaffa5d054\"],\"620332e0-6108-4611-bac5-8b48d20051c9\":[\"ed7c4a07-6e02-4784-ae9a-9cd41cfef390\"],\"2e823ceb-4de6-41ac-8025-e2ae3512a331\":[\"620332e0-6108-4611-bac5-8b48d20051c9\"]}}}";
+
+        ArrayList<String> allowedLevels = new ArrayList<>();
+        allowedLevels.add("Country");
+        allowedLevels.add("Province");
+        allowedLevels.add("Region");
+        allowedLevels.add("District");
+        allowedLevels.add("Sub-district");
+        allowedLevels.add("Operational Area");
+
+        LinkedHashMap<String, TreeNode<String, Location>> map = AssetHandler.jsonStringToJava(locationData, LocationTree.class).getLocationsHierarchy();
+
+        Mockito.doReturn(true).when(locationHelper).isLocationTagsShownEnabled();
+        List<FormLocation> formLocationsList = locationHelper.generateLocationHierarchyTree(false, allowedLevels, map);
+
+        assertEquals(1, formLocationsList.size());
+
+        FormLocation formLocation = formLocationsList.get(0);
+        assertEquals("Zambia", formLocation.name);
+        assertEquals("ra Zambia", formLocation.key);
+        assertEquals("Country", formLocation.level);
+        assertEquals(1, formLocation.nodes.size());
+    }
 
     @Test
     public void testGenerateLocationHierarchyTreeShouldReturnListWithOtherFormLocationOnly() {
         locationHelper = Mockito.spy(locationHelper);
-        String locationData = anmLocation1;
 
         ArrayList<String> allowedLevels = new ArrayList<>();
         allowedLevels.add("Canton");
 
-        LinkedHashMap<String, TreeNode<String, Location>> map = AssetHandler.jsonStringToJava(locationData, LocationTree.class).getLocationsHierarchy();
+        LinkedHashMap<String, TreeNode<String, Location>> map = AssetHandler.jsonStringToJava(anmLocation1, LocationTree.class).getLocationsHierarchy();
         Mockito.doReturn(map).when(locationHelper).map();
 
         List<FormLocation> formLocationsList = locationHelper.generateLocationHierarchyTree(true, allowedLevels);
@@ -361,7 +336,6 @@ public class LocationHelperTest extends BaseRobolectricUnitTest {
         assertEquals("Other", formLocation.key);
         assertEquals("", formLocation.level);
     }
-
 
 
     @Test
@@ -400,4 +374,95 @@ public class LocationHelperTest extends BaseRobolectricUnitTest {
                 .when(anmLocationController).get();
         assertEquals("Jambula Girls School", locationHelper.getOpenMrsLocationName("982eb3f3-b7e3-450f-a38e-d067f2345212"));
     }
+
+    public void testGetOpenMrsLocationHierarchyWithEmptyLocationIdShouldReturnEmptyList() {
+        locationHelper = Mockito.spy(locationHelper);
+        List<String> hierarchy = locationHelper.getOpenMrsLocationHierarchy("", false);
+        assertEquals(0, hierarchy.size());
+    }
+
+    @Test
+    public void testGetOpenMrsLocationHierarchyWithLocationIdAndAllowedLevelsFlagShouldReturnListOfLocationNames() {
+        locationHelper = Mockito.spy(locationHelper);
+
+        ArrayList<String> allowedLevels = new ArrayList<>();
+        allowedLevels.add("District");
+        allowedLevels.add("Facility");
+        allowedLevels.add("Commune");
+
+        AllSharedPreferences spiedAllSharedPreferences = Mockito.spy((AllSharedPreferences) ReflectionHelpers.getField(locationHelper, "allSharedPreferences"));
+        ReflectionHelpers.setField(locationHelper, "allSharedPreferences", spiedAllSharedPreferences);
+
+        Mockito.doReturn("Mabebe").when(spiedAllSharedPreferences).fetchRegisteredANM();
+        Mockito.doReturn("11").when(spiedAllSharedPreferences).fetchDefaultLocalityId("Mabebe");
+
+        ANMLocationController anmLocationController = Mockito.spy(CoreLibrary.getInstance().context().anmLocationController());
+        ReflectionHelpers.setField(CoreLibrary.getInstance().context(), "anmLocationController", anmLocationController);
+
+        String locationTree = "{\"locationsHierarchy\":{\"map\":{\"1\":{\"id\":\"1\",\"label\":\"Kiamb\",\"node\":{\"locationId\":\"1\",\"name\":\"Kiamb\",\"tags\":[\"District\"],\"voided\":false},\"children\":{\"11\":{\"id\":\"11\",\"label\":\"Mabebe\",\"node\":{\"locationId\":\"11\",\"name\":\"Mabebe\",\"parentLocation\":{\"locationId\":\"1\",\"voided\":false},\"tags\":[\"Commune\"],\"voided\":false},\"children\":{\"111\":{\"id\":\"111\",\"label\":\"Omshindi\",\"node\":{\"locationId\":\"111\",\"name\":\"Omshindi\",\"parentLocation\":{\"locationId\":\"11\",\"voided\":false},\"tags\":[\"District\"],\"voided\":false},\"parent\":\"11\"}},\"parent\":\"1\"}}}},\"parentChildren\":{\"1\":[\"11\"],\"11\":[\"111\"]}}}";
+        Mockito.doReturn(locationTree).when(anmLocationController).get();
+
+        List<String> hierarchy = locationHelper.getOpenMrsLocationHierarchy("1", false);
+
+        assertEquals(1, hierarchy.size());
+        assertTrue(hierarchy.contains("Kiamb"));
+    }
+
+    @Test
+    public void testGetAllowedLevelsReturnsListOfLevelNames() {
+        ReflectionHelpers.setStaticField(LocationHelper.class, "instance", null);
+
+        ArrayList<String> allowedLevels = new ArrayList<>();
+        allowedLevels.add("District");
+        allowedLevels.add("Commune");
+        allowedLevels.add("Facility");
+
+        LocationHelper.init(allowedLevels, "Facility");
+        locationHelper = LocationHelper.getInstance();
+
+        List<String> actualAllowedLevels = locationHelper.getAllowedLevels();
+
+        assertNotNull(actualAllowedLevels);
+        assertEquals(3, actualAllowedLevels.size());
+        assertTrue(actualAllowedLevels.contains("Facility"));
+    }
+
+    @Test
+    public void testGetDefaultLocationLevelReturnsLocationLevelName() {
+        ReflectionHelpers.setStaticField(LocationHelper.class, "instance", null);
+
+        ArrayList<String> allowedLevels = new ArrayList<>();
+        allowedLevels.add("District");
+        allowedLevels.add("Commune");
+        allowedLevels.add("Facility");
+
+        LocationHelper.init(allowedLevels, "Facility");
+        locationHelper = LocationHelper.getInstance();
+
+        String defaultLocationLevel = locationHelper.getDefaultLocationLevel();
+
+        assertEquals("Facility", defaultLocationLevel);
+    }
+
+    @Test
+    public void testGetAdvancedDataCaptureStrategies() {
+        ReflectionHelpers.setStaticField(LocationHelper.class, "instance", null);
+        String advancedDataStrategyType = "Mobile Clinic";
+        ArrayList<String> allowedLevels = new ArrayList<>();
+        allowedLevels.add("County");
+        allowedLevels.add("Ward");
+        allowedLevels.add("Facility");
+
+        ArrayList<String> advancedDataStrategy = new ArrayList<>();
+        advancedDataStrategy.add(advancedDataStrategyType);
+
+        LocationHelper.init(allowedLevels, "Facility", advancedDataStrategy);
+        locationHelper = LocationHelper.getInstance();
+
+        List<String> defaultLocationLevel = locationHelper.getAdvancedDataCaptureStrategies();
+
+        assertEquals(1, defaultLocationLevel.size());
+        assertEquals(advancedDataStrategyType, defaultLocationLevel.get(0));
+    }
+
 }

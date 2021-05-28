@@ -27,7 +27,6 @@ public class CryptographicHelperTest {
 
     public static final String SAMPLE_STRING = "I am a high security string that needs to be hidden from prying eyes";
 
-
     public static final String SAMPLE_KEY_ALIAS = "SampleKeyAlias";
 
     private CryptographicHelper cryptographicHelper;
@@ -40,7 +39,6 @@ public class CryptographicHelperTest {
 
     @Before
     public void setUp() {
-
         MockitoAnnotations.initMocks(this);
 
         cryptographicHelper = CryptographicHelper.getInstance(RuntimeEnvironment.application);
@@ -53,16 +51,13 @@ public class CryptographicHelperTest {
     @Test
     public void testCryptographicHelperInitsCorrectly() {
         Assert.assertNotNull(cryptographicHelper);
-
     }
 
     @Test
     public void testCryptographicHelperEncryptInvokesAndroidMEncryptMethod() throws UnsupportedEncodingException {
-
         cryptographicHelper.encrypt(SAMPLE_STRING.getBytes(CharEncoding.UTF_8), SAMPLE_KEY_ALIAS);
 
         Mockito.verify(androidMCryptography).encrypt(ArgumentMatchers.any(byte[].class), ArgumentMatchers.anyString());
-
     }
 
     @Test
@@ -71,17 +66,13 @@ public class CryptographicHelperTest {
         cryptographicHelper.encrypt(SAMPLE_STRING.getBytes(CharEncoding.UTF_8), SAMPLE_KEY_ALIAS);
 
         Mockito.verify(androidLegacyCryptography).encrypt(ArgumentMatchers.any(byte[].class), ArgumentMatchers.anyString());
-
     }
-
 
     @Test
     public void testCryptographicHelperDecrypteInvokesAndroidMDecryptMethod() throws UnsupportedEncodingException {
-
         cryptographicHelper.decrypt(SAMPLE_STRING.getBytes(CharEncoding.UTF_8), SAMPLE_KEY_ALIAS);
 
         Mockito.verify(androidMCryptography).decrypt(ArgumentMatchers.any(byte[].class), ArgumentMatchers.anyString());
-
     }
 
     @Test
@@ -90,16 +81,13 @@ public class CryptographicHelperTest {
         cryptographicHelper.decrypt(SAMPLE_STRING.getBytes(CharEncoding.UTF_8), SAMPLE_KEY_ALIAS);
 
         Mockito.verify(androidLegacyCryptography).decrypt(ArgumentMatchers.any(byte[].class), ArgumentMatchers.anyString());
-
     }
 
     @Test
     public void testCryptographicHelperGenerateKeyInvokesAndroidMGenerateKeyMethod() {
-
         cryptographicHelper.generateKey(SAMPLE_KEY_ALIAS);
 
         Mockito.verify(androidMCryptography).generateKey(SAMPLE_KEY_ALIAS);
-
     }
 
     @Test
@@ -108,16 +96,13 @@ public class CryptographicHelperTest {
         cryptographicHelper.generateKey(SAMPLE_KEY_ALIAS);
 
         Mockito.verify(androidLegacyCryptography).generateKey(SAMPLE_KEY_ALIAS);
-
     }
 
     @Test
     public void testCryptographicHelperGetKeyInvokesAndroidMGetKeyMethod() {
-
         cryptographicHelper.getKey(SAMPLE_KEY_ALIAS);
 
         Mockito.verify(androidMCryptography).getKey(SAMPLE_KEY_ALIAS);
-
     }
 
     @Test
@@ -126,16 +111,13 @@ public class CryptographicHelperTest {
         cryptographicHelper.getKey(SAMPLE_KEY_ALIAS);
 
         Mockito.verify(androidLegacyCryptography).getKey(SAMPLE_KEY_ALIAS);
-
     }
 
     @Test
     public void testCryptographicHelperDeleteKeyInvokesAndroidMGetKeyMethod() {
-
         cryptographicHelper.deleteKey(SAMPLE_KEY_ALIAS);
 
         Mockito.verify(androidMCryptography).deleteKey(SAMPLE_KEY_ALIAS);
-
     }
 
     @Test
@@ -144,7 +126,5 @@ public class CryptographicHelperTest {
         cryptographicHelper.deleteKey(SAMPLE_KEY_ALIAS);
 
         Mockito.verify(androidLegacyCryptography).deleteKey(SAMPLE_KEY_ALIAS);
-
     }
-
 }

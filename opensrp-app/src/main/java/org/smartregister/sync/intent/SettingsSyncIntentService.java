@@ -10,6 +10,8 @@ import org.smartregister.CoreLibrary;
 import org.smartregister.job.SyncServiceJob;
 import org.smartregister.sync.helper.SyncSettingsServiceHelper;
 
+import timber.log.Timber;
+
 import static org.smartregister.util.Log.logError;
 
 /**
@@ -37,7 +39,7 @@ public class SettingsSyncIntentService extends BaseSyncIntentService {
     }
 
     protected boolean processSettings(Intent intent) {
-        Log.d("ssssssss", "In Settings Sync Intent Service...");
+        Timber.d("In Settings Sync Intent Service...");
         boolean isSuccessfulSync = true;
         if (intent != null) {
             try {
@@ -59,11 +61,6 @@ public class SettingsSyncIntentService extends BaseSyncIntentService {
         super.onCreate();
         Context context = CoreLibrary.getInstance().context();
         syncSettingsServiceHelper = new SyncSettingsServiceHelper(context.configuration().dristhiBaseURL(), context.getHttpAgent());
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
     }
 
 }

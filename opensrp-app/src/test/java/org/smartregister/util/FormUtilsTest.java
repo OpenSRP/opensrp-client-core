@@ -35,6 +35,7 @@ import org.smartregister.util.mock.XmlSerializerMock;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
@@ -211,7 +212,7 @@ public class FormUtilsTest extends BaseUnitTest {
     }
 
     @Test
-    public void getFormJsonShouldReturnCorrectFormWithSameLength() {
+    public void getFormJsonShouldReturnCorrectFormWithSameLength() throws IOException {
         Mockito.doReturn(RuntimeEnvironment.application.getResources()).when(context_).getResources();
         Mockito.doReturn(RuntimeEnvironment.application.getApplicationContext()).when(context_).getApplicationContext();
         Assert.assertEquals(10011, formUtils.getFormJson("test_basic_form").toString().length());

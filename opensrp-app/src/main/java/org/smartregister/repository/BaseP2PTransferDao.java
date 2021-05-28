@@ -16,8 +16,8 @@ public abstract class BaseP2PTransferDao {
     protected DataType profilePic = new DataType(AllConstants.P2PDataTypes.PROFILE_PIC, DataType.Type.MEDIA, 3);
     protected DataType structure = new DataType(AllConstants.P2PDataTypes.STRUCTURE, DataType.Type.NON_MEDIA, 4);
     protected DataType task = new DataType(AllConstants.P2PDataTypes.TASK, DataType.Type.NON_MEDIA, 5);
-    protected DataType foreignEvent = new DataType(AllConstants.P2PDataTypes.FOREIGN_EVENT, DataType.Type.NON_MEDIA, 2);
-    protected DataType foreignClient = new DataType(AllConstants.P2PDataTypes.FOREIGN_CLIENT, DataType.Type.NON_MEDIA, 2);
+    protected DataType foreignEvent = new DataType(AllConstants.P2PDataTypes.FOREIGN_EVENT, DataType.Type.NON_MEDIA, 6);
+    protected DataType foreignClient = new DataType(AllConstants.P2PDataTypes.FOREIGN_CLIENT, DataType.Type.NON_MEDIA, 7);
 
     protected TreeSet<DataType> dataTypes;
 

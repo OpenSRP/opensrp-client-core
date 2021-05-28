@@ -1,8 +1,13 @@
 package org.smartregister;
 
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
+
+import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.security.crypto.MasterKeys;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
@@ -12,6 +17,7 @@ import org.smartregister.commonregistry.CommonFtsObject;
 import org.smartregister.commonregistry.CommonPersonObjectClients;
 import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.commonregistry.CommonRepositoryInformationHolder;
+import org.smartregister.domain.ColumnDetails;
 import org.smartregister.repository.AlertRepository;
 import org.smartregister.repository.AllAlerts;
 import org.smartregister.repository.AllBeneficiaries;
@@ -24,6 +30,7 @@ import org.smartregister.repository.AllTimelineEvents;
 import org.smartregister.repository.CampaignRepository;
 import org.smartregister.repository.ChildRepository;
 import org.smartregister.repository.ClientFormRepository;
+import org.smartregister.repository.ClientRelationshipRepository;
 import org.smartregister.repository.DetailsRepository;
 import org.smartregister.repository.DrishtiRepository;
 import org.smartregister.repository.EligibleCoupleRepository;
@@ -110,16 +117,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import timber.log.Timber;
 
-import static android.preference.PreferenceManager.getDefaultSharedPreferences;
+import static androidx.preference.PreferenceManager.getDefaultSharedPreferences;
 
 public class Context {
 
     ///////////////////common bindtypes///////////////
+
     public static ArrayList<CommonRepositoryInformationHolder> bindtypes;
     private static Context context = new Context();
     protected DristhiConfiguration configuration;
@@ -220,8 +228,12 @@ public class Context {
     private LocationTagRepository locationTagRepository;
     private ManifestRepository manifestRepository;
     private ClientFormRepository clientFormRepository;
+    private ClientRelationshipRepository clientRelationshipRepository;
+
+    private static final String SHARED_PREFERENCES_FILENAME = "%s_preferences";
 
     /////////////////////////////////////////////////
+
     protected Context() {
     }
 
@@ -238,6 +250,10 @@ public class Context {
             return context;
         }
         return null;
+    }
+
+    public static void destroyInstance() {
+        context = null;
     }
 
     public android.content.Context applicationContext() {
@@ -520,39 +536,38 @@ public class Context {
 
     public HTTPAgent httpAgent() {
         if (httpAgent == null) {
-            httpAgent = new HTTPAgent(applicationContext, allSettings(), allSharedPreferences(),
-                    configuration());
+            httpAgent = new HTTPAgent(applicationContext, allSharedPreferences(), configuration());
         }
         return httpAgent;
     }
 
     public ArrayList<DrishtiRepository> sharedRepositories() {
         assignbindtypes();
-        ArrayList<DrishtiRepository> drishtireposotorylist = new ArrayList<DrishtiRepository>();
-        drishtireposotorylist.add(settingsRepository());
-        drishtireposotorylist.add(alertRepository());
-        drishtireposotorylist.add(eligibleCoupleRepository());
-        drishtireposotorylist.add(childRepository());
-        drishtireposotorylist.add(timelineEventRepository());
-        drishtireposotorylist.add(motherRepository());
-        drishtireposotorylist.add(reportRepository());
-        drishtireposotorylist.add(formDataRepository());
-        drishtireposotorylist.add(serviceProvidedRepository());
-        drishtireposotorylist.add(formsVersionRepository());
-        drishtireposotorylist.add(imageRepository());
-        drishtireposotorylist.add(detailsRepository());
+        ArrayList<DrishtiRepository> drishtiRepositoryList = new ArrayList<DrishtiRepository>();
+        drishtiRepositoryList.add(settingsRepository());
+        drishtiRepositoryList.add(alertRepository());
+        drishtiRepositoryList.add(eligibleCoupleRepository());
+        drishtiRepositoryList.add(childRepository());
+        drishtiRepositoryList.add(timelineEventRepository());
+        drishtiRepositoryList.add(motherRepository());
+        drishtiRepositoryList.add(reportRepository());
+        drishtiRepositoryList.add(formDataRepository());
+        drishtiRepositoryList.add(serviceProvidedRepository());
+        drishtiRepositoryList.add(formsVersionRepository());
+        drishtiRepositoryList.add(imageRepository());
+        drishtiRepositoryList.add(detailsRepository());
         for (int i = 0; i < bindtypes.size(); i++) {
-            drishtireposotorylist.add(commonrepository(bindtypes.get(i).getBindtypename()));
+            drishtiRepositoryList.add(commonrepository(bindtypes.get(i).getBindtypename()));
         }
-        return drishtireposotorylist;
+        return drishtiRepositoryList;
 
     }
 
     public DrishtiRepository[] sharedRepositoriesArray() {
         ArrayList<DrishtiRepository> drishtiRepositories = sharedRepositories();
-        DrishtiRepository[] drishtireposotoryarray = drishtiRepositories
+        DrishtiRepository[] drishtiRepositoryArray = drishtiRepositories
                 .toArray(new DrishtiRepository[drishtiRepositories.size()]);
-        return drishtireposotoryarray;
+        return drishtiRepositoryArray;
     }
 
     public AllEligibleCouples allEligibleCouples() {
@@ -579,10 +594,42 @@ public class Context {
 
     public AllSharedPreferences allSharedPreferences() {
         if (allSharedPreferences == null) {
-            allSharedPreferences = new AllSharedPreferences(
-                    getDefaultSharedPreferences(this.applicationContext));
+            allSharedPreferences = new AllSharedPreferences(createSharedPreferences(this.applicationContext));
         }
         return allSharedPreferences;
+    }
+
+    private SharedPreferences createSharedPreferences(android.content.Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && Utils.getBooleanProperty(AllConstants.PROPERTY.ENCRYPT_SHARED_PREFERENCES)) {
+
+            return createEncryptedSharedPreferences(context);
+        } else {
+            return getDefaultSharedPreferences(context);
+        }
+    }
+
+    private SharedPreferences createEncryptedSharedPreferences(android.content.Context context) {
+        SharedPreferences sharedPreferences = null;
+
+        try {
+            String masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC);
+
+            sharedPreferences = EncryptedSharedPreferences.create(
+                    String.format(SHARED_PREFERENCES_FILENAME, context.getPackageName()),
+                    masterKeyAlias,
+                    context,
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            );
+        } catch (Exception e) {
+            Timber.e(e, "Error creating encrypted SharedPreferences");
+
+            // fall back to unencrypted SharedPreferences
+            sharedPreferences = getDefaultSharedPreferences(context);
+        }
+
+        return sharedPreferences;
     }
 
     public AllBeneficiaries allBeneficiaries() {
@@ -961,15 +1008,22 @@ public class Context {
             JSONArray bindtypeObjects = jsonObject.getJSONArray("bindobjects");
 
             for (int i = 0; i < bindtypeObjects.length(); i++) {
-                String bindname = bindtypeObjects.getJSONObject(i).getString("name");
-                String[] columNames = new String[bindtypeObjects.getJSONObject(i)
-                        .getJSONArray("columns").length()];
+                String bindname = bindtypeObjects.getJSONObject(i).getString(AllConstants.ClientProcessing.NAME);
+                ColumnDetails[] columNames = new ColumnDetails[bindtypeObjects.getJSONObject(i)
+                        .getJSONArray(AllConstants.ClientProcessing.COLUMNS).length()];
+
                 for (int j = 0; j < columNames.length; j++) {
-                    columNames[j] = bindtypeObjects.getJSONObject(i).getJSONArray("columns")
-                            .getJSONObject(j).getString("name");
+                    JSONObject columnObject = bindtypeObjects.getJSONObject(i).getJSONArray(AllConstants.ClientProcessing.COLUMNS)
+                            .getJSONObject(j);
+
+                    String name = columnObject.getString(AllConstants.ClientProcessing.NAME);
+                    String dataType = columnObject.has(AllConstants.ClientProcessing.DATA_TYPES) ? columnObject.getString(AllConstants.ClientProcessing.DATA_TYPES) : AllConstants.ClientProcessing.VARCHAR;
+                    columNames[j] =
+                            ColumnDetails.builder().name(name).dataType(StringUtils.isBlank(dataType) ? AllConstants.ClientProcessing.VARCHAR : dataType).build();
+
                 }
                 bindtypes.add(new CommonRepositoryInformationHolder(bindname, columNames));
-                Timber.v("bind type logs %s", bindtypeObjects.getJSONObject(i).getString("name"));
+                Timber.v("bind type logs %s", bindtypeObjects.getJSONObject(i).getString(AllConstants.ClientProcessing.NAME));
             }
         } catch (Exception e) {
             Timber.e(e);
@@ -992,22 +1046,24 @@ public class Context {
                 JSONObject columnDefinitionObject = bindtypeObjects.getJSONObject(i);
                 String bindname = columnDefinitionObject.getString("name");
                 JSONArray columnsJsonArray = columnDefinitionObject.getJSONArray("columns");
-                ArrayList<String> columnNames = new ArrayList<>();
+                List<ColumnDetails> columnNames = new ArrayList<>();
 
                 // This adds the ability to have multiple mappings for one column and at the same time
                 // Prevents the app from crashing when creating the common repository
-                HashSet<String> uniqueColumnNames = new HashSet<>();
+                HashMap<String, ColumnDetails> uniqueColumnNames = new HashMap<>();
 
                 for (int j = 0; j < columnsJsonArray.length(); j++) {
                     JSONObject columnObject = columnsJsonArray.getJSONObject(j);
                     String colName = columnObject.getString("column_name");
+                    String colType = columnObject.has("data_type") ? columnObject.getString("data_type") : "VARCHAR";
 
-                    if (!uniqueColumnNames.contains(colName)) {
-                        uniqueColumnNames.add(colName);
-                        columnNames.add(colName);
+                    if (!uniqueColumnNames.containsKey(colName)) {
+                        ColumnDetails details = ColumnDetails.builder().name(colName).dataType(StringUtils.isBlank(colType) ? "VARCHAR" : colType).build();
+                        uniqueColumnNames.put(colName, details);
+                        columnNames.add(details);
                     }
                 }
-                bindtypes.add(new CommonRepositoryInformationHolder(bindname, columnNames.toArray(new String[0])));
+                bindtypes.add(new CommonRepositoryInformationHolder(bindname, columnNames.toArray(new ColumnDetails[0])));
                 Timber.v("bind type logs %s", bindname);
             }
         } catch (Exception e) {
@@ -1136,7 +1192,7 @@ public class Context {
         return foreignEventClientRepository;
     }
 
-    public boolean hasForeignEvents(){
+    public boolean hasForeignEvents() {
         return DrishtiApplication.getInstance().getP2PClassifier() != null;
     }
 
@@ -1189,5 +1245,12 @@ public class Context {
         return clientFormRepository;
     }
 
-///////////////////////////////////////////////////////////////////////////////
+    public ClientRelationshipRepository getClientRelationshipRepository() {
+        if (clientRelationshipRepository == null) {
+            clientRelationshipRepository = new ClientRelationshipRepository();
+        }
+        return clientRelationshipRepository;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////
 }

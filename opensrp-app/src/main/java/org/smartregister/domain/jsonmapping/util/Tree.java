@@ -112,6 +112,25 @@ public class Tree<K, T> {
         return null;
     }
 
+    /**
+     * Delete nodes from location hierarchy
+     *
+     * @param id the id of the node to remove
+     */
+    public void deleteNode(K id) {
+        TreeNode<K, T> node = getNode(id);
+        if (node == null)
+            return;
+        removeNode(id);
+        parentChildren.remove(id);
+        LinkedHashSet<K> parent = parentChildren.get(node.getParent());
+        if (parent != null && parent.size() == 1) {
+            deleteNode(node.getParent());
+        } else if (parent != null) {
+            parent.remove(id);
+        }
+    }
+
 
     public boolean hasNode(K id) {
         return getNode(id) != null;

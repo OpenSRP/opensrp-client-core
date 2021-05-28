@@ -2,7 +2,6 @@ package org.smartregister.util;
 
 import android.app.Service;
 import android.content.Intent;
-import android.content.res.Resources;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.HurlStack;
@@ -22,11 +21,13 @@ import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.Robolectric;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.android.controller.ActivityController;
+import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.BaseUnitTest;
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
 import org.smartregister.util.mock.OpenSRPImageLoaderTestActivity;
-import org.smartregister.view.activity.DrishtiApplication;
+
+import static org.mockito.Mockito.doReturn;
 
 /**
  * Created by kaderchowdhury on 14/11/17.
@@ -39,12 +40,13 @@ public class OpenSRPImageLoaderTest extends BaseUnitTest {
     public PowerMockRule rule = new PowerMockRule();
 
     private OpenSRPImageLoaderTestActivity activity;
+
     @Mock
     private Context context;
+
     @Mock
-    Resources res;
-    @Mock
-    private DrishtiApplication drishtiApplication;
+    private CoreLibrary coreLibrary;
+
     private ActivityController<OpenSRPImageLoaderTestActivity> controller;
 
     @Before
@@ -53,7 +55,8 @@ public class OpenSRPImageLoaderTest extends BaseUnitTest {
         Intent intent = new Intent(RuntimeEnvironment.application, OpenSRPImageLoaderTestActivity.class);
         controller = Robolectric.buildActivity(OpenSRPImageLoaderTestActivity.class, intent);
         activity = controller.get();
-        CoreLibrary.init(context);
+        ReflectionHelpers.setStaticField(CoreLibrary.class, "instance", coreLibrary);
+        doReturn(context).when(coreLibrary).context();
         controller.setup();
     }
 
@@ -81,5 +84,4 @@ public class OpenSRPImageLoaderTest extends BaseUnitTest {
         OpenSRPImageLoader openSRPImageLoader = new OpenSRPImageLoader(Mockito.mock(Service.class), -1);
         Assert.assertNotNull(openSRPImageLoader);
     }
-
 }

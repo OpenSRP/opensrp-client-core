@@ -3,14 +3,19 @@ package org.smartregister.util;
 import android.content.Context;
 import android.content.pm.PackageManager;
 
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.modules.junit4.rule.PowerMockRule;
+import org.robolectric.util.ReflectionHelpers;
+import org.smartregister.BaseUnitTest;
 import org.smartregister.CoreLibrary;
+import org.smartregister.SyncConfiguration;
 import org.smartregister.domain.Setting;
 import org.smartregister.repository.AllSettings;
 
@@ -28,9 +33,8 @@ import static org.smartregister.AllConstants.FORCED_LOGOUT.MIN_ALLOWED_APP_VERSI
  * Created by Vincent Karuri on 10/03/2020
  */
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({Utils.class})
-public class SyncUtilsTest {
+@PrepareForTest(Utils.class)
+public class SyncUtilsTest extends BaseUnitTest {
 
     @Mock
     private Context context;
@@ -43,10 +47,17 @@ public class SyncUtilsTest {
 
     private SyncUtils syncUtils;
 
+    @Rule
+    public PowerMockRule rule = new PowerMockRule();
+
+    @Mock
+    private CoreLibrary coreLibrary;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        CoreLibrary.init(opensrpContext);
+        ReflectionHelpers.setStaticField(CoreLibrary.class, "instance", coreLibrary);
+        doReturn(opensrpContext).when(coreLibrary).context();
         syncUtils = new SyncUtils(context);
         doReturn(settingsRepository).when(opensrpContext).allSettings();
     }
@@ -88,6 +99,21 @@ public class SyncUtilsTest {
         // 3. newer version app
         when(Utils.getVersionCode(any())).thenReturn(3l);
         assertTrue(syncUtils.isAppVersionAllowed());
+    }
+
+    @Test
+    public void testGetNumOfSyncAttemptsShouldGetCorrectNum() {
+        SyncConfiguration syncConfiguration = Mockito.mock(SyncConfiguration.class);
+        Mockito.doReturn(syncConfiguration).when(CoreLibrary.getInstance()).getSyncConfiguration();
+
+        Mockito.doReturn(3).when(syncConfiguration).getSyncMaxRetries();
+        Assert.assertEquals(4, syncUtils.getNumOfSyncAttempts());
+
+        Mockito.doReturn(0).when(syncConfiguration).getSyncMaxRetries();
+        Assert.assertEquals(1, syncUtils.getNumOfSyncAttempts());
+
+        Mockito.doReturn(-10).when(syncConfiguration).getSyncMaxRetries();
+        Assert.assertEquals(1, syncUtils.getNumOfSyncAttempts());
     }
 
     private String getMinAppVersionSetting(int minVersion) {

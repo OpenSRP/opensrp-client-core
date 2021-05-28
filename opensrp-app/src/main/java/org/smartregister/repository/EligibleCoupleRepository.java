@@ -50,12 +50,12 @@ public class EligibleCoupleRepository extends DrishtiRepository {
     }
 
     public void add(EligibleCouple eligibleCouple) {
-        SQLiteDatabase database = masterRepository.getWritableDatabase();
+        SQLiteDatabase database = masterRepository().getWritableDatabase();
         database.insert(EC_TABLE_NAME, null, createValuesFor(eligibleCouple));
     }
 
     public void updateDetails(String caseId, Map<String, String> details) {
-        SQLiteDatabase database = masterRepository.getWritableDatabase();
+        SQLiteDatabase database = masterRepository().getWritableDatabase();
 
         EligibleCouple couple = findByCaseID(caseId);
         if (couple == null) {
@@ -68,7 +68,7 @@ public class EligibleCoupleRepository extends DrishtiRepository {
     }
 
     public void mergeDetails(String caseId, Map<String, String> details) {
-        SQLiteDatabase database = masterRepository.getWritableDatabase();
+        SQLiteDatabase database = masterRepository().getWritableDatabase();
 
         EligibleCouple couple = findByCaseID(caseId);
         if (couple == null) {
@@ -83,7 +83,7 @@ public class EligibleCoupleRepository extends DrishtiRepository {
     }
 
     public List<EligibleCouple> allEligibleCouples() {
-        SQLiteDatabase database = masterRepository.getReadableDatabase();
+        SQLiteDatabase database = masterRepository().getReadableDatabase();
         Cursor cursor = database.query(EC_TABLE_NAME, EC_TABLE_COLUMNS,
                 IS_OUT_OF_AREA_COLUMN + "" + " = ? AND " + IS_CLOSED_COLUMN + " = ?",
                 new String[]{IN_AREA, NOT_CLOSED}, null, null, null, null);
@@ -91,7 +91,7 @@ public class EligibleCoupleRepository extends DrishtiRepository {
     }
 
     public List<EligibleCouple> findByCaseIDs(String... caseIds) {
-        SQLiteDatabase database = masterRepository.getReadableDatabase();
+        SQLiteDatabase database = masterRepository().getReadableDatabase();
         Cursor cursor = database.rawQuery(
                 String.format("SELECT * FROM %s WHERE %s IN (%s)", EC_TABLE_NAME, ID_COLUMN,
                         insertPlaceholdersForInClause(caseIds.length)), caseIds);
@@ -99,7 +99,7 @@ public class EligibleCoupleRepository extends DrishtiRepository {
     }
 
     public EligibleCouple findByCaseID(String caseId) {
-        SQLiteDatabase database = masterRepository.getReadableDatabase();
+        SQLiteDatabase database = masterRepository().getReadableDatabase();
         Cursor cursor = database
                 .query(EC_TABLE_NAME, EC_TABLE_COLUMNS, ID_COLUMN + " = ?", new String[]{caseId},
                         null, null, null, null);
@@ -111,14 +111,14 @@ public class EligibleCoupleRepository extends DrishtiRepository {
     }
 
     public long count() {
-        return longForQuery(masterRepository.getReadableDatabase(),
+        return longForQuery(masterRepository().getReadableDatabase(),
                 "SELECT COUNT(1) FROM " + EC_TABLE_NAME + " WHERE " + IS_OUT_OF_AREA_COLUMN + " = ?"
                         + " and " + IS_CLOSED_COLUMN + " = ?",
                 new String[]{IN_AREA, NOT_CLOSED});
     }
 
     public List<String> villages() {
-        SQLiteDatabase database = masterRepository.getReadableDatabase();
+        SQLiteDatabase database = masterRepository().getReadableDatabase();
         Cursor cursor = database.query(true, EC_TABLE_NAME, new String[]{VILLAGE_NAME_COLUMN},
                 IS_OUT_OF_AREA_COLUMN + " = ? AND " + IS_CLOSED_COLUMN + " = ?",
                 new String[]{IN_AREA, NOT_CLOSED}, null, null, null, null);
@@ -133,7 +133,7 @@ public class EligibleCoupleRepository extends DrishtiRepository {
     }
 
     public void updatePhotoPath(String caseId, String imagePath) {
-        SQLiteDatabase database = masterRepository.getWritableDatabase();
+        SQLiteDatabase database = masterRepository().getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(PHOTO_PATH_COLUMN, imagePath);
         database.update(EC_TABLE_NAME, values, ID_COLUMN + " = ?", new String[]{caseId});
@@ -142,7 +142,7 @@ public class EligibleCoupleRepository extends DrishtiRepository {
     public void close(String caseId) {
         ContentValues values = new ContentValues();
         values.put(IS_CLOSED_COLUMN, TRUE.toString());
-        masterRepository.getWritableDatabase()
+        masterRepository().getWritableDatabase()
                 .update(EC_TABLE_NAME, values, ID_COLUMN + " = ?", new String[]{caseId});
     }
 
@@ -188,7 +188,7 @@ public class EligibleCoupleRepository extends DrishtiRepository {
     }
 
     public long fpCount() {
-        SQLiteDatabase database = masterRepository.getReadableDatabase();
+        SQLiteDatabase database = masterRepository().getReadableDatabase();
         Cursor cursor = database.rawQuery(
                 format("SELECT details FROM {0} WHERE {1} = ? and" + " {2} = ?",
                         EC_TABLE_NAME, IS_OUT_OF_AREA_COLUMN, IS_CLOSED_COLUMN)

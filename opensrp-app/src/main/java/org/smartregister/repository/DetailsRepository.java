@@ -33,7 +33,7 @@ public class DetailsRepository extends DrishtiRepository {
     }
 
     public void add(String baseEntityId, String key, String value, Long timestamp) {
-        SQLiteDatabase database = masterRepository.getWritableDatabase();
+        SQLiteDatabase database = masterRepository().getWritableDatabase();
         Boolean exists = getIdForDetailsIfExists(baseEntityId, key, value);
         if (exists == null) { // Value has not changed, no need to update
             return;
@@ -59,7 +59,7 @@ public class DetailsRepository extends DrishtiRepository {
     private Boolean getIdForDetailsIfExists(String baseEntityId, String key, String value) {
         Cursor mCursor = null;
         try {
-            SQLiteDatabase db = masterRepository.getWritableDatabase();
+            SQLiteDatabase db = masterRepository().getWritableDatabase();
             String query = "SELECT " + VALUE_COLUMN + " FROM " + TABLE_NAME + " WHERE "
                     + BASE_ENTITY_ID_COLUMN + " = ? AND " + KEY_COLUMN + " MATCH ? ";
             mCursor = db.rawQuery(query, new String[]{baseEntityId, key});
@@ -86,7 +86,7 @@ public class DetailsRepository extends DrishtiRepository {
         Cursor cursor = null;
         Map<String, String> clientDetails = new HashMap<String, String>();
         try {
-            SQLiteDatabase db = masterRepository.getReadableDatabase();
+            SQLiteDatabase db = masterRepository().getReadableDatabase();
             String query =
                     "SELECT * FROM " + TABLE_NAME + " WHERE " + BASE_ENTITY_ID_COLUMN + " =?";
             cursor = db.rawQuery(query, new String[]{baseEntityId});
@@ -134,7 +134,7 @@ public class DetailsRepository extends DrishtiRepository {
 
     public boolean deleteDetails(String baseEntityId) {
         try {
-            SQLiteDatabase db = masterRepository.getWritableDatabase();
+            SQLiteDatabase db = masterRepository().getWritableDatabase();
             int afftectedRows = db
                     .delete(TABLE_NAME, BASE_ENTITY_ID_COLUMN + " = ?", new String[]{baseEntityId});
             if (afftectedRows > 0) {

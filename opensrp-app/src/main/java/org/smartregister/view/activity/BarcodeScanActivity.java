@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.SparseArray;
@@ -31,12 +32,15 @@ public class BarcodeScanActivity extends Activity implements Detector.Processor<
     private CameraSource cameraSource;
     private CameraSourcePreview cameraSourcePreview;
 
-
     @Override
     protected void attachBaseContext(Context base) {
         // get language from prefs
         String lang = LangUtils.getLanguage(base.getApplicationContext());
-        super.attachBaseContext(LangUtils.setAppLocale(base, lang));
+        Configuration newConfiguration = LangUtils.setAppLocale(base, lang);
+
+        super.attachBaseContext(base);
+
+        applyOverrideConfiguration(newConfiguration);
     }
 
     @Override

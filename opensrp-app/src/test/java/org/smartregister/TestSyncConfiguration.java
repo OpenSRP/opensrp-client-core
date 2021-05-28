@@ -1,5 +1,7 @@
 package org.smartregister;
 
+import org.smartregister.view.activity.BaseLoginActivity;
+
 import java.util.List;
 
 /**
@@ -54,5 +56,20 @@ public class TestSyncConfiguration extends SyncConfiguration {
     @Override
     public String getTopAllowedLocationLevel() {
         return null;
+    }
+
+    @Override
+    public String getOauthClientId() {
+        return "opensrp-client-id";
+    }
+
+    @Override
+    public String getOauthClientSecret() {
+        return "$om3cl13nt$3cret";
+    }
+
+    @Override
+    public Class<? extends BaseLoginActivity> getAuthenticationActivity() {
+        return BaseLoginActivity.class;
     }
 }

@@ -6,8 +6,8 @@ public enum ResponseStatus  {
 
     private String displayValue;
 
-    ResponseStatus(String failure) {
-        displayValue = failure;
+    ResponseStatus(String displayValue) {
+        this.displayValue = displayValue;
     }
 
     public String displayValue() {

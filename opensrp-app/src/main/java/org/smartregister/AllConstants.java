@@ -19,6 +19,16 @@ public class AllConstants {
     public static final String SETTINGS = "settings";
     public static final String SERVER_VERSION = "serverVersion";
 
+    public static final String DETAILS = "details";
+    public static final String PLAN_IDENTIFIER = "planIdentifier";
+    public static final String LOCATION_ID = "locationId";
+    public static final String RESIDENCE = "residence";
+    public static final String CLIENT_TYPE = "clientType";
+    public static final String ATTRIBUTES = "attributes";
+    public static final String FAMILY = "Family";
+    public static final String RELATIONSHIPS = "relationships";
+    public static final String TASK_IDENTIFIER = "taskIdentifier";
+
 
     // Maximum time difference between server and client time in milliseconds
     public static final long MAX_SERVER_TIME_DIFFERENCE = 300000L;
@@ -33,6 +43,7 @@ public class AllConstants {
     public static final String PIONEER_USER = "pioneerUser";
     public static final String LANGUAGE_PREFERENCE_KEY = "locale";
     public static final String CURRENT_LOCALITY = "current_locality";
+    public static final String DATA_STRATEGY = "data_strategy";
     public static final String ENGLISH_LOCALE = "en";
     public static final String KANNADA_LOCALE = "kn";
     public static final String DEFAULT_LOCALE = ENGLISH_LOCALE;
@@ -94,10 +105,11 @@ public class AllConstants {
 
     public static final String LAST_SYNC_TIMESTAMP = "LAST_SYNC_TIMESTAMP";
     public static final String LAST_CHECK_TIMESTAMP = "LAST_SYNC_CHECK_TIMESTAMP";
-    public static final boolean TIME_CHECK = false;
+    public static final Boolean TIME_CHECK = false;
 
     public static final String CAMPAIGNS = "CAMPAIGNS";
     public static final String OPERATIONAL_AREAS = "OPERATIONAL_AREAS";
+    public static final String JURISDICTION_IDS = "JURISDICTION_IDS";
     public static final String ORGANIZATION_IDS = "ORGANIZATION_IDS";
 
     public static final String ACCOUNT_DISABLED = "account_disabled_reason";
@@ -125,6 +137,10 @@ public class AllConstants {
 
     public static final String CLIENT_FORM_ASSET_VERSION = "base version";
     public static final String RETURN_COUNT = "return_count";
+    public static final String LIMIT = "limit";
+    public static final String COMBINE_CHECKBOX_OPTION_VALUES = "combine_checkbox_option_values";
+
+    public static final String GPS = "gps";
 
 
     public static class Immunizations {
@@ -417,6 +433,8 @@ public class AllConstants {
         public static final String IS_REMOTE_LOGIN = "is_remote_login";
         public static final String TASK_GENERATED_EVENT = "task_generated_event";
         public static final String TASK_GENERATED = "task_generated";
+        public static final String DIALOG_TITLE = "dialog_title";
+        public static final String DIALOG_MESSAGE = "dialog_message";
     }
 
     public static final class REGISTER_FRAGMENT {
@@ -454,7 +472,8 @@ public class AllConstants {
     public static class PROPERTY {
         public static final String SYSTEM_TOASTER_CENTERED = "system.toaster.centered";
         public static final String DISABLE_LOCATION_PICKER_VIEW = "disable.location.picker.view";
-
+        public static final String LOCATION_PICKER_TAG_SHOWN = "location.picker.tag.shown";
+        public static final String ENCRYPT_SHARED_PREFERENCES = "encrypt.shared.preferences";
     }
 
     public interface FORCED_LOGOUT {
@@ -478,6 +497,7 @@ public class AllConstants {
         String TOTAL_RECORDS = "total_records";
         String SYNC_PROGRESS_DATA = "sync_progress_data";
     }
+
     public interface LocationConstants {
         String SPECIAL_TAG_FOR_OPENMRS_TEAM_MEMBERS = "SPECIAL_TAG_FOR_OPENMRS_TEAM_MEMBERS";
         String LOCATIONS = "locations";
@@ -498,4 +518,59 @@ public class AllConstants {
         String FOREIGN_CLIENT = "ForeignClient";
         String FOREIGN_EVENT = "ForeignEvent";
     }
+
+    public static class HTTP_REQUEST_HEADERS {
+        public static String AUTHORIZATION = "Authorization";
+    }
+
+    public static class HTTP_REQUEST_AUTH_TOKEN_TYPE {
+        public static String BEARER = "Bearer";
+        public static String BASIC = "Basic";
+    }
+
+    public static class DATA_CAPTURE_STRATEGY {
+        public static String ADVANCED = "Advanced";
+        public static String NORMAL = "Normal";
+    }
+
+    public static class DataTypes {
+        public static final String INTEGER = "INTEGER";
+    }
+
+    public interface DownloadFileConstants {
+        String FILE_NAME = "FILE_NAME";
+        String FILE_PATH = "FILE_PATH";
+    }
+
+    public interface GpsConstants {
+        String ALTITUDE = "altitude";
+        String ACCURACY = "accuracy";
+        String LATITUDE = "latitude";
+        String LONGITUDE = "longitude";
+    }
+
+    public interface PerformanceMonitoring {
+        String TEAM = "team";
+        String PUSH = "push";
+        String FETCH = "fetch";
+        String ACTION = "action";
+        String STRUCTURE = "structure";
+        String LOCATION = "location";
+        String TASK_SYNC = "task_sync";
+        String PLAN_SYNC = "plan_sync";
+        String EVENT_SYNC = "event_sync";
+        String LOCATION_SYNC = "location_sync";
+        String CLIENT_PROCESSING = "client_processing";
+    }
+
+
+    public interface ClientProcessing {
+        String VARCHAR = "VARCHAR";
+        String NAME = "name";
+        String DATA_TYPES = "data_type";
+        String COLUMNS = "columns";
+
+    }
+
+
 }

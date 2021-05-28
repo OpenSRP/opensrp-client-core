@@ -2,7 +2,7 @@ package org.smartregister.repository;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import net.sqlcipher.database.SQLiteDatabase;
 
@@ -47,12 +47,12 @@ public class ImageRepository extends DrishtiRepository {
     }
 
     public void add(ProfileImage Image) {
-        SQLiteDatabase database = masterRepository.getWritableDatabase();
+        SQLiteDatabase database = masterRepository().getWritableDatabase();
         database.insert(Image_TABLE_NAME, null, createValuesFor(Image, TYPE_ANC));
     }
 
     public List<ProfileImage> allProfileImages() {
-        SQLiteDatabase database = masterRepository.getReadableDatabase();
+        SQLiteDatabase database = masterRepository().getReadableDatabase();
         Cursor cursor = database
                 .query(Image_TABLE_NAME, Image_TABLE_COLUMNS, syncStatus_COLUMN + " = ?",
                         new String[]{TYPE_Unsynced}, null, null, null, null);
@@ -62,7 +62,7 @@ public class ImageRepository extends DrishtiRepository {
     @Nullable
     public HashMap<String, Object> getImage(long lastRowId) {
 
-        SQLiteDatabase database = masterRepository.getReadableDatabase();
+        SQLiteDatabase database = masterRepository().getReadableDatabase();
         Cursor cursor = database
                 .query(Image_TABLE_NAME, new String[]{"rowid", filepath_COLUMN, syncStatus_COLUMN, entityID_COLUMN, anm_ID_COLUMN
                                 , filecategory_COLUMN}
@@ -96,7 +96,7 @@ public class ImageRepository extends DrishtiRepository {
     }
 
     public ProfileImage findByEntityId(String entityId) {
-        SQLiteDatabase database = masterRepository.getReadableDatabase();
+        SQLiteDatabase database = masterRepository().getReadableDatabase();
         Cursor cursor = database.query(Image_TABLE_NAME, Image_TABLE_COLUMNS,
                 entityID_COLUMN + " = ? COLLATE NOCASE ", new String[]{entityId}, null,
                 null, null, null);
@@ -105,7 +105,7 @@ public class ImageRepository extends DrishtiRepository {
     }
 
     public List<ProfileImage> findAllUnSynced() {
-        SQLiteDatabase database = masterRepository.getReadableDatabase();
+        SQLiteDatabase database = masterRepository().getReadableDatabase();
         Cursor cursor = database
                 .query(Image_TABLE_NAME, Image_TABLE_COLUMNS, syncStatus_COLUMN + " = ?",
                         new String[]{TYPE_Unsynced}, null, null, null, null);
@@ -115,7 +115,7 @@ public class ImageRepository extends DrishtiRepository {
     public void close(String caseId) {
         ContentValues values = new ContentValues();
         values.put(syncStatus_COLUMN, TYPE_Synced);
-        masterRepository.getWritableDatabase()
+        masterRepository().getWritableDatabase()
                 .update(Image_TABLE_NAME, values, ID_COLUMN + " = ?", new String[]{caseId});
     }
 
@@ -157,7 +157,7 @@ public class ImageRepository extends DrishtiRepository {
     }
 
 //    public void update(Mother mother) {
-//        SQLiteDatabase database = masterRepository.getWritableDatabase();
+//        SQLiteDatabase database = masterRepository().getWritableDatabase();
 //        database.update(MOTHER_TABLE_NAME, createValuesFor(mother, TYPE_ANC), ID_COLUMN + " =
 // ?", new String[]{mother.caseId()});
 //    }

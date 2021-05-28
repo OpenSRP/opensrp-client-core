@@ -28,6 +28,10 @@ public class ProfileImage {
     public ProfileImage() {
     }
 
+    public ProfileImage(String imageId) {
+        this(imageId, null, null, null, null, null, null);
+    }
+
     public String getFilecategory() {
         return filecategory;
     }

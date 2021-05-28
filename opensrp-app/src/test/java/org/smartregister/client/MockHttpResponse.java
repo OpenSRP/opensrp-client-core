@@ -3,9 +3,9 @@ package org.smartregister.client;
 import org.apache.http.Header;
 import org.apache.http.HeaderIterator;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.params.HttpParams;
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ import java.util.Locale;
  * Created by kaderchowdhury on 30/11/17.
  */
 
-public class MockHttpResponse implements HttpResponse {
+public class MockHttpResponse implements CloseableHttpResponse {
 
     @Override
     public StatusLine getStatusLine() {
@@ -217,5 +217,10 @@ public class MockHttpResponse implements HttpResponse {
     @Override
     public void setParams(HttpParams httpParams) {
         System.out.println();
+    }
+
+    @Override
+    public void close() throws IOException {
+        // do nothing
     }
 }

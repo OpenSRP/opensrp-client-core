@@ -4,9 +4,6 @@ import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -18,6 +15,10 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.LocalDate;
@@ -399,9 +400,7 @@ public abstract class SecuredNativeSmartRegisterCursorAdapterFragment extends
     }
 
     public void refresh() {
-        pageInfoView.setText(
-                format(getResources().getString(R.string.str_page_info), (getCurrentPageCount()),
-                        getTotalcount()));
+        pageInfoView.setText(getFormattedPaginationInfoText(getCurrentPageCount(), getTotalcount()));
         nextPageView.setVisibility(hasNextPage() ? VISIBLE : INVISIBLE);
         previousPageView.setVisibility(hasPreviousPage() ? VISIBLE : INVISIBLE);
     }
@@ -707,5 +706,9 @@ public abstract class SecuredNativeSmartRegisterCursorAdapterFragment extends
         private void clearSearchText() {
             searchView.setText("");
         }
+    }
+
+    protected String getFormattedPaginationInfoText(int currentPage, int pageCount) {
+        return format(getResources().getString(R.string.str_page_info), currentPage, pageCount);
     }
 }

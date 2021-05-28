@@ -20,6 +20,7 @@ import org.mockito.junit.MockitoRule;
 import org.powermock.reflect.Whitebox;
 import org.smartregister.BaseUnitTest;
 import org.smartregister.domain.Location;
+import org.smartregister.domain.LocationTag;
 import org.smartregister.domain.LocationTest;
 import org.smartregister.util.DateTimeTypeConverter;
 import org.smartregister.view.activity.DrishtiApplication;
@@ -71,7 +72,7 @@ public class LocationRepositoryTest extends BaseUnitTest {
 
     @Before
     public void setUp() {
-        Whitebox.setInternalState(DrishtiApplication.getInstance(),"repository",repository);
+        Whitebox.setInternalState(DrishtiApplication.getInstance(), "repository", repository);
         locationRepository = new LocationRepository();
         when(repository.getReadableDatabase()).thenReturn(sqLiteDatabase);
         when(repository.getWritableDatabase()).thenReturn(sqLiteDatabase);
@@ -79,7 +80,6 @@ public class LocationRepositoryTest extends BaseUnitTest {
 
     @Test
     public void testAddOrUpdateShouldAdd() {
-
         Location location = gson.fromJson(locationJson, Location.class);
         locationRepository.addOrUpdate(location);
 
@@ -98,13 +98,10 @@ public class LocationRepositoryTest extends BaseUnitTest {
         assertEquals("21", contentValues.getAsString("parent_id"));
         assertEquals(locationJson, stripTimezone(contentValues.getAsString("geojson")));
         assertTrue(contentValues.containsKey("sync_status"));
-
-
     }
 
     @Test
     public void testAddOrUpdateWithSyncStatus() {
-
         Location location = gson.fromJson(locationJson, Location.class);
         location.setSyncStatus(TYPE_Unsynced);
         locationRepository.addOrUpdate(location);
@@ -116,17 +113,13 @@ public class LocationRepositoryTest extends BaseUnitTest {
         assertEquals(6, contentValues.size());
 
         assertEquals(TYPE_Unsynced, contentValues.getAsString("sync_status"));
-
     }
-
 
     @Test(expected = IllegalArgumentException.class)
     public void testAddOrUpdateShouldThrowException() {
         Location location = new Location();
         locationRepository.addOrUpdate(location);
-
     }
-
 
     @Test
     public void tesGetAllLocations() {
@@ -139,7 +132,6 @@ public class LocationRepositoryTest extends BaseUnitTest {
         assertEquals(1, allLocations.size());
         Location location = allLocations.get(0);
         assertEquals(locationJson, stripTimezone(gson.toJson(location)));
-
     }
 
     @Test
@@ -156,9 +148,7 @@ public class LocationRepositoryTest extends BaseUnitTest {
         List<Location> allLocations = locationRepository.getAllLocations();
         assertEquals(1, allLocations.size());
         assertEquals(allLocationIds.get(0), allLocations.get(0).getId());
-
     }
-
 
     @Test
     public void tesGetLocationsByParentId() {
@@ -173,7 +163,6 @@ public class LocationRepositoryTest extends BaseUnitTest {
         assertEquals(1, allLocations.size());
         Location location = allLocations.get(0);
         assertEquals(locationJson, stripTimezone(gson.toJson(location)));
-
     }
 
     @Test
@@ -187,7 +176,6 @@ public class LocationRepositoryTest extends BaseUnitTest {
         assertEquals("3734", argsCaptor.getValue()[0]);
 
         assertEquals(locationJson, stripTimezone(gson.toJson(location)));
-
     }
 
     @Test
@@ -202,7 +190,6 @@ public class LocationRepositoryTest extends BaseUnitTest {
         assertEquals("41587456-b7c8-4c4e-b433-23a786f742fc", argsCaptor.getValue()[0]);
 
         assertEquals(locationJson, stripTimezone(gson.toJson(location)));
-
     }
 
     @Test
@@ -217,7 +204,6 @@ public class LocationRepositoryTest extends BaseUnitTest {
         assertEquals("01_5", argsCaptor.getValue()[0]);
 
         assertEquals(locationJson, stripTimezone(gson.toJson(location)));
-
     }
 
     @Test
@@ -233,7 +219,6 @@ public class LocationRepositoryTest extends BaseUnitTest {
 
         assertNotNull(locations);
         assertEquals(locationJson, stripTimezone(gson.toJson(locations.get(0))));
-
     }
 
     @Test
@@ -250,6 +235,15 @@ public class LocationRepositoryTest extends BaseUnitTest {
         assertEquals(0, locations.size());
     }
 
+    @Test
+    public void testGetLocationsByTagName() {
+        when(sqLiteDatabase.rawQuery("SELECT * FROM location_tag WHERE name =?", new String[]{"Facility"})).thenReturn(getLocationTagsCursor());
+        when(sqLiteDatabase.rawQuery("SELECT * FROM location WHERE _id IN (?)", new String[]{"1"})).thenReturn(getCursor());
+
+        List<Location> tags = locationRepository.getLocationsByTagName("Facility");
+        assertNotNull(tags);
+        assertEquals(1, tags.size());
+    }
 
     public MatrixCursor getCursor() {
         MatrixCursor cursor = new MatrixCursor(LocationRepository.COLUMNS);
@@ -259,4 +253,11 @@ public class LocationRepositoryTest extends BaseUnitTest {
         return cursor;
     }
 
+    public MatrixCursor getLocationTagsCursor() {
+        String locationTagJson = "{\"name\":\"Facility\",\"locationId\":\"1\"}";
+        MatrixCursor cursor = new MatrixCursor(LocationTagRepository.COLUMNS);
+        LocationTag locationTag = gson.fromJson(locationTagJson, LocationTag.class);
+        cursor.addRow(new Object[]{locationTag.getName(), locationTag.getLocationId()});
+        return cursor;
+    }
 }

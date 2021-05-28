@@ -26,4 +26,12 @@ public class AppProperties extends Properties {
 
         return getProperty(key) != null;
     }
+
+    /**
+     * @param key key as present in the properties file
+     * @return returns true if a property with the provided key exists and the Boolean evaluation is true, false otherwise
+     */
+    public Boolean isTrue(String key) {
+        return hasProperty(key) && getPropertyBoolean(key);
+    }
 }

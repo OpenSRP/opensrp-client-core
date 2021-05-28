@@ -3,7 +3,7 @@ package org.smartregister.util;
 import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.os.Build;
-import android.support.v4.util.LruCache;
+import androidx.collection.LruCache;
 
 import com.android.volley.toolbox.ImageLoader;
 

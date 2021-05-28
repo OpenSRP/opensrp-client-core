@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import org.apache.commons.codec.CharEncoding;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,12 +36,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xmlpull.v1.XmlSerializer;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -1062,33 +1061,32 @@ public class FormUtils {
         return value;
     }
 
-    private String readFileFromAssetsFolder(String fileName) {
+    private String readFileFromAssetsFolder(String fileName) throws IOException {
         String fileContents = null;
+        InputStream inputStream = null;
         try {
-            InputStream is = mContext.getAssets().open(fileName);
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            fileContents = new String(buffer, CharEncoding.UTF_8);
-        } catch (IOException ex) {
-            Timber.e(ex);
 
-            return null;
+            inputStream = mContext.getAssets().open(fileName);
+            fileContents = IOUtils.toString(inputStream);
+
+        } catch (IOException e) {
+            Timber.e(e);
+        } finally {
+            if (inputStream != null) {
+                inputStream.close();
+            }
         }
-
-        //Log.d("File", fileContents);
 
         return fileContents;
     }
 
     public JSONObject getFormJson(String formIdentity) {
         if (mContext != null) {
+
+            InputStream inputStream = null;
             try {
                 String locale = mContext.getResources().getConfiguration().locale.getLanguage();
                 locale = locale.equalsIgnoreCase(Locale.ENGLISH.getLanguage()) ? "" : "-" + locale;
-
-                InputStream inputStream;
                 try {
                     inputStream = mContext.getApplicationContext().getAssets()
                             .open("json.form" + locale + "/" + formIdentity + AllConstants.JSON_FILE_EXTENSION);
@@ -1097,19 +1095,18 @@ public class FormUtils {
                     inputStream = mContext.getApplicationContext().getAssets()
                             .open("json.form/" + formIdentity + AllConstants.JSON_FILE_EXTENSION);
                 }
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(inputStream, CharEncoding.UTF_8));
-                String jsonString;
-                StringBuilder stringBuilder = new StringBuilder();
-
-                while ((jsonString = reader.readLine()) != null) {
-                    stringBuilder.append(jsonString);
-                }
-                inputStream.close();
-
-                return new JSONObject(stringBuilder.toString());
+                String rawForm = IOUtils.toString(inputStream);
+                return new JSONObject(rawForm);
             } catch (IOException | JSONException e) {
                 Timber.e(e);
+            } finally {
+                if (inputStream != null) {
+                    try {
+                        inputStream.close();
+                    } catch (IOException e) {
+                        Timber.e(e);
+                    }
+                }
             }
         }
         return null;

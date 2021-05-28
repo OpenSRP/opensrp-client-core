@@ -45,6 +45,12 @@ public class AlertService {
         }
     }
 
+    public void create(List<Alert> alerts) {
+        if (alerts != null && alerts.size() > 0) {
+            repository.createAlerts(alerts);
+        }
+    }
+
     public void close(Action action) {
         repository.markAlertAsClosed(action.caseID(), action.get("visitCode"),
                 action.get("completionDate"));

@@ -27,14 +27,14 @@ public class SyncProgressBroadcastReceiver extends BroadcastReceiver {
         Bundle data = intent.getExtras();
         if (data != null) {
             Serializable syncProgressDataSerializable = data.getSerializable(AllConstants.SyncProgressConstants.SYNC_PROGRESS_DATA);
-            if (syncProgressDataSerializable instanceof  SyncProgress) {
+            if (syncProgressDataSerializable instanceof SyncProgress) {
                 SyncProgress syncProgress = (SyncProgress) syncProgressDataSerializable;
                 syncProgressListener.onSyncProgress(syncProgress);
             }
         }
     }
 
-    public interface SyncProgressListener{
+    public interface SyncProgressListener {
         void onSyncProgress(SyncProgress syncProgress);
     }
 }

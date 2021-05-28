@@ -1,6 +1,6 @@
 package org.smartregister.util;
 
-import android.support.v4.util.Pair;
+import androidx.core.util.Pair;
 
 import com.google.gson.Gson;
 

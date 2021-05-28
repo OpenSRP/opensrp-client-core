@@ -2,13 +2,20 @@ package org.smartregister.repository;
 
 import android.content.ContentValues;
 
+import androidx.annotation.NonNull;
+
 import net.sqlcipher.Cursor;
 import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteException;
 
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.smartregister.domain.PlanDefinition;
+import org.smartregister.domain.PlanDefinitionSearch;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import timber.log.Timber;
@@ -84,6 +91,49 @@ public class PlanDefinitionSearchRepository extends BaseRepository {
                 cursor.close();
         }
         return getPlanDefinitionRepository().findPlanDefinitionByIds(planIds);
+    }
+
+    public List<PlanDefinitionSearch> findPlanDefinitionSearchByPlanId(@NonNull String planId) {
+        List<PlanDefinitionSearch> planDefinitionSearchList = new ArrayList<>();
+        String query = String.format("SELECT * FROM %s WHERE %s=? ",
+                PLAN_DEFINITION_SEARCH_TABLE, PLAN_ID);
+        try (Cursor cursor = getReadableDatabase().rawQuery(query, new String[]{planId})) {
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    planDefinitionSearchList.add(readCursor(cursor));
+                }
+            }
+        } catch (SQLiteException e) {
+            Timber.e(e);
+        }
+        return planDefinitionSearchList;
+    }
+
+    public List<PlanDefinitionSearch> findPlanDefinitionSearchByPlanStatus(@NonNull PlanDefinition.PlanStatus status) {
+        List<PlanDefinitionSearch> planDefinitionSearchList = new ArrayList<>();
+        String query = String.format("SELECT * FROM %s WHERE %s=? ",
+                PLAN_DEFINITION_SEARCH_TABLE, STATUS);
+        try (Cursor cursor = getReadableDatabase().rawQuery(query, new String[]{status.value()})) {
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    planDefinitionSearchList.add(readCursor(cursor));
+                }
+            }
+        } catch (SQLiteException e) {
+            Timber.e(e);
+        }
+        return planDefinitionSearchList;
+    }
+
+    private PlanDefinitionSearch readCursor(@NonNull Cursor cursor) {
+        PlanDefinitionSearch planDefinitionSearch = new PlanDefinitionSearch();
+        planDefinitionSearch.setName(cursor.getString(cursor.getColumnIndex(NAME)));
+        planDefinitionSearch.setPlanId(cursor.getString(cursor.getColumnIndex(PLAN_ID)));
+        planDefinitionSearch.setJurisdictionId(cursor.getString(cursor.getColumnIndex(JURISDICTION_ID)));
+        planDefinitionSearch.setStart(new DateTime(cursor.getLong(cursor.getColumnIndex(START))));
+        planDefinitionSearch.setEnd(new DateTime(cursor.getLong(cursor.getColumnIndex(END))));
+        planDefinitionSearch.setStatus(cursor.getString(cursor.getColumnIndex(STATUS)));
+        return planDefinitionSearch;
     }
 
     public boolean planExists(String planId, String jurisdictionId) {

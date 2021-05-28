@@ -33,8 +33,8 @@
     <string name="settings_logout_confirm_dialog_message">هل أنت متأكد أنك تريد تسجيل الخروج؟ سيتم مسح جميع البيانات</string>
     <string name="unsynced_forms_count_message">استمارات غير متزامنة </string>
 
-    <string name="str_next">التالي &gt;&gt;</string>
-    <string name="str_previous">&gt;&gt;سابق</string>
+    <string name="str_next"> التالية&gt;&gt;</string>
+    <string name="str_previous">&gt;&gt;السابقة </string>
     <string name="str_page_info">صفحة {0} من {1}</string>
 
     <string name="header_name">الاسم</string>
@@ -415,4 +415,5 @@
     <string name="x_years_months">%1$dس
         %2$dش</string>
 
+    <string name="account_removed">لقد تم تسجيل خروجك لأنه تم حذف حسابك من مدير الحساب</string>
 </resources>

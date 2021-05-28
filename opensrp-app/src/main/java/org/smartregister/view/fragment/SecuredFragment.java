@@ -2,8 +2,8 @@ package org.smartregister.view.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.VisibleForTesting;
-import android.support.v4.app.Fragment;
+import androidx.annotation.VisibleForTesting;
+import androidx.fragment.app.Fragment;
 import android.view.MenuItem;
 
 import com.google.gson.Gson;
@@ -18,7 +18,6 @@ import org.smartregister.event.Listener;
 import org.smartregister.util.Utils;
 import org.smartregister.view.activity.DrishtiApplication;
 import org.smartregister.view.activity.FormActivity;
-import org.smartregister.view.activity.LoginActivity;
 import org.smartregister.view.activity.MicroFormActivity;
 import org.smartregister.view.activity.SecuredActivity;
 import org.smartregister.view.controller.ANMController;
@@ -44,11 +43,9 @@ public abstract class SecuredFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        logoutListener = new Listener<Boolean>() {
-            public void onEvent(Boolean data) {
-                if (getActivity() != null && !getActivity().isFinishing()) {
-                    getActivity().finish();
-                }
+        logoutListener = data -> {
+            if (getActivity() != null && !getActivity().isFinishing()) {
+                getActivity().finish();
             }
         };
         Event.ON_LOGOUT.addListener(logoutListener);
@@ -104,7 +101,6 @@ public abstract class SecuredFragment extends Fragment {
 
     public void logoutUser() {
         context().userService().logout();
-        startActivity(new Intent(getActivity(), LoginActivity.class));
     }
 
     protected abstract void onCreation();

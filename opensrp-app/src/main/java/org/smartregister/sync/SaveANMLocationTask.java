@@ -1,5 +1,6 @@
 package org.smartregister.sync;
 
+import org.apache.commons.lang3.StringUtils;
 import org.smartregister.repository.AllSettings;
 import org.smartregister.util.Log;
 import org.smartregister.view.BackgroundAction;
@@ -28,7 +29,8 @@ public class SaveANMLocationTask {
         task.doActionInBackground(new BackgroundAction<String>() {
             @Override
             public String actionToDoInBackgroundThread() {
-                allSettings.saveANMLocation(anmLocation);
+                if (StringUtils.isNotBlank(anmLocation))
+                    allSettings.saveANMLocation(anmLocation);
                 return anmLocation;
             }
 

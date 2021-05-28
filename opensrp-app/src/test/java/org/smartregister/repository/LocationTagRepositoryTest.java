@@ -19,26 +19,21 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.powermock.reflect.Whitebox;
 import org.smartregister.BaseUnitTest;
-import org.smartregister.domain.Location;
 import org.smartregister.domain.LocationTag;
-import org.smartregister.domain.LocationTest;
 import org.smartregister.util.DateTimeTypeConverter;
 import org.smartregister.view.activity.DrishtiApplication;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.smartregister.domain.LocationTest.stripTimezone;
-import static org.smartregister.repository.LocationRepository.LOCATION_TABLE;
 import static org.smartregister.repository.LocationTagRepository.LOCATION_ID;
 import static org.smartregister.repository.LocationTagRepository.LOCATION_TAG_TABLE;
+import static org.smartregister.repository.LocationTagRepository.NAME;
 
 /**
  * Created by ilakozejumanne on 02/20/20.
@@ -73,7 +68,7 @@ public class LocationTagRepositoryTest extends BaseUnitTest {
 
     @Before
     public void setUp() {
-        Whitebox.setInternalState(DrishtiApplication.getInstance(),"repository",repository);
+        Whitebox.setInternalState(DrishtiApplication.getInstance(), "repository", repository);
         locationTagRepository = new LocationTagRepository();
         when(repository.getReadableDatabase()).thenReturn(sqLiteDatabase);
         when(repository.getWritableDatabase()).thenReturn(sqLiteDatabase);
@@ -81,7 +76,6 @@ public class LocationTagRepositoryTest extends BaseUnitTest {
 
     @Test
     public void testAddOrUpdateShouldAdd() {
-
         LocationTag locationTag = gson.fromJson(locationTagJson, LocationTag.class);
         locationTagRepository.addOrUpdate(locationTag);
 
@@ -97,8 +91,6 @@ public class LocationTagRepositoryTest extends BaseUnitTest {
 
         assertEquals("Facility", contentValues.getAsString("name"));
         assertEquals("1", contentValues.getAsString("location_id"));
-
-
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -107,10 +99,9 @@ public class LocationTagRepositoryTest extends BaseUnitTest {
         locationTagRepository.addOrUpdate(locationTag);
     }
 
-
     @Test
     public void tesGetAllLocationTags() {
-        when(sqLiteDatabase.rawQuery("SELECT * FROM "+LOCATION_TAG_TABLE, null)).thenReturn(getCursor());
+        when(sqLiteDatabase.rawQuery("SELECT * FROM " + LOCATION_TAG_TABLE, null)).thenReturn(getCursor());
         List<LocationTag> allLocationsTags = locationTagRepository.getAllLocationTags();
         verify(sqLiteDatabase).rawQuery(stringArgumentCaptor.capture(), argsCaptor.capture());
 
@@ -119,23 +110,32 @@ public class LocationTagRepositoryTest extends BaseUnitTest {
         assertEquals(1, allLocationsTags.size());
         LocationTag locationTag = allLocationsTags.get(0);
         assertEquals(locationTagJson, stripTimezone(gson.toJson(locationTag)));
-
     }
 
     @Test
-    public void tesGetLocationTagsById() {
-        when(sqLiteDatabase.rawQuery("SELECT * FROM "+LOCATION_TAG_TABLE+" WHERE "+LOCATION_ID+" =?", new String[]{"1"})).thenReturn(getCursor());
+    public void testGetLocationTagsById() {
+        when(sqLiteDatabase.rawQuery("SELECT * FROM " + LOCATION_TAG_TABLE + " WHERE " + LOCATION_ID + " =?", new String[]{"1"})).thenReturn(getCursor());
         List<LocationTag> locationTags = locationTagRepository.getLocationTagByLocationId("1");
         verify(sqLiteDatabase).rawQuery(stringArgumentCaptor.capture(), argsCaptor.capture());
 
-        assertEquals("SELECT * FROM "+LOCATION_TAG_TABLE+" WHERE "+LOCATION_ID+" =?", stringArgumentCaptor.getValue());
+        assertEquals("SELECT * FROM " + LOCATION_TAG_TABLE + " WHERE " + LOCATION_ID + " =?", stringArgumentCaptor.getValue());
         assertEquals(1, argsCaptor.getValue().length);
         assertEquals("1", argsCaptor.getValue()[0]);
 
         assertEquals(locationTagJson, stripTimezone(gson.toJson(locationTags.get(0))));
-
     }
 
+    @Test
+    public void testGetLocationTagsByTagName() {
+        when(sqLiteDatabase.rawQuery("SELECT * FROM " + LOCATION_TAG_TABLE + " WHERE " + NAME + " =?", new String[]{"Facility"})).thenReturn(getCursor());
+        List<LocationTag> locationTags = locationTagRepository.getLocationTagsByTagName("Facility");
+        verify(sqLiteDatabase).rawQuery(stringArgumentCaptor.capture(), argsCaptor.capture());
+
+        assertEquals("SELECT * FROM " + LOCATION_TAG_TABLE + " WHERE " + NAME + " =?", stringArgumentCaptor.getValue());
+        assertEquals(1, argsCaptor.getValue().length);
+        assertEquals("Facility", argsCaptor.getValue()[0]);
+        assertEquals(locationTagJson, stripTimezone(gson.toJson(locationTags.get(0))));
+    }
 
     public MatrixCursor getCursor() {
         MatrixCursor cursor = new MatrixCursor(LocationTagRepository.COLUMNS);
@@ -143,5 +143,4 @@ public class LocationTagRepositoryTest extends BaseUnitTest {
         cursor.addRow(new Object[]{locationTag.getName(), locationTag.getLocationId()});
         return cursor;
     }
-
 }

@@ -1,7 +1,6 @@
 package org.smartregister.repository;
 
 import org.junit.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -12,7 +11,6 @@ import org.smartregister.domain.Setting;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,16 +31,6 @@ public class AllSettingsTest extends BaseUnitTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         allSettings = new AllSettings(allSharedPreferences, settingsRepository);
-    }
-
-    @Test
-    public void shouldFetchANMPassword() throws Exception {
-        Mockito.when(settingsRepository.querySetting("anmPassword", "")).thenReturn("actual password");
-
-        String actual = allSettings.fetchANMPassword();
-
-        Mockito.verify(settingsRepository).querySetting("anmPassword", "");
-        Assert.assertEquals("actual password", actual);
     }
 
     @Test
@@ -96,10 +84,8 @@ public class AllSettingsTest extends BaseUnitTest {
     @Test
     public void assertRegisterANMCallsPreferenceAndRepositoryUpdate() throws Exception {
         Mockito.doNothing().when(allSharedPreferences).updateANMUserName(Mockito.anyString());
-        Mockito.doNothing().doNothing().when(settingsRepository).updateSetting(Mockito.anyString(), Mockito.anyString());
-        allSettings.registerANM("", "");
+        allSettings.registerANM("");
         Mockito.verify(allSharedPreferences, Mockito.times(1)).updateANMUserName(Mockito.anyString());
-        Mockito.verify(settingsRepository, Mockito.times(1)).updateSetting(Mockito.anyString(), Mockito.anyString());
     }
 
     @Test
@@ -128,15 +114,6 @@ public class AllSettingsTest extends BaseUnitTest {
         Mockito.doNothing().doNothing().when(settingsRepository).updateSetting(Mockito.anyString(), Mockito.anyString());
         allSettings.saveUserInformation("");
         Mockito.verify(settingsRepository, Mockito.times(1)).updateSetting(Mockito.anyString(), Mockito.anyString());
-    }
-
-    @Test
-    public void assertGetAuthParamsReturnsUserNamePassword() {
-        Mockito.when(allSharedPreferences.fetchRegisteredANM()).thenReturn("username");
-        Mockito.when(settingsRepository.querySetting(Mockito.anyString(), Mockito.anyString())).thenReturn("password");
-        Map<String, String> auth = allSettings.getAuthParams();
-        Assert.assertEquals("username", auth.get("username"));
-        Assert.assertEquals("password", auth.get("password"));
     }
 
     @Test
@@ -177,7 +154,8 @@ public class AllSettingsTest extends BaseUnitTest {
     @Test
     public void testGetSetting() {
         Setting s = new Setting();
-        s.setKey("testKey"); s.setValue("testValue");
+        s.setKey("testKey");
+        s.setValue("testValue");
 
         Mockito.when(settingsRepository.querySetting("testKey")).thenReturn(s);
 
@@ -193,10 +171,12 @@ public class AllSettingsTest extends BaseUnitTest {
         List<Setting> ls = new ArrayList<>();
 
         Setting s = new Setting();
-        s.setKey("testKey"); s.setValue("testValue");
+        s.setKey("testKey");
+        s.setValue("testValue");
         ls.add(s);
         Setting s2 = new Setting();
-        s2.setKey("testKey2"); s2.setValue("testValue2");
+        s2.setKey("testKey2");
+        s2.setValue("testValue2");
         ls.add(s2);
 
         Mockito.when(settingsRepository.querySettingsByType("testType")).thenReturn(ls);
@@ -211,7 +191,8 @@ public class AllSettingsTest extends BaseUnitTest {
     @Test
     public void testPutSetting() {
         Setting s = new Setting();
-        s.setKey("testKey"); s.setValue("testValue");
+        s.setKey("testKey");
+        s.setValue("testValue");
 
         allSettings.putSetting(s);
 
@@ -223,7 +204,8 @@ public class AllSettingsTest extends BaseUnitTest {
         List<Setting> ls = new ArrayList<>();
 
         Setting s = new Setting();
-        s.setKey("testUnsyncedKey"); s.setValue("testUnsyncedValue");
+        s.setKey("testUnsyncedKey");
+        s.setValue("testUnsyncedValue");
         ls.add(s);
 
         Mockito.when(settingsRepository.queryUnsyncedSettings()).thenReturn(ls);

@@ -1,14 +1,12 @@
 package org.smartregister.view;
 
 
-import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.IdRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.smartregister.util.AppExecutors;
-import org.smartregister.view.adapter.ListableAdapter;
-import org.smartregister.view.viewholder.ListableViewHolder;
 
 import java.util.List;
 import java.util.concurrent.Callable;

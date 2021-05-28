@@ -1,7 +1,7 @@
 package org.smartregister.repository.helper;
 
 import android.location.Location;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.smartregister.domain.Geometry;
 

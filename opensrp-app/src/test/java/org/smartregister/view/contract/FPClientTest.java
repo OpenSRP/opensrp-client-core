@@ -10,16 +10,18 @@ import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.smartregister.BaseUnitTest;
+import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
 import org.smartregister.R;
 
 import java.util.Arrays;
 
+import static org.mockito.Mockito.doReturn;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(CoreLibrary.class)
-public class FPClientTest  {
+public class FPClientTest {
 
     @Mock
     private Context context;
@@ -30,19 +32,18 @@ public class FPClientTest  {
     CoreLibrary coreLibrary;
 
     @Before
-    public void setUp()  {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
-        CoreLibrary.init(context);
+        ReflectionHelpers.setStaticField(CoreLibrary.class, "instance", coreLibrary);
+        doReturn(context).when(coreLibrary).context();
 
-        PowerMockito.mockStatic(CoreLibrary.class);
-        PowerMockito.when(CoreLibrary.getInstance()).thenReturn(coreLibrary);
         Mockito.doReturn(context).when(coreLibrary).context();
 
         fpClient = new FPClient("entity id 1", "woman name", "husband name", "village name", "ec no 1");
     }
 
     @Test
-    public void shouldReturnTheReferralFollowUpAlert()  {
+    public void shouldReturnTheReferralFollowUpAlert() {
         fpClient.withAlerts(Arrays.asList(new AlertDTO("FP Referral Followup", "normal", "2013-02-02")
                 , new AlertDTO("OCP Refill", "urgent", "2013-02-02")
                 , new AlertDTO("Female sterilization Followup 1", "urgent", "2013-02-02")
@@ -69,7 +70,7 @@ public class FPClientTest  {
     }
 
     @Test
-    public void shouldSetFPFollowupDataIfAFPFollowupExistsAndReferralAlertDoesNotExist()  {
+    public void shouldSetFPFollowupDataIfAFPFollowupExistsAndReferralAlertDoesNotExist() {
         fpClient.withAlerts(Arrays.asList(new AlertDTO("OCP Refill", "urgent", "2013-02-02")
                 , new AlertDTO("FP Followup", "normal", "2013-02-02")
                 , new AlertDTO("Female sterilization Followup 1", "urgent", "2013-02-02")))
@@ -89,7 +90,7 @@ public class FPClientTest  {
     }
 
     @Test
-    public void shouldSetFemaleSterilizationFollowUpDataWhenAFemaleSterilizationAlertExitsAndReferralDataAndFPFollowUpIsNotSpecified()  {
+    public void shouldSetFemaleSterilizationFollowUpDataWhenAFemaleSterilizationAlertExitsAndReferralDataAndFPFollowUpIsNotSpecified() {
         fpClient.withAlerts(Arrays.asList(new AlertDTO("OCP Refill", "urgent", "2013-02-02")
                 , new AlertDTO("Female sterilization Followup 1", "urgent", "2013-02-02")))
                 .withFPMethod("female_sterilization");
@@ -108,7 +109,7 @@ public class FPClientTest  {
     }
 
     @Test
-    public void shouldOnlySetFemaleSterilizationFollowUpDataWhenFPMethodIsAlsoFemaleSterilization()  {
+    public void shouldOnlySetFemaleSterilizationFollowUpDataWhenFPMethodIsAlsoFemaleSterilization() {
         fpClient.withAlerts(Arrays.asList(new AlertDTO("Male Sterilization Followup", "urgent", "2013-02-02")
                 , new AlertDTO("Female sterilization Followup 1", "urgent", "2013-02-02")))
                 .withFPMethod("female_sterilization");
@@ -145,7 +146,7 @@ public class FPClientTest  {
     }
 
     @Test
-    public void shouldSetCondomRefillDataOverSterilisationDataIfFPMethodIsCondomAndNotAnyOfSterilizationMethods()  {
+    public void shouldSetCondomRefillDataOverSterilisationDataIfFPMethodIsCondomAndNotAnyOfSterilizationMethods() {
         fpClient.withAlerts(Arrays.asList(new AlertDTO("Female sterilization Followup 1", "urgent", "2013-02-02")
                 , new AlertDTO("Condom Refill", "urgent", "2013-02-02")))
                 .withFPMethod("condom");

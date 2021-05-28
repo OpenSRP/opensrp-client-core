@@ -5,6 +5,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Obs {
 
@@ -18,6 +19,8 @@ public class Obs {
     private String parentCode;
     @JsonProperty
     private List<Object> values;
+    @JsonProperty
+    private Map<String, Object> keyValPairs;
     @JsonProperty
     private List<Object> humanReadableValues;
     @JsonProperty
@@ -43,9 +46,11 @@ public class Obs {
         this.formSubmissionField = formSubmissionField;
     }
 
-    public Obs(String fieldType, String fieldDataType, String fieldCode, String parentCode, List<Object> values, List<Object> humanReadableValues, String comments, String formSubmissionField, boolean saveObsAsArray) {
+    public Obs(String fieldType, String fieldDataType, String fieldCode, String parentCode,
+               List<Object> values, List<Object> humanReadableValues, String comments,
+               String formSubmissionField, boolean saveObsAsArray) {
         this(fieldType, fieldDataType, fieldCode, parentCode, values, humanReadableValues, comments, formSubmissionField);
-        this.saveObsAsArray = saveObsAsArray;
+        setSaveObsAsArray(saveObsAsArray);
     }
 
     public String getFieldType() {
@@ -115,6 +120,14 @@ public class Obs {
         this.humanReadableValues = humanReadableValues;
     }
 
+    public Map<String, Object>  getKeyValPairs() {
+        return keyValPairs;
+    }
+
+    public void setKeyValPairs(Map<String, Object> keyValPairs) {
+        this.keyValPairs = keyValPairs;
+    }
+
     public List<Object> getValues() {
         return values;
     }
@@ -165,6 +178,10 @@ public class Obs {
 
     public Obs withValues(List<Object> values) {
         this.values = values;
+        return this;
+    }
+    public Obs withKeyValPairs(Map<String, Object> keyValPairs) {
+        setKeyValPairs(keyValPairs);
         return this;
     }
 

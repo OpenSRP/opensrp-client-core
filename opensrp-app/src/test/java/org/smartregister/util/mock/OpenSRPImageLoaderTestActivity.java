@@ -1,7 +1,7 @@
 package org.smartregister.util.mock;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import androidx.fragment.app.FragmentActivity;
 import android.widget.LinearLayout;
 
 import org.smartregister.R;

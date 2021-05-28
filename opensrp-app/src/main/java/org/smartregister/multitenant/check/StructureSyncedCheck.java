@@ -1,9 +1,8 @@
 package org.smartregister.multitenant.check;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.WorkerThread;
+import androidx.annotation.NonNull;
+import androidx.annotation.WorkerThread;
 
-import org.smartregister.CoreLibrary;
 import org.smartregister.domain.FetchStatus;
 import org.smartregister.exception.PreResetAppOperationException;
 import org.smartregister.receiver.SyncStatusBroadcastReceiver;
@@ -28,7 +27,7 @@ public class StructureSyncedCheck implements PreResetAppCheck, SyncStatusBroadca
 
     @Override
     public void performPreResetAppOperations(@NonNull DrishtiApplication application) throws PreResetAppOperationException {
-        org.smartregister.Context context = CoreLibrary.getInstance().context();
+        org.smartregister.Context context = application.getContext();
         LocationServiceHelper locationServiceHelper = new LocationServiceHelper(
                 context.getLocationRepository(),
                 context.getLocationTagRepository(),

@@ -19,6 +19,7 @@ import org.smartregister.CoreLibrary;
 import org.smartregister.DristhiConfiguration;
 import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.commonregistry.CommonRepositoryInformationHolder;
+import org.smartregister.domain.ColumnDetails;
 import org.smartregister.domain.SyncStatus;
 import org.smartregister.domain.form.FormSubmission;
 import org.smartregister.repository.mock.SQLiteDatabaseMock;
@@ -36,13 +37,20 @@ import static org.junit.Assert.assertNotNull;
 @PrepareForTest({CoreLibrary.class})
 public class FormDataRepositoryTest extends BaseUnitTest {
 
+    public static final String INSTANCE_ID_COLUMN = "instanceId";
+    public static final String ENTITY_ID_COLUMN = "entityId";
+    private static final String FORM_NAME_COLUMN = "formName";
+    private static final String INSTANCE_COLUMN = "instance";
+    private static final String VERSION_COLUMN = "version";
+    private static final String SERVER_VERSION_COLUMN = "serverVersion";
+    private static final String SYNC_STATUS_COLUMN = "syncStatus";
+    private static final String FORM_DATA_DEFINITION_VERSION_COLUMN = "formDataDefinitionVersion";
+    private static final String DETAILS_COLUMN_NAME = "details";
     @Rule
     public PowerMockRule rule = new PowerMockRule();
-
     @Mock
     private Context context;
     private FormDataRepository formDataRepository;
-
     @Mock
     private SQLiteDatabaseMock sqLiteDatabase;
     @Mock
@@ -51,15 +59,6 @@ public class FormDataRepositoryTest extends BaseUnitTest {
     private CoreLibrary coreLibrary;
     @Mock
     private Repository repository;
-    private static final String FORM_NAME_COLUMN = "formName";
-    private static final String INSTANCE_COLUMN = "instance";
-    private static final String VERSION_COLUMN = "version";
-    private static final String SERVER_VERSION_COLUMN = "serverVersion";
-    private static final String SYNC_STATUS_COLUMN = "syncStatus";
-    private static final String FORM_DATA_DEFINITION_VERSION_COLUMN = "formDataDefinitionVersion";
-    public static final String INSTANCE_ID_COLUMN = "instanceId";
-    public static final String ENTITY_ID_COLUMN = "entityId";
-    private static final String DETAILS_COLUMN_NAME = "details";
 
     @Before
     public void setUp() {
@@ -67,7 +66,7 @@ public class FormDataRepositoryTest extends BaseUnitTest {
         PowerMockito.mockStatic(CoreLibrary.class);
         CoreLibrary.init(context);
         Context.bindtypes = new ArrayList<CommonRepositoryInformationHolder>();
-        CommonRepositoryInformationHolder bt = new CommonRepositoryInformationHolder("BINDTYPENAME", new String[]{"A", "B"});
+        CommonRepositoryInformationHolder bt = new CommonRepositoryInformationHolder("BINDTYPENAME", new ColumnDetails[2]);
         Context.bindtypes.add(bt);
         PowerMockito.when(CoreLibrary.getInstance()).thenReturn(coreLibrary);
         PowerMockito.when(coreLibrary.context()).thenReturn(context);
@@ -84,12 +83,12 @@ public class FormDataRepositoryTest extends BaseUnitTest {
 
     @Test
     public void assertqueryUniqueResult() {
-        assertNotNull(formDataRepository.queryUniqueResult("sql",new String[0]));
+        assertNotNull(formDataRepository.queryUniqueResult("sql", new String[0]));
     }
 
     @Test
     public void assertqueryList() {
-        assertNotNull(formDataRepository.queryList("sql",new String[0]));
+        assertNotNull(formDataRepository.queryList("sql", new String[0]));
     }
 
     @Test
@@ -140,7 +139,7 @@ public class FormDataRepositoryTest extends BaseUnitTest {
 
     @Test
     public void assertgetMapFromSQLQuery() {
-        assertNotNull(formDataRepository.getMapFromSQLQuery("",null));
+        assertNotNull(formDataRepository.getMapFromSQLQuery("", null));
     }
 
     @Test

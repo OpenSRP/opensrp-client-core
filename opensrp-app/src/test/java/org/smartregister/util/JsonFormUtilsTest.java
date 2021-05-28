@@ -22,6 +22,7 @@ import org.smartregister.domain.tag.FormTag;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -162,7 +163,7 @@ public class JsonFormUtilsTest {
     private JSONObject formjson;
     private String bindtype = "ec_child";
 
-    private final String STEP_1_FIELDS =  "[\n" +
+    private final String STEP_1_FIELDS = "[\n" +
             "  {\n" +
             "    \"openmrs_entity\": \"entity\",\n" +
             "    \"openmrs_entity_id\": \"entity_id\",\n" +
@@ -593,7 +594,6 @@ public class JsonFormUtilsTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         formjson = new JSONObject(formresultJson);
-
     }
 
     @Test
@@ -664,7 +664,7 @@ public class JsonFormUtilsTest {
                         "*\",\"openmrs_entity_parent\":\"\",\"openmrs_data_type\":\"text\",\"type\":\"edit_text\"," +
                         "\"key\":\"Birth_Weight\",\"v_numeric\":{\"value\":\"true\",\"err\":\"Enter a valid weight\"}}";
         JSONObject observationJsonObject = new JSONObject(observationJsonObjectString);
-        org.smartregister.clientandeventmodel.Event event = Mockito.mock(org.smartregister.clientandeventmodel.Event.class);
+        Event event = Mockito.mock(Event.class);
         JsonFormUtils.addObservation(event, observationJsonObject);
         Mockito.verify(event, Mockito.atLeastOnce()).addObs(any(Obs.class));
     }
@@ -678,7 +678,7 @@ public class JsonFormUtilsTest {
                         "\"openmrs_data_type\":\"text\",\"type\":\"edit_text\",\"key\":\"Birth_Weight\"," +
                         "\"v_numeric\":{\"value\":\"true\",\"err\":\"Enter a valid weight\"}}";
         JSONObject observationJsonObject = new JSONObject(observationJsonObjectString);
-        org.smartregister.clientandeventmodel.Event event = Mockito.mock(org.smartregister.clientandeventmodel.Event.class);
+        Event event = Mockito.mock(Event.class);
         JsonFormUtils.addObservation(event, observationJsonObject);
         Mockito.verify(event, Mockito.atLeastOnce()).addObs(any(Obs.class));
     }
@@ -718,7 +718,7 @@ public class JsonFormUtilsTest {
                         "        ]\n" +
                         "      }";
         JSONObject observationJsonObject = new JSONObject(observationJsonObjectString);
-        org.smartregister.clientandeventmodel.Event event = Mockito.mock(org.smartregister.clientandeventmodel.Event.class);
+        Event event = Mockito.mock(Event.class);
         JsonFormUtils.addObservation(event, observationJsonObject);
         Mockito.verify(event, Mockito.atLeastOnce()).addObs(obsArgumentCaptor.capture());
         List<Object> values = obsArgumentCaptor.getValue().getValues();
@@ -1082,6 +1082,85 @@ public class JsonFormUtilsTest {
     }
 
     @Test
+    public void assertMergeRecursiveMergeJson() throws Exception {
+        String original = "{\n" +
+                "  \"birthdate\": \"2011-05-27T00:00:00.000Z\",\n" +
+                "  \"birthdateApprox\": false,\n" +
+                "  \"deathdateApprox\": false,\n" +
+                "  \"firstName\": \"Baby\",\n" +
+                "  \"gender\": \"Male\",\n" +
+                "  \"lastName\": \"Robert\",\n" +
+                "  \"relationships\": {},\n" +
+                "  \"addresses\": [],\n" +
+                "  \"attributes\": {\n" +
+                "    \"grade_class\": \"2B\",\n" +
+                "    \"age_entered\": \"10y\",\n" +
+                "  },\n" +
+                "  \"baseEntityId\": \"c659f922-9292-455e-8206-1c71562a4a3b\",\n" +
+                "  \"identifiers\": {\n" +
+                "    \"opensrp_id\": \"4380884-9\",\n" +
+                "    \"reveal_id\": \"2011052743808849\"\n" +
+                "  },\n" +
+                "  \"clientApplicationVersion\": 34,\n" +
+                "  \"clientDatabaseVersion\": 14,\n" +
+                "  \"dateCreated\": \"2021-05-27T15:17:24.483Z\",\n" +
+                "  \"type\": \"Client\"\n" +
+                "}";
+
+        String updated = "{\n" +
+                "  \"gender\": \"Male\",\n" +
+                "  \"lastName\": null,\n" + // updated
+                "  \"attributes\": {\n" +
+                "    \"grade_class\": \"2A\",\n" + // updated
+                "    \"age_entered\": \"10y\",\n" +
+                "    \"default_residence\": \"f0de23e0-1e42-49e1-a60f-58d92040dddd\"\n" + // added
+                "  },\n" +
+                "  \"baseEntityId\": \"c659f922-9292-455e-8206-1c71562a4a3b\",\n" +
+                "  \"identifiers\": {\n" +
+                "    \"opensrp_id\": \"4380884-9\",\n" +
+                "    \"reveal_id\": \"2011052743808849\"\n" +
+                "  },\n" +
+                "  \"clientApplicationVersion\": 34,\n" +
+                "  \"type\": \"Client\"\n" +
+                "}";
+
+        String expected = "{\n" +
+                "  \"birthdate\": \"2011-05-27T00:00:00.000Z\",\n" +
+                "  \"birthdateApprox\": false,\n" +
+                "  \"deathdateApprox\": false,\n" +
+                "  \"firstName\": \"Baby\",\n" +
+                "  \"gender\": \"Male\",\n" +
+                "  \"lastName\": null,\n" +
+                "  \"relationships\": {},\n" +
+                "  \"addresses\": [],\n" +
+                "  \"attributes\": {\n" +
+                "    \"grade_class\": \"2A\",\n" +
+                "    \"age_entered\": \"10y\",\n" +
+                "    \"default_residence\": \"f0de23e0-1e42-49e1-a60f-58d92040dddd\"\n" +
+                "  },\n" +
+                "  \"baseEntityId\": \"c659f922-9292-455e-8206-1c71562a4a3b\",\n" +
+                "  \"identifiers\": {\n" +
+                "    \"opensrp_id\": \"4380884-9\",\n" +
+                "    \"reveal_id\": \"2011052743808849\"\n" +
+                "  },\n" +
+                "  \"clientApplicationVersion\": 34,\n" +
+                "  \"clientDatabaseVersion\": 14,\n" +
+                "  \"dateCreated\": \"2021-05-27T15:17:24.483Z\",\n" +
+                "  \"type\": \"Client\"\n" +
+                "}";
+
+
+        JSONObject jsonOriginal = new JSONObject(original);
+        JSONObject jsonUpdated = new JSONObject(updated);
+        JSONObject jsonExpected = new JSONObject(expected);
+
+        JSONObject newJson = JsonFormUtils.merge(jsonOriginal, jsonUpdated);
+
+        assertTrue(areEqual(newJson, jsonExpected));
+
+    }
+
+    @Test
     public void testGetMultiStepFormFields() throws JSONException {
         assertNotNull(multiStepForm);
 
@@ -1117,7 +1196,7 @@ public class JsonFormUtilsTest {
 
         assertNotNull(formTag);
 
-        org.smartregister.clientandeventmodel.Event event =
+        Event event =
                 JsonFormUtils.createEvent(fields, metadata, formTag, "97dc48f681ddcf188b2758fba89635fe", "Quick Check", "");
         assertNotNull(event.getEventType());
         Assert.assertEquals(event.getObs().size(), 20);
@@ -1165,12 +1244,12 @@ public class JsonFormUtilsTest {
         JSONObject jsonObject1 = new JSONObject();
         jsonObject1.put(OPENMRS_ENTITY_ID, "entityId");
         jsonObject1.put(OPENMRS_ENTITY, "concept");
-        jsonObject1.put(AllConstants.TEXT,"text");
+        jsonObject1.put(AllConstants.TEXT, "text");
 
         JSONObject jsonObject2 = new JSONObject();
         jsonObject2.put(OPENMRS_ENTITY_ID, "entityId2");
         jsonObject2.put(OPENMRS_ENTITY, "concept");
-        jsonObject2.put(AllConstants.TEXT,"text2");
+        jsonObject2.put(AllConstants.TEXT, "text2");
 
         JSONArray jsonArray = new JSONArray();
         jsonArray.put(jsonObject1);
@@ -1300,7 +1379,7 @@ public class JsonFormUtilsTest {
     public void testGetJSONArrayShouldGetCorrectJSONArray() throws JSONException {
         JSONObject jsonObject = new JSONObject(JSON_ARRAY);
         assertEquals(jsonObject.getJSONArray("json_array"), JsonFormUtils.getJSONArray(jsonObject, "json_array"));
-        assertNull( JsonFormUtils.getJSONArray(jsonObject, "json_array_1"));
+        assertNull(JsonFormUtils.getJSONArray(jsonObject, "json_array_1"));
     }
 
     @Test
@@ -1408,7 +1487,7 @@ public class JsonFormUtilsTest {
     @Test
     public void testGetFieldValueFromJsonObjShouldGetCorrectValue() {
         assertEquals("Secondary", JsonFormUtils.getFieldValue(multiStepForm, "educ_level"));
-        assertEquals( "primary" , JsonFormUtils.getFieldValue(multiStepForm, "educ_level_2"));
+        assertEquals("primary", JsonFormUtils.getFieldValue(multiStepForm, "educ_level_2"));
     }
 
     @Test
@@ -1458,9 +1537,10 @@ public class JsonFormUtilsTest {
         jsonObject.put(KEY, "key");
         Event event = new Event();
         List values = new ArrayList<>();
+        Map<String, Object> keyValPairs = new HashMap<>();
         values.add("value1");
         values.add("value2");
-        Whitebox.invokeMethod(JsonFormUtils.class, "createObservation", event, jsonObject, values);
+        Whitebox.invokeMethod(JsonFormUtils.class, "createObservation", event, jsonObject, keyValPairs, values);
         List<Obs> obsList = event.getObs();
         assertEquals(1, obsList.size());
         Obs obs = obsList.get(0);
@@ -1470,5 +1550,54 @@ public class JsonFormUtilsTest {
         assertEquals("key", obs.getFieldCode());
         assertFalse(obs.isSaveObsAsArray());
         assertEquals(values, obs.getValues());
+        assertEquals(keyValPairs, obs.getKeyValPairs());
+    }
+
+    @Test
+    public void addObservationAddsGpsObservationsToEvent() throws Exception {
+        String observationJsonObjectString =
+                "{\"value\":\"-2.4535 37.324 0.2 0.3\",\"openmrs_entity\":\"\"," +
+                        "\"openmrs_entity_id\":\"\",\"openmrs_entity_parent\":\"\"," +
+                        "\"openmrs_data_type\":\"text\",\"type\":\"gps\",\"key\":\"gps\"}";
+        JSONObject observationJsonObject = new JSONObject(observationJsonObjectString);
+        Event event = Mockito.spy(new Event());
+        JsonFormUtils.addObservation(event, observationJsonObject);
+        Mockito.verify(event, Mockito.times(5)).addObs(any(Obs.class));
+        String values[] = observationJsonObject.optString(VALUE).split(" ");
+        String latitudeKey = observationJsonObject.getString(KEY) + "_" + AllConstants.GpsConstants.LATITUDE;
+        String longitudeKey = observationJsonObject.getString(KEY) + "_" + AllConstants.GpsConstants.LONGITUDE;
+        String altitudeKey = observationJsonObject.getString(KEY) + "_" + AllConstants.GpsConstants.ALTITUDE;
+        String accuracyKey = observationJsonObject.getString(KEY) + "_" + AllConstants.GpsConstants.ACCURACY;
+        List<String> formSubmissionFields = Arrays.asList(latitudeKey, longitudeKey, accuracyKey, altitudeKey, "gps");
+        for (Obs obs : event.getObs()) {
+            String formSubmissionField = obs.getFormSubmissionField();
+            assertTrue(formSubmissionFields.contains(formSubmissionField));
+            if (formSubmissionField.equals(latitudeKey)) {
+                assertEquals(values[0], obs.getValues().get(0));
+            } else if (formSubmissionField.equals(longitudeKey)) {
+                assertEquals(values[1], obs.getValues().get(0));
+            } else if (formSubmissionField.equals(altitudeKey)) {
+                assertEquals(values[2], obs.getValues().get(0));
+            } else if (formSubmissionField.equals(accuracyKey)) {
+                assertEquals(values[3], obs.getValues().get(0));
+            }
+        }
+    }
+
+    @Test
+    public void testCreateObservationForNativeRadioShouldAddKeyValuePairsToObservation() throws Exception {
+        String strJsonObj = "{\"key\":\"not_good\",\"openmrs_entity_parent\":\"\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\",\"type\":\"native_radio\",\"label\":\"Quel est le problème avec ce produit ?\",\"label_text_style\":\"bold\",\"options\":[{\"key\":\"worn_broken\",\"text\":\"Usé, endommagé, ou cassé\",\"openmrs_entity_parent\":\"\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\"},{\"key\":\"expired\",\"text\":\"Expiré\",\"openmrs_entity_parent\":\"\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\"},{\"key\":\"parts_missing\",\"text\":\"Pièces manquantes\",\"openmrs_entity_parent\":\"\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\"},{\"key\":\"other\",\"text\":\"Autre (préciser)\",\"openmrs_entity_parent\":\"\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\"}],\"v_required\":{\"value\":true,\"err\":\"Ce champ est requis\"},\"relevance\":{\"step1:flag_problem\":{\"ex-checkbox\":[{\"or\":[\"not_good\"]}]}},\"is-rule-check\":false,\"is_visible\":true,\"value\":\"worn_broken\"}";
+        JSONObject jsonObject = new JSONObject(strJsonObj);
+        Event event = new Event();
+        String value = "worn_broken";
+        Whitebox.invokeMethod(JsonFormUtils.class, "createObservation", event, jsonObject, value);
+        List<Obs> obsList = event.getObs();
+        assertEquals(1, obsList.size());
+        Obs obs = obsList.get(0);
+        assertNotNull(obs.getKeyValPairs());
+        assertEquals(1, obs.getKeyValPairs().size());
+        assertNotNull(obs.getKeyValPairs().get(value));
+        assertEquals("Usé, endommagé, ou cassé", obs.getKeyValPairs().get(value));
+        assertEquals(value, obs.getValue());
     }
 }

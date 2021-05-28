@@ -16,8 +16,8 @@ import android.graphics.drawable.TransitionDrawable;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -34,6 +34,7 @@ import org.apache.http.HttpResponse;
 import org.smartregister.AllConstants;
 import org.smartregister.CoreLibrary;
 import org.smartregister.R;
+import org.smartregister.account.AccountHelper;
 import org.smartregister.domain.ProfileImage;
 import org.smartregister.repository.ImageRepository;
 import org.smartregister.view.activity.DrishtiApplication;
@@ -159,8 +160,7 @@ public class OpenSRPImageLoader extends ImageLoader {
                 public HttpResponse performRequest(Request<?> request, Map<String, String>
                         headers) throws IOException, AuthFailureError {
 
-                    headers.putAll(
-                            CoreLibrary.getInstance().context().allSettings().getAuthParams());
+                    addBearerTokenAuthorizationHeader(headers);
 
                     return super.performRequest(request, headers);
                 }
@@ -172,11 +172,9 @@ public class OpenSRPImageLoader extends ImageLoader {
             HttpClientStack stack = new HttpClientStack(
                     AndroidHttpClient.newInstance(FileUtilities.getUserAgent(context))) {
                 @Override
-                public HttpResponse performRequest(Request<?> request, Map<String, String>
-                        headers) throws IOException, AuthFailureError {
+                public HttpResponse performRequest(Request<?> request, Map<String, String> headers) throws IOException, AuthFailureError {
 
-                    headers.putAll(CoreLibrary.getInstance().context().allSettings().
-                            getAuthParams());
+                    addBearerTokenAuthorizationHeader(headers);
 
                     return super.performRequest(request, headers);
                 }
@@ -185,6 +183,11 @@ public class OpenSRPImageLoader extends ImageLoader {
             requestQueue = Volley.newRequestQueue(context, stack);
         }
         return requestQueue;
+    }
+
+    private static void addBearerTokenAuthorizationHeader(Map<String, String> headers) {
+        String accessToken = AccountHelper.getOAuthToken(CoreLibrary.getInstance().context().allSharedPreferences().fetchRegisteredANM(), CoreLibrary.getInstance().getAccountAuthenticatorXml().getAccountType(), AccountHelper.TOKEN_TYPE.PROVIDER);
+        headers.put(AllConstants.HTTP_REQUEST_HEADERS.AUTHORIZATION, new StringBuilder(AllConstants.HTTP_REQUEST_AUTH_TOKEN_TYPE.BEARER + " ").append(accessToken).toString());
     }
 
     /**
@@ -386,13 +389,13 @@ public class OpenSRPImageLoader extends ImageLoader {
                 }
 
             } catch (FileNotFoundException e) {
-                Timber.e( "Failed to save static image to disk");
+                Timber.e("Failed to save static image to disk");
             } finally {
                 if (os != null) {
                     try {
                         os.close();
                     } catch (IOException e) {
-                        Timber.e( "Failed to close static images output stream after attempting"
+                        Timber.e("Failed to close static images output stream after attempting"
                                 + " to write image");
                     }
                 }
@@ -515,7 +518,7 @@ public class OpenSRPImageLoader extends ImageLoader {
 
             }
         } catch (Exception e) {
-            Timber.e( e.getMessage(), e);
+            Timber.e(e.getMessage(), e);
         }
     }
 
@@ -537,7 +540,7 @@ public class OpenSRPImageLoader extends ImageLoader {
             startAsyncTask(loadBitmap, filePathArray);
 
         } catch (Exception e) {
-            Timber.e( e.getMessage(), e);
+            Timber.e(e.getMessage(), e);
         }
     }
 
@@ -701,7 +704,7 @@ public class OpenSRPImageLoader extends ImageLoader {
 
             } catch (Exception exc) {
 
-                Timber.e( exc.getMessage(), exc);
+                Timber.e(exc.getMessage(), exc);
 
             }
 

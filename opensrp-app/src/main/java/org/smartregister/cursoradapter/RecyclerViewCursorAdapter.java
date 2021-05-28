@@ -19,7 +19,7 @@ package org.smartregister.cursoradapter;
 
 import android.database.Cursor;
 import android.database.DataSetObserver;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created by skyfishjy on 10/31/14.
@@ -133,7 +133,7 @@ public abstract class RecyclerViewCursorAdapter extends RecyclerView.Adapter<Rec
         return oldCursor;
     }
 
-    private class NotifyingDataSetObserver extends DataSetObserver {
+    protected class NotifyingDataSetObserver extends DataSetObserver {
         @Override
         public void onChanged() {
             super.onChanged();

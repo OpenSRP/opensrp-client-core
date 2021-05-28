@@ -1,13 +1,15 @@
 package org.smartregister.commonregistry;
 
+import org.smartregister.domain.ColumnDetails;
+
 /**
  * Created by Raihan Ahmed on 3/16/15.
  */
 public class CommonRepositoryInformationHolder {
     private String bindtypename;
-    private String[] columnNames;
+    private ColumnDetails[] columnNames;
 
-    public CommonRepositoryInformationHolder(String bindtypename, String[] columnNames) {
+    public CommonRepositoryInformationHolder(String bindtypename, ColumnDetails[] columnNames) {
         this.bindtypename = bindtypename;
         this.columnNames = columnNames;
     }
@@ -20,11 +22,11 @@ public class CommonRepositoryInformationHolder {
         this.bindtypename = bindtypename;
     }
 
-    public String[] getColumnNames() {
+    public ColumnDetails[] getColumnNames() {
         return columnNames;
     }
 
-    public void setColumnNames(String[] columnNames) {
+    public void setColumnNames(ColumnDetails[] columnNames) {
         this.columnNames = columnNames;
     }
 }
