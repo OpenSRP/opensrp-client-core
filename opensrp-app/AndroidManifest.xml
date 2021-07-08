@@ -31,7 +31,8 @@
     <application
         android:clearTaskOnLaunch="true"
         android:label="@string/app_name"
-        android:largeHeap="true">
+        android:largeHeap="true"
+        android:requestLegacyExternalStorage="true">
         <service
             android:name=".service.ImageUploadSyncService"
             android:description="@string/component_desc_image_upload_service"
@@ -116,6 +117,12 @@
             android:exported="false"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".view.activity.StatsActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeNoActionBarAndTitle" />
 
         <receiver
             android:name=".view.receiver.SyncBroadcastReceiver"

@@ -129,4 +129,5 @@
     <dimen name="profile_btn_registration_info_padding">24dp</dimen>
     <dimen name="profile_dot_separator_margin">10dp</dimen>
 
+    <dimen name="register_member_title_size">17sp</dimen>
 </resources>

@@ -3,9 +3,6 @@ package org.smartregister.sample;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,10 +13,16 @@ import android.widget.DatePicker;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.Toolbar;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.smartregister.cursoradapter.SmartRegisterQueryBuilder;
 import org.smartregister.sample.fragment.ReportFragment;
+import org.smartregister.util.AppHealthUtils;
 import org.smartregister.util.DateUtil;
 import org.smartregister.util.LangUtils;
 import org.smartregister.view.activity.MultiLanguageActivity;
@@ -29,7 +32,6 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends MultiLanguageActivity {
-
 
     DatePicker picker;
     Button btnGet;
@@ -61,7 +63,6 @@ public class MainActivity extends MultiLanguageActivity {
                 tvw.setText("Selected Date: " + picker.getDayOfMonth() + "/" + (picker.getMonth() + 1) + "/" + picker.getYear());
             }
         });
-
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -138,6 +139,7 @@ public class MainActivity extends MultiLanguageActivity {
 
         ((TextView) findViewById(R.id.time)).setText(DateUtil.getDuration(new DateTime().minusYears(4).minusMonths(3).minusWeeks(2).minusDays(1)));
 
+        new AppHealthUtils(findViewById(R.id.show_sync_stats));
     }
 
     @Override

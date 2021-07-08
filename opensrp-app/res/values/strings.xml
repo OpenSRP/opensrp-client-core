@@ -439,4 +439,21 @@
     <string name="new_db_encryption_version_migration">You have been logged off as your application database encryption version has changed. Please login in again to complete the upgrade.</string>
     <string name="account_removed">You have been logged off as your account has been removed from the accounts manager.</string>
     <string name="no_client_available_for_url">No auth client available for the URL</string>
+
+    <!-- Sync Statistics View -->
+    <string name="download_database">Download Database</string>
+    <string name="view_sync_stats">Show Sync Stats</string>
+    <string name="export_db_notification">Exporting Database…</string>
+    <string name="database_download_success">Database download successful</string>
+    <string name="synced_events">Synced events:</string>
+    <string name="unsynced_events">Unsynced events:</string>
+    <string name="synced_clients">Synced clients:</string>
+    <string name="unsynced_clients">Unsynced clients:</string>
+    <string name="validated_events">Validated events:</string>
+    <string name="validated_clients">Validated clients:</string>
+    <string name="task_unprocessed_events">Task unprocessed events:</string>
+    <string name="refresh">Refresh</string>
+    <string name="return_to_register">Return</string>
+    <string name="summary_forms">Other Forms</string>
+    <string name="permission_write_external_storage_rationale">Write access to the device internal storage is required for database download.</string>
 </resources>

@@ -5,4 +5,6 @@
     <string name="sample">Night gathers, and now my watch begins</string>
     <string name="language_label">Select Language</string>
     <string name="action_report_sample">Sample Reports</string>
+    <string name="action_sync_stats">Sync Statistics</string>
+    <string name="sync_stats_label">Show Sync Stats (Long Press for Dialog)</string>
 </resources>

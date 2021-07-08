@@ -57,7 +57,6 @@ subprojects {
         maven {
             url "https://s3.amazonaws.com/repo.commonsware.com"
         }
-        maven { url "https://dl.bintray.com/ibm-watson-health/ibm-fhir-server-releases"}
         mavenLocal()
     }
 
