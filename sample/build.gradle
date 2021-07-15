@@ -83,7 +83,7 @@ dependencies {
         exclude group: 'com.ibm.fhir', module: 'fhir-model'
     }
 
-    jarJar 'com.ibm.fhir:fhir-model:4.2.3'
+    jarJar 'com.ibm.fhir:fhir-model:4.7.0'
 
     // Repackaged jars will be placed here, adding them to classpath
     implementation fileTree(dir: "./build/libs", include: ['*.jar'])

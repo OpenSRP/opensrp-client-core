@@ -25,8 +25,11 @@ import org.smartregister.service.HTTPAgent;
 import org.smartregister.util.DateTimeTypeConverter;
 import org.smartregister.util.DateTypeConverter;
 import org.smartregister.util.Utils;
+import org.smartregister.utils.TimingRepeatTimeTypeConverter;
 
+import java.sql.Time;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -49,8 +52,10 @@ public class PlanIntentServiceHelper extends BaseHelper {
 
     private final PlanDefinitionRepository planDefinitionRepository;
     private final AllSharedPreferences allSharedPreferences;
-    protected static Gson gson = new GsonBuilder().registerTypeAdapter(DateTime.class, new DateTimeTypeConverter("yyyy-MM-dd"))
+    protected static Gson gson = new GsonBuilder()
+            .registerTypeAdapter(DateTime.class, new DateTimeTypeConverter("yyyy-MM-dd"))
             .registerTypeAdapter(LocalDate.class, new DateTypeConverter())
+            .registerTypeAdapter(Time.class, new TimingRepeatTimeTypeConverter())
             .disableHtmlEscaping()
             .create();
 
@@ -63,6 +68,8 @@ public class PlanIntentServiceHelper extends BaseHelper {
     private SyncProgress syncProgress;
 
     private Trace planSyncTrace;
+    private ArrayList<PlanDefinition> planIdsToEvaluate = new ArrayList<>();
+    private PeriodicTriggerEvaluationHelper periodicTriggerEvaluationHelper;
 
     public static PlanIntentServiceHelper getInstance() {
         if (instance == null) {
@@ -76,6 +83,7 @@ public class PlanIntentServiceHelper extends BaseHelper {
         this.planDefinitionRepository = planRepository;
         this.planSyncTrace  = initTrace(PLAN_SYNC);
         this.allSharedPreferences = CoreLibrary.getInstance().context().allSharedPreferences();
+        periodicTriggerEvaluationHelper = new PeriodicTriggerEvaluationHelper();
     }
 
     public void syncPlans() {
@@ -112,15 +120,30 @@ public class PlanIntentServiceHelper extends BaseHelper {
             List<PlanDefinition> plans = gson.fromJson(plansResponse, new TypeToken<List<PlanDefinition>>() {
             }.getType());
 
+            ArrayList<PlanDefinition> fixedPlans = new ArrayList<>();
+
+            for (PlanDefinition planDefinition: plans) {
+                if ("2d12e224-401d-4d23-80fd-7b0f37e56fc1".equals(planDefinition.getIdentifier())) {
+                    String planString = "{\"identifier\":\"2d12e224-401d-4d23-80fd-7b0f37e56fc1\",\"version\":\"1\",\"name\":\"Goldsmith_Supervisor_Template\",\"status\":\"active\",\"date\":\"2021-03-11\",\"effectivePeriod\":{\"start\":\"2020-03-11\",\"end\":\"2025-03-11\"},\"useContext\":[{\"code\":\"interventionType\",\"valueCodableConcept\":\"Linked-PNC\"},{\"code\":\"taskGenerationStatus\",\"valueCodableConcept\":\"internal\"}],\"jurisdiction\":[{\"code\":\"ac7ba751-35e8-4b46-9e53-3cbaad193697\"}],\"goal\":[{\"id\":\"Day_2_Visit\",\"description\":\"Complete the Day 2 Visit form for each child.\",\"priority\":\"medium-priority\",\"target\":[{\"measure\":\"Percent of children with completed Day 2 Visit form completed.\",\"detail\":{\"detailQuantity\":{\"value\":80,\"comparator\":\"&amp;amp;gt;=\",\"unit\":\"Percent\"}},\"due\":\"2021-10-19\"}]}],\"action\":[{\"identifier\":\"5df40280-ea48-4b08-ad9e-4cb937c31110\",\"prefix\":1,\"title\":\"Create PNC Supervisor Follow-up Tasks\",\"description\":\"Create Follow up tasks when PNC is not completed in 48 hours\",\"code\":\"PNC Task Follow Up\",\"timingPeriod\":{\"start\":\"2020-06-04\",\"end\":\"2025-10-01\"},\"reason\":\"Routine\",\"goalId\":\"PNC-Task-Follow-Up\",\"subjectCodableConcept\":{\"text\":\"Global.Task\"},\"trigger\":[{\"type\":\"named-event\",\"name\":\"plan-activation\"},{\"type\":\"periodic\",\"timingTiming\":{\"event\":[\"2020-03-04\"],\"repeat\":{\"frequency\":1,\"periodUnit\":\"d\",\"timeOfDay\":[\"04:00:00\"]}}}],\"condition\":[{\"kind\":\"applicability\",\"expression\":{\"expression\":\"Task.code.text.value.startsWith('PNC Day') and Task.code.text.value.endsWith('Visit') and Task.status.value = 'ready' and Task.authoredOn < today() - 2 'days'\"}}],\"definitionUri\":\"\",\"type\":\"create\"},{\"identifier\":\"19deb463-7728-4bad-b62a-ccc6a7abb286\",\"prefix\":2,\"title\":\"Create ANC Supervisor Follow-up Tasks\",\"description\":\"Create Follow up tasks when an ANC task is not completed in 48 hours\",\"code\":\"ANC Task Follow Up\",\"timingPeriod\":{\"start\":\"2020-06-04\",\"end\":\"2025-10-01\"},\"reason\":\"Routine\",\"goalId\":\"ANC-Task-Follow-Up\",\"subjectCodableConcept\":{\"text\":\"Global.Task\"},\"trigger\":[{\"type\":\"named-event\",\"name\":\"plan-activation\"},{\"type\":\"periodic\",\"timingTiming\":{\"event\":[\"2020-03-04\"],\"repeat\":{\"frequency\":1,\"periodUnit\":\"d\",\"timeOfDay\":[\"04:00:00\"]}}}],\"condition\":[{\"kind\":\"applicability\",\"expression\":{\"expression\":\"Task.code.text.value.startsWith('ANC Contact') and Task.status.value = 'ready' and Task.authoredOn < today() - 2 'days'\"}}],\"definitionUri\":\"\",\"type\":\"create\"}],\"experimental\":false,\"serverVersion\":19}";
+                    planDefinition = gson.fromJson(planString, PlanDefinition.class);
+                }
+
+                fixedPlans.add(planDefinition);
+            }
+
+            plans = fixedPlans;
+
             addAttribute(planSyncTrace, COUNT, String.valueOf(plans.size()));
             stopTrace(planSyncTrace);
             for (PlanDefinition plan : plans) {
                 try {
                     planDefinitionRepository.addOrUpdate(plan);
+                    planIdsToEvaluate.add(plan);
                 } catch (Exception e) {
                     Timber.e(e, "EXCEPTION %s", e.toString());
                 }
             }
+
             // update most recent server version
             if (!Utils.isEmptyCollection(plans)) {
                 batchFetchCount = plans.size();
@@ -132,12 +155,17 @@ public class PlanIntentServiceHelper extends BaseHelper {
                 // retry fetch since there were items synced from the server
                 batchFetchPlansFromServer(false);
             }
+
+            if (!planIdsToEvaluate.isEmpty()) {
+                periodicTriggerEvaluationHelper.reschedulePeriodicPlanEvaluations(plans);
+            }
         } catch (Exception e) {
             Timber.e(e, "EXCEPTION %s", e.toString());
         }
 
         return batchFetchCount;
     }
+
 
     private void startPlanTrace(String action) {
         String providerId = allSharedPreferences.fetchRegisteredANM();
