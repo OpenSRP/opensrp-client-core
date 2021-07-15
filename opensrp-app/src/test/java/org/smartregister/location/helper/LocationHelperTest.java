@@ -28,11 +28,13 @@ import org.smartregister.util.AssetHandler;
 import org.smartregister.view.controller.ANMLocationController;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 
 public class LocationHelperTest extends BaseRobolectricUnitTest {
@@ -217,6 +219,56 @@ public class LocationHelperTest extends BaseRobolectricUnitTest {
         assertEquals("ra Kashikishi HAHC", locations.get(1));
 
     }
+
+    @Test
+    public void testGenerateDefaultLocationHierarchyReturnsEmptyForEmptyAllowedLevels(){
+        List<String> levelsEmpty = new ArrayList<>();
+        List<String> result = locationHelper.generateDefaultLocationHierarchy(levelsEmpty);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testGenerateDefaultLocationHierarchyWithRegisteredANMNotSetReturnsNull(){
+        LocationHelper spyLocationHelper = Mockito.spy(locationHelper);
+        AllSharedPreferences spiedAllSharedPreferences = Mockito.spy((AllSharedPreferences) ReflectionHelpers.getField(spyLocationHelper, "allSharedPreferences"));
+        ReflectionHelpers.setField(spyLocationHelper, "allSharedPreferences", spiedAllSharedPreferences);
+
+        ANMLocationController anmLocationController = Mockito.spy(CoreLibrary.getInstance().context().anmLocationController());
+        ReflectionHelpers.setField(CoreLibrary.getInstance().context(), "anmLocationController", anmLocationController);
+
+        Mockito.doReturn(anmLocation1)
+                .when(anmLocationController).get();
+
+        List<String> allowedLevels = Arrays.asList("District", "Village");
+        List<String> result = spyLocationHelper.generateDefaultLocationHierarchy(allowedLevels);
+
+        Mockito.verify(spiedAllSharedPreferences).fetchDefaultLocalityId(Mockito.eq(""));
+        Mockito.verify(spyLocationHelper).getDefaultLocationHierarchy(Mockito.isNull(), Mockito.any(), Mockito.anyList(), Mockito.eq(allowedLevels), Mockito.eq(false));
+        assertNull(result);
+    }
+
+    @Test
+    public void testGenerateDefaultLocationHierarchyReturnsNUllWhenNoDefaultLocationIdSet(){
+        LocationHelper spyLocationHelper = Mockito.spy(locationHelper);
+        AllSharedPreferences spiedAllSharedPreferences = Mockito.spy((AllSharedPreferences) ReflectionHelpers.getField(spyLocationHelper, "allSharedPreferences"));
+        ReflectionHelpers.setField(spyLocationHelper, "allSharedPreferences", spiedAllSharedPreferences);
+
+        ANMLocationController anmLocationController = Mockito.spy(CoreLibrary.getInstance().context().anmLocationController());
+        ReflectionHelpers.setField(CoreLibrary.getInstance().context(), "anmLocationController", anmLocationController);
+
+        Mockito.doReturn(anmLocation1).when(anmLocationController).get();
+        final String anmIdentifier = "NL1";
+        Mockito.doReturn(anmIdentifier).when(spiedAllSharedPreferences).fetchRegisteredANM();
+
+        List<String> allowedLevels = Arrays.asList("District", "Village");
+        List<String> result = spyLocationHelper.generateDefaultLocationHierarchy(allowedLevels);
+
+        final String defaultLocationId = Mockito.verify(spiedAllSharedPreferences).fetchDefaultLocalityId(Mockito.eq(anmIdentifier));
+        assertNull(defaultLocationId);
+        Mockito.verify(spyLocationHelper).getDefaultLocationHierarchy(Mockito.isNull(), Mockito.any(), Mockito.anyList(), Mockito.eq(allowedLevels), Mockito.eq(false));
+        assertNull(result);
+    }
+
 
     @Test
     public void testGenerateLocationHierarchyTreeShouldReturnEmptyList() {
