@@ -36,13 +36,14 @@ public class LangUtils {
 
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                configuration.setLocale(locale);
+                Configuration overrideConfiguration = new Configuration(configuration);
+                overrideConfiguration.setLocale(locale);
 
                 LocaleList localeList = new LocaleList(locale);
                 LocaleList.setDefault(localeList);
-                configuration.setLocales(localeList);
+                overrideConfiguration.setLocales(localeList);
 
-                context.createConfigurationContext(configuration);
+                context.createConfigurationContext(overrideConfiguration);
 
             } else {
                 configuration.locale = locale;
