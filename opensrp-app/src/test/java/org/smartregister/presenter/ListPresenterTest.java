@@ -55,6 +55,15 @@ public class ListPresenterTest {
     }
 
     @Test
+    public void testOnFetchRequestErrorWithException() {
+        listPresenter.with(view);
+        Exception e = new Exception();
+        listPresenter.onFetchRequestError(e);
+        Mockito.verify(view).setLoadingState(false);
+        Mockito.verify(view).onFetchError(e);
+    }
+
+    @Test
     public void testWithAttachesView() {
         listPresenter.with(view);
         Assert.assertEquals(listPresenter.getView(), view);
