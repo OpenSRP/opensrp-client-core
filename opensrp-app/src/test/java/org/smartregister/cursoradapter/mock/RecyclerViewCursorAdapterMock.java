@@ -1,4 +1,4 @@
-package org.smartregister.shadows;
+package org.smartregister.cursoradapter.mock;
 
 import android.database.Cursor;
 import android.view.ViewGroup;
@@ -11,8 +11,8 @@ import org.smartregister.cursoradapter.RecyclerViewCursorAdapter;
 /**
  * Created by samuelgithengi on 10/27/20.
  */
-public class RecyclerViewCursorAdapterShadow extends RecyclerViewCursorAdapter {
-    public RecyclerViewCursorAdapterShadow(Cursor cursor) {
+public class RecyclerViewCursorAdapterMock extends RecyclerViewCursorAdapter {
+    public RecyclerViewCursorAdapterMock(Cursor cursor) {
         super(cursor);
     }
 

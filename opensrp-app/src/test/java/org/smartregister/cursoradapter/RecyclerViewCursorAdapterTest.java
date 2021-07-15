@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.BaseRobolectricUnitTest;
 import org.smartregister.cursoradapter.RecyclerViewCursorAdapter.NotifyingDataSetObserver;
-import org.smartregister.shadows.RecyclerViewCursorAdapterShadow;
+import org.smartregister.cursoradapter.mock.RecyclerViewCursorAdapterMock;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 public class RecyclerViewCursorAdapterTest extends BaseRobolectricUnitTest {
 
     @InjectMocks
-    private RecyclerViewCursorAdapterShadow recyclerViewCursorAdapter;
+    private RecyclerViewCursorAdapterMock recyclerViewCursorAdapter;
 
     @Mock
     private Cursor cursor;
