@@ -147,6 +147,7 @@ public class AllConstants {
     public static final String COMBINE_CHECKBOX_OPTION_VALUES = "combine_checkbox_option_values";
 
     public static final String GPS = "gps";
+    public static final String MIGRATION_FILENAME_PATTERN = "(\\d)\\.(up|down)\\.sql";
 
 
     public static class Immunizations {

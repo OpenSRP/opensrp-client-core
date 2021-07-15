@@ -1,0 +1,1 @@
+CREATE IF NOT EXISTS TABLE clients(id INTEGER, full_name VARCHAR, age INTEGER, dob INTEGER);

@@ -141,4 +141,19 @@ public class RepositoryRobolectricTest extends BaseRobolectricUnitTest {
         Mockito.doReturn(true).when(repository).isDatabaseWritable(password);
         Assert.assertTrue(repository.canUseThisPassword(password));
     }
+
+    @Test
+    public void onUpgradeShouldApplyMigrationsFromAssetsFolder() {
+        Repository repository = Mockito.mock(Repository.class, Mockito.CALLS_REAL_METHODS);
+        ReflectionHelpers.setField(repository, "context", RuntimeEnvironment.application);
+        SQLiteDatabase database = Mockito.mock(SQLiteDatabase.class);
+
+        // call the method under test
+        repository.onUpgrade(database, 0, 3);
+
+        // Verify the migration calls
+        Mockito.verify(database).execSQL(Mockito.eq("CREATE IF NOT EXISTS TABLE key_value(key VARCHAR, val VARCHAR);"));
+        Mockito.verify(database).execSQL(Mockito.eq("CREATE IF NOT EXISTS TABLE clients(id INTEGER, full_name VARCHAR, age INTEGER, dob INTEGER);"));
+        Mockito.verify(database).execSQL(Mockito.eq("CREATE IF NOT EXISTS TABLE events(event_id INTEGER, json VARCHAR, server_version INTEGER);"));
+    }
 }

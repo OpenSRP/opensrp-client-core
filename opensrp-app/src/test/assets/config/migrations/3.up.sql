@@ -1,0 +1,1 @@
+CREATE IF NOT EXISTS TABLE events(event_id INTEGER, json VARCHAR, server_version INTEGER);

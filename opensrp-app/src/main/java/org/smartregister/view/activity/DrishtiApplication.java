@@ -173,4 +173,8 @@ public abstract class DrishtiApplication extends Application {
         return context;
     }
 
+    public int getDbVersion() {
+        return getContext().allSharedPreferences().getDbVersion();
+    }
+
 }

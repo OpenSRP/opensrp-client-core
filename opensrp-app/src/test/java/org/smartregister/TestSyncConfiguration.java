@@ -72,4 +72,9 @@ public class TestSyncConfiguration extends SyncConfiguration {
     public Class<? extends BaseLoginActivity> getAuthenticationActivity() {
         return BaseLoginActivity.class;
     }
+
+    @Override
+    public boolean isMigrationsConfigurationEnabled() {
+        return true;
+    }
 }

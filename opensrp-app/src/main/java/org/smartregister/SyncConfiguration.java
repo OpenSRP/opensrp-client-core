@@ -214,4 +214,9 @@ public abstract class SyncConfiguration {
     public boolean validateUserAssignments() {
         return true;
     }
+    // TODO: Rename this method
+    public boolean isMigrationsConfigurationEnabled() {
+        return false;
+    }
+
 }

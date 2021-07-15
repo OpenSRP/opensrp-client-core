@@ -1,6 +1,7 @@
 package org.smartregister.repository;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import androidx.annotation.VisibleForTesting;
 
@@ -12,8 +13,12 @@ import net.sqlcipher.database.SQLiteOpenHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.smartregister.AllConstants;
 import org.smartregister.CoreLibrary;
+import org.smartregister.SyncConfiguration;
 import org.smartregister.commonregistry.CommonFtsObject;
 import org.smartregister.exception.DatabaseMigrationException;
+import org.smartregister.repository.contract.MigrationSource;
+import org.smartregister.repository.dao.AppFolderMigrationSource;
+import org.smartregister.repository.dao.AssetMigrationSource;
 import org.smartregister.repository.helper.OpenSRPDatabaseErrorHandler;
 import org.smartregister.util.DatabaseMigrationUtils;
 import org.smartregister.util.Session;
@@ -23,6 +28,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -143,6 +150,40 @@ public class Repository extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
+        SyncConfiguration syncConfiguration = CoreLibrary.getInstance().getSyncConfiguration();
+        if (syncConfiguration != null && syncConfiguration.isMigrationsConfigurationEnabled()) {
+            AssetMigrationSource assetMigrationSource = new AssetMigrationSource(context);
+            AppFolderMigrationSource appFolderMigrationSource = new AppFolderMigrationSource(context);
+
+            HashMap<Integer, ArrayList<MigrationSource.Migration>> assetMigrations
+                    =  assetMigrationSource.getMigrations(oldVersion);
+            HashMap<Integer, ArrayList<MigrationSource.Migration>> appFolderMigrationSourceMigrations
+                    = appFolderMigrationSource.getMigrations(oldVersion);
+
+            for (int version = oldVersion + 1; version <= newVersion; version++) {
+                ArrayList<MigrationSource.Migration> migrations = assetMigrations.get(version);
+
+                if (migrations == null) {
+                    migrations = appFolderMigrationSourceMigrations.get(version);
+                }
+
+                if (migrations != null) {
+                    for (MigrationSource.Migration migration: migrations) {
+                        if (MigrationSource.Migration.MigrationType.UP.equals(migration.getMigrationType())) {
+                            Timber.i("Running %s migration for v%d -> %d", migration.getMigrationType().name(), version, migrations.size());
+
+                            for (String migrationQuery: migration.getUpMigrationQueries()) {
+                                migrationQuery = migrationQuery.trim();
+                                if (!TextUtils.isEmpty(migrationQuery)){
+                                    Timber.i("Running query [%s]", migrationQuery);
+                                    sqLiteDatabase.execSQL(migrationQuery);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public SQLiteDatabase getReadableDatabase() {

@@ -33,6 +33,8 @@ public class AllSharedPreferences {
     public static final String FORMS_VERSION = "FORMS_VERSION";
     private static final String ENCRYPTED_PASSPHRASE_KEY = "ENCRYPTED_PASSPHRASE_KEY";
     private static final String DB_ENCRYPTION_VERSION = "DB_ENCRYPTION_VERSION";
+    private static final String DB_VERSION = "DB_VERSION";
+    private static final String DB_MIGRATION_REQUIRED = "DB_MIGRATION_REQUIRED";
     private SharedPreferences preferences;
     private String LAST_AUTHENTICATION_HTTP_STATUS = "LAST_AUTHENTICATION_HTTP_STATUS";
 
@@ -383,8 +385,24 @@ public class AllSharedPreferences {
         return preferences.getInt(DB_ENCRYPTION_VERSION, 0);
     }
 
-    public void setDBEncryptionVersion(int encryptionVersion) {
-        preferences.edit().putInt(DB_ENCRYPTION_VERSION, encryptionVersion).commit();
+    public boolean setDBEncryptionVersion(int encryptionVersion) {
+        return preferences.edit().putInt(DB_ENCRYPTION_VERSION, encryptionVersion).commit();
+    }
+
+    public int getDbVersion() {
+        return preferences.getInt(DB_VERSION, 0);
+    }
+
+    public boolean setDbVersion(int dbVersion) {
+        return preferences.edit().putInt(DB_VERSION, dbVersion).commit();
+    }
+
+    public boolean isDbMigrationRequired() {
+        return preferences.getBoolean(DB_MIGRATION_REQUIRED, false);
+    }
+
+    public boolean setDbMigrationRequired(boolean isRequired) {
+        return preferences.edit().putBoolean(DB_MIGRATION_REQUIRED, isRequired).commit();
     }
 
     /**
